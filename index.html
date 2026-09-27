@@ -218,6 +218,28 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
 .logo-prev{ width:64px; height:64px; border:1px dashed var(--border-2); border-radius:8px; display:flex; align-items:center; justify-content:center; background:#fff; overflow:hidden; color:var(--muted); font-size:11px; }
 .logo-prev img{ max-width:100%; max-height:100%; }
 #printArea{ display:none; }
+.rtools{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px 16px; border-bottom:1px solid var(--border); background:var(--bg); }
+.rtools .rt-l{ font-size:12.5px; color:var(--muted); }
+.rsearch{ padding:10px 16px 6px; }
+.rsearch .input{ width:100%; }
+.rlist2{ padding:0 0 6px; }
+.rs{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; padding:7px 16px; border-bottom:1px solid var(--border); }
+.rs.on{ background:var(--bad-soft); }
+.rs-h{ display:flex; align-items:center; gap:10px; flex:1 1 220px; min-width:0; cursor:pointer; margin:0; color:var(--ink); font-size:14px; font-weight:500; }
+.rs-h input{ width:20px; height:20px; accent-color:var(--bad); flex:none; margin:0; }
+.rs-n{ color:var(--muted); font-size:12px; width:20px; text-align:center; flex:none; }
+.rs-name{ min-width:0; }
+.rs.on .rs-name{ font-weight:700; }
+.rs-d{ flex-basis:100%; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; padding:4px 0 6px 30px; }
+.rs-d .input{ width:100%; }
+.modal.dlg{ width:min(640px,100%); }
+.modal .reged-f{ position:sticky; bottom:0; background:var(--card); z-index:2; }
+.modal .reged-h{ position:sticky; top:0; background:var(--card); z-index:2; }
+.dlg-b{ padding:16px 18px; overflow:auto; flex:1; }
+.nimp{ display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid var(--border); border-radius:8px; margin-bottom:8px; cursor:pointer; }
+.nimp input{ width:18px; height:18px; margin-top:3px; flex:none; accent-color:var(--accent); }
+.nimp-b{ line-height:1.9; font-size:13.5px; }
+.nimp-b small{ color:var(--muted); }
 .tile-foot{ justify-content:space-between; align-items:center; gap:6px; }
 .btn.sm{ padding:3px 9px; font-size:12px; }
 .btn.sm .cnt{ background:var(--accent); color:var(--accent-fg); border-radius:999px; padding:0 6px; font-size:11px; font-weight:700; }
@@ -248,6 +270,14 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
   .modal .regt .seg button{ flex:1; padding:11px; font-size:15.5px; }
   .modal .regt .input{ min-height:46px; font-size:16px; }
   .modal .reged-h{ padding:12px 16px; }
+  .rs{ padding:10px 14px; }
+  .rs-h{ font-size:16px; flex-basis:100%; }
+  .rs-h input{ width:24px; height:24px; }
+  .rs .seg{ flex:1; } .rs .seg button{ flex:1; padding:9px; font-size:15px; }
+  .rs-d{ grid-template-columns:repeat(2,minmax(0,1fr)); padding:4px 0 6px; }
+  .rtools .btn.sm{ font-size:14px; padding:7px 10px; }
+  .rtools .rt-l{ flex-basis:100%; font-size:13.5px; }
+  .nimp-b{ font-size:15px; }
   .modal .reged-f{ position:sticky; bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--card); }
 }
 @media (max-width:860px){
@@ -506,7 +536,7 @@ const DEFAULT_CFG = { gender:'بنين', school:'مدرسة سلامة الدر�
 const today = iso(new Date());
 const state = {
   cfg: null, days: {}, mode: 'local', db: null, downloads: null, ready: {cfg:false, days:false},
-  view: 'entry', entryDate: today, draft: {}, dirty: false,
+  view: 'entry', entryDate: today, roster: {}, rsOpen: new Set(), rq: '', bulkType: 'بدون', draft: {}, dirty: false,
   rpt: { type:'daily', date: today, month: today.slice(0,7) }
 };
 
@@ -538,6 +568,10 @@ async function saveDay(date, entries, students){
   if(state.mode === 'db') return dbWrite(() => state.db.doc('days/' + date).set(body));
   state.days[date] = body; lsSet('days', state.days); return true;
 }
+async function saveRoster(){
+  if(state.mode === 'db') return dbWrite(() => state.db.doc('config/roster').set({classes: clone(state.roster)}));
+  lsSet('roster', state.roster); return true;
+}
 async function deleteDay(date){
   if(state.mode === 'db') return dbWrite(() => state.db.doc('days/' + date).delete());
   delete state.days[date]; lsSet('days', state.days); return true;
@@ -547,6 +581,7 @@ function useLocal(){
   state.mode = 'local';
   state.cfg = Object.assign(clone(DEFAULT_CFG), lsGet('cfg', {}));
   state.days = lsGet('days', {});
+  state.roster = lsGet('roster', {});
   state.ready = {cfg:true, days:true};
   onData();
 }
@@ -758,22 +793,195 @@ function nameHistory(cid){
 const newRow = () => ({name:'', type:'بدون', phone:'', time:'', answer:'', reason:''});
 const namedCount = cid => (state.regDraft[cid] || []).filter(r => (r.name||'').trim()).length;
 
+/* قراءة كشف أسماء نور (PDF) — نصوصه مخزنة بأرقام الحروف في خط Arial، ومقلوبة بصريًا */
+const NOOR_SPECIAL = {0x2EF:'ء',0x2F0:'ـ',0x308:'ە',0x32F:'ک',0x335:'ی',0x336:'ی',0xBCC:'\uFDF2',0xBD7:' '};
+function noorIsGarbled(str){ for(const ch of str){ const c = ch.codePointAt(0); if((c >= 0x2E0 && c <= 0x3FF) || c === 0xBCC || (c < 0x20 && c !== 9 && c !== 10)) return true; } return false; }
+function noorDecode(str){
+  if(!noorIsGarbled(str)) return str.trim();
+  let out = [];
+  for(const ch of str){
+    const c = ch.codePointAt(0);
+    if(NOOR_SPECIAL[c]) out.push(NOOR_SPECIAL[c]);
+    else if(c >= 0x370 && c <= 0x3FC) out.push(String.fromCodePoint(c + 0xFB00));
+    else if(c >= 3 && c < 0x62) out.push(String.fromCodePoint(c + 29));
+    else out.push(ch);
+  }
+  // الترتيب في الملف بصري (من اليسار لليمين) فنعكسه
+  let s = out.reverse().join('');
+  // الأرقام اللاتينية داخل النص المقلوب تعود لترتيبها
+  s = s.replace(/[0-9]+/g, m => m.split('').reverse().join(''));
+  s = s.normalize('NFKC').replace(/\uFDF2|ﷲ/g, 'الله').replace(/\s+/g, ' ').trim();
+  return s;
+}
+const NOOR_GRADES = ['الأول','الثاني','الثالث','الرابع','الخامس','السادس'];
+function noorNormGrade(t){
+  const s = t.replace(/[إأآ]/g,'ا');
+  const g = ['الاول','الثاني','الثالث','الرابع','الخامس','السادس'].findIndex(w => s.includes(w));
+  const stage = /متوسط/.test(s) ? 'متوسط' : (/ابتدائ/.test(s) ? 'ابتدائي' : null);
+  return g >= 0 && stage ? {grade: NOOR_GRADES[g], stage} : null;
+}
+/* pages: [[{str, x, y}]] → {classes:[{grade,stage,section,names:[]}], female:bool} */
+function noorParse(pages){
+  const map = new Map(); let female = null;
+  pages.forEach(items => {
+    const its = items.map(i => ({...i, t: noorDecode(i.str)})).filter(i => i.t);
+    const lines = [];
+    its.forEach(i => { let L = lines.find(l => Math.abs(l.y - i.y) < 3.5); if(!L){ L = {y:i.y, items:[]}; lines.push(L); } L.items.push(i); });
+    lines.forEach(L => L.items.sort((a,b) => b.x - a.x));
+    const all = its.map(i => i.t).join(' ');
+    if(/الطالبات|الطالبة/.test(all)) female = true; else if(female === null && /الطلاب|الطالب/.test(all)) female = false;
+    let gr = null, sec = null;
+    lines.forEach(L => {
+      const txt = L.items.map(i => i.t).join(' ');
+      if(!gr && /الصف/.test(txt)) gr = noorNormGrade(txt.replace(/.*الصف/, ''));
+      if(sec == null && /الفصل/.test(txt) && !/الدراسي/.test(txt)){ const m = txt.replace(/.*الفصل/, '').match(/\d+/); if(m) sec = +m[0]; }
+    });
+    if(!gr || sec == null) return;
+    const key = gr.stage + '|' + gr.grade + '|' + sec;
+    if(!map.has(key)) map.set(key, {...gr, section: sec, rows: []});
+    const C = map.get(key);
+    lines.forEach(L => {
+      const nums = L.items.filter(i => /^\d{1,3}$/.test(i.t));
+      const names = L.items.filter(i => /[\u0600-\u06FF]/.test(i.t) && !/[:：]/.test(i.t) && !/^(اسم الطالب|اسم الطالبة|اسم الطالب\/ة|عدد|م|التوقيع|الصف|الفصل|القسم|العام الدراسي)$/.test(i.t));
+      if(/^(الصف|الفصل|القسم|العام الدراسي)$/.test(L.items.map(i => i.t).join(' ').split(' ')[0])) return;
+      if(nums.length && names.length){
+        const n = +nums[nums.length - 1].t, name = names.map(i => i.t).join(' ').trim();
+        if(n > 0 && n < 200 && name.split(' ').length >= 2 && !C.rows.some(r => r.n === n)) C.rows.push({n, name});
+      }
+    });
+  });
+  const classes = [...map.values()].map(c => ({grade:c.grade, stage:c.stage, section:c.section, names: c.rows.sort((a,b) => a.n - b.n).map(r => r.name)})).filter(c => c.names.length);
+  return {classes, female};
+}
+
+const SEC_L = ['أ','ب','ج','د','هـ','و','ز','ح','ط','ي'];
+const normAr = t => String(t || '').replace(/[إأآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ').trim();
+const rosterOf = cid => (state.roster && state.roster[cid]) || [];
+function phoneFor(cid, name){ const r = rosterOf(cid).find(x => x.name === name); return (r && r.phone) || nameHistory(cid).get(name) || ''; }
+const rosterRow = (cid, name) => ({name, type: state.bulkType || 'بدون', phone: phoneFor(cid, name), time:'', answer:'', reason:''});
+let pdfjsReady = null;
+function loadScript(src){ return new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = () => rej(new Error('load ' + src)); document.head.appendChild(el); }); }
+function loadPdfJs(){
+  if(!pdfjsReady){
+    const base = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+    pdfjsReady = loadScript(base + 'pdf.min.js').then(() => loadScript(base + 'pdf.worker.min.js')).then(() => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + 'pdf.worker.min.js'; return window.pdfjsLib; });
+    pdfjsReady.catch(() => { pdfjsReady = null; });
+  }
+  return pdfjsReady;
+}
+function matchClass(stage, grade, n){
+  return (state.cfg.classes || []).find(c => c.stage === stage && c.grade === grade && (String(c.section).trim() === SEC_L[n-1] || String(c.section).trim() === String(n)));
+}
+function openDlg(html){
+  let bg = $('#dlgBg');
+  if(!bg){ bg = document.createElement('div'); bg.id = 'dlgBg'; bg.className = 'modal-bg no-print'; document.body.appendChild(bg); }
+  bg.innerHTML = `<div class="modal dlg" role="dialog" aria-modal="true">${html}</div>`;
+}
+function closeDlg(){ const bg = $('#dlgBg'); if(bg) bg.remove(); state.noorResult = null; }
+async function noorImport(file){
+  toast('جارٍ قراءة الكشف…');
+  let lib;
+  try{ lib = await loadPdfJs(); }catch(e){ toast('تعذّر تحميل قارئ PDF. تأكد من الاتصال بالإنترنت ثم أعد المحاولة.','err'); return; }
+  try{
+    const doc = await lib.getDocument({data: new Uint8Array(await file.arrayBuffer()), isEvalSupported:false}).promise;
+    const pages = [];
+    for(let i = 1; i <= doc.numPages; i++){
+      const pg = await doc.getPage(i), tc = await pg.getTextContent();
+      pages.push(tc.items.filter(it => it.str && it.str.trim()).map(it => ({str: it.str, x: it.transform[4], y: it.transform[5]})));
+    }
+    const res = noorParse(pages);
+    if(!res.classes.length){ toast('لم أتعرّف على أسماء في هذا الملف. تأكد أنه «كشف بأسماء الطلاب» من نور، أو استخدم «لصق أسماء فصل».','err'); return; }
+    state.noorResult = res; showNoorPreview();
+  }catch(e){ toast('تعذّر قراءة الملف.','err'); }
+}
+function showNoorPreview(){
+  const res = state.noorResult; if(!res) return;
+  const rows = res.classes.map((k, i) => {
+    const m = matchClass(k.stage, k.grade, k.section);
+    const label = `${k.grade} ${k.stage} / ${m ? m.section : (SEC_L[k.section-1] || k.section)}`;
+    return `<label class="nimp"><input type="checkbox" data-nk="${i}" checked>
+      <span class="nimp-b"><b>${esc(label)}</b> <span class="tag ${m ? 'mute' : 'warn'}">${m ? `موجود · العدد الحالي ${m.count || 0}` : 'فصل جديد سيُنشأ'}</span>
+      <span class="tag ok">${k.names.length} اسمًا</span><br><small>${esc(k.names.slice(0,3).join('، '))}${k.names.length > 3 ? '…' : ''}</small></span></label>`;
+  }).join('');
+  const gNote = res.female !== null && res.female !== G().f ? `<label class="nimp"><input type="checkbox" id="nGender"><span class="nimp-b">الكشف بصيغة ${res.female ? 'الطالبات' : 'الطلاب'}: تحويل نوع المدرسة إلى «${res.female ? 'بنات' : 'بنين'}»</span></label>` : '';
+  openDlg(`<div class="reged-h"><b>استيراد كشف نور</b><span class="tag mute">${res.classes.length} فصول</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b">
+      <p class="hint" style="margin:0 0 12px;color:var(--muted)">راجع الفصول المكتشفة ثم اضغط «استيراد». قائمة الفصل الموجودة مسبقًا تُستبدل بأسماء الكشف، ويبقى رقم الجوال المحفوظ لأي اسم مطابق.</p>
+      ${rows}
+      <label class="nimp"><input type="checkbox" id="nCount" checked><span class="nimp-b">تحديث عدد ${G().students} في كل فصل ليطابق الكشف</span></label>
+      ${gNote}
+    </div>
+    <div class="reged-f"><span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn primary" data-act="noorApply">استيراد</button></div>`);
+}
+async function noorApply(){
+  const res = state.noorResult; if(!res) return;
+  const upd = $('#nCount') && $('#nCount').checked, gEl = $('#nGender');
+  let n = 0, names = 0;
+  document.querySelectorAll('#dlgBg [data-nk]').forEach(cb => {
+    if(!cb.checked) return;
+    const k = res.classes[+cb.dataset.nk];
+    let c = matchClass(k.stage, k.grade, k.section);
+    if(!c){ c = {id:newId(), stage:k.stage, grade:k.grade, section: SEC_L[k.section-1] || String(k.section), count:k.names.length}; state.cfg.classes.push(c); }
+    const old = rosterOf(c.id);
+    state.roster[c.id] = k.names.map(nm => { const o = old.find(x => normAr(x.name) === normAr(nm)); return {name:nm, phone:(o && o.phone) || ''}; });
+    if(upd) c.count = k.names.length;
+    n++; names += k.names.length;
+  });
+  if(gEl && gEl.checked) state.cfg.gender = res.female ? 'بنات' : 'بنين';
+  if(!n){ toast('لم تحدد أي فصل.','err'); return; }
+  closeDlg();
+  if(await saveCfg() && await saveRoster()){ toast(`تم استيراد ${names} اسمًا في ${n} فصول`); render(); }
+}
+function openPaste(cid){
+  const list = classes(); if(!list.length){ toast('أضف الفصول أولًا.','err'); return; }
+  const c = list.find(x => x.id === cid) || list[0];
+  openDlg(`<div class="reged-h"><b>لصق أسماء فصل</b><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b">
+      <label class="f">الفصل<select class="input" id="pCls">${list.map(x => `<option value="${esc(x.id)}" ${x.id === c.id ? 'selected' : ''}>${esc(clsLabel(x))} (${rosterOf(x.id).length} اسمًا)</option>`).join('')}</select></label>
+      <label class="f" style="margin-top:12px">الأسماء: اسم في كل سطر، ويمكن النسخ من Excel مع عمود الجوال
+        <textarea class="input" id="pNames" rows="12" style="min-height:230px;padding:10px;line-height:1.9;resize:vertical">${esc(rosterOf(c.id).map(r => r.name + (r.phone ? '\t' + r.phone : '')).join('\n'))}</textarea></label>
+      <label class="nimp" style="margin-top:10px"><input type="checkbox" id="pCount" checked><span class="nimp-b">تحديث عدد ${G().students} ليطابق عدد الأسماء</span></label>
+    </div>
+    <div class="reged-f"><button class="btn danger" data-act="pasteClear">حذف قائمة الفصل</button><span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn primary" data-act="pasteSave">حفظ القائمة</button></div>`);
+}
+function parsePasted(text){
+  const out = [];
+  String(text || '').split(/\r?\n/).forEach(line => {
+    const cells = line.split(/\t|,|؛|;/).map(x => x.trim()).filter(Boolean);
+    let phone = '', name = '';
+    cells.forEach(cl => {
+      const d = cl.replace(/[٠-٩]/g, x => '٠١٢٣٤٥٦٧٨٩'.indexOf(x)).replace(/[^\d+]/g, '');
+      if(/^(\+?966|0)?5\d{8}$/.test(d)) phone = d;
+      else if(/[\u0600-\u06FF]/.test(cl) && cl.length > name.length) name = cl;
+    });
+    name = name.replace(/^[\s\d٠-٩\-\.\)\(]+/, '').replace(/\s+/g, ' ').trim();
+    if(name.length >= 2) out.push({name, phone});
+  });
+  return out;
+}
+
 /* نافذة إدخال أسماء الغائبين لفصل */
 function openNames(cid){
   const c = state.cfg.classes.find(x => x.id === cid); if(!c) return;
   const rows = state.regDraft[cid] = state.regDraft[cid] || [];
-  const want = +state.draft[cid] || 0;
-  while(rows.length < want) rows.push(newRow());
-  if(!rows.length) rows.push(newRow());
+  state.rq = ''; state.rsOpen = new Set();
+  if(!rosterOf(cid).length){
+    const want = +state.draft[cid] || 0;
+    while(rows.length < want) rows.push(newRow());
+    if(!rows.length) rows.push(newRow());
+  }
   state.modalCid = cid; renderModal();
   const first = document.querySelector('.modal input[data-rf="name"]'); if(first) first.focus();
 }
-function renderModal(){
+function renderModal(keep){
+  const sc = keep && document.querySelector('.modal .reged') ? document.querySelector('.modal .reged').scrollTop : 0;
   let bg = $('#modalBg');
   if(!state.modalCid){ if(bg) bg.remove(); return; }
   const c = state.cfg.classes.find(x => x.id === state.modalCid); if(!c){ state.modalCid = null; if(bg) bg.remove(); return; }
   if(!bg){ bg = document.createElement('div'); bg.id = 'modalBg'; bg.className = 'modal-bg no-print'; document.body.appendChild(bg); }
   const rows = state.regDraft[c.id] || [], hist = nameHistory(c.id), d = parse(state.entryDate);
+  const R = rosterOf(c.id);
+  if(R.length){ bg.innerHTML = rosterModalHTML(c, rows, hist, d); if(keep){ const el = document.querySelector('.modal .reged'); if(el) el.scrollTop = sc; } applyRq(); return; }
   bg.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="غياب ${esc(clsLabel(c))}">
     <div class="card reged" data-cid="${esc(c.id)}">
       <div class="reged-h"><b>غياب ${esc(clsLabel(c))}</b><span class="tag mute">${dayName(d)} ${dmy(d)}</span><span class="tag mute">${G().enrolled} ${c.count || 0}</span><span class="tag warn">المرصود ${+state.draft[c.id] || 0}</span><button class="modal-x" data-act="mclose" aria-label="إغلاق">×</button></div>
@@ -793,13 +1001,69 @@ function renderModal(){
       <div class="reged-f"><button class="btn" data-act="radd">+ إضافة ${G().student}</button><span class="grow"></span><button class="btn" data-act="mclose">إغلاق</button><button class="btn primary" data-act="msave">حفظ</button></div>
     </div></div>`;
 }
+function rowHTML(r, i){
+  return `<tr data-i="${i}">
+        <td class="n"><span class="n-l">${G().student} </span>${i+1}</td>
+        <td class="f-name" data-l="اسم ${G().studentDef}"><input class="input" data-rf="name" list="nl-m" value="${esc(r.name)}" placeholder="الاسم الرباعي"></td>
+        <td class="f-type" data-l="نوع الغياب"><div class="seg"><button data-act="rtype" data-v="بعذر" class="${r.type === 'بعذر' ? 'on' : ''}">بعذر</button><button data-act="rtype" data-v="بدون" class="${r.type !== 'بعذر' ? 'on' : ''}">بدون</button></div></td>
+        <td data-l="رقم الهاتف"><input class="input" data-rf="phone" type="tel" inputmode="tel" dir="ltr" value="${esc(r.phone)}" placeholder="05xxxxxxxx"></td>
+        <td data-l="الزمن"><input class="input" data-rf="time" type="time" value="${esc(r.time)}"></td>
+        <td data-l="المجيب"><input class="input" data-rf="answer" list="al-m" value="${esc(r.answer)}"></td>
+        <td data-l="سبب الغياب"><input class="input" data-rf="reason" value="${esc(r.reason)}"></td>
+        <td class="f-del"><button class="btn danger" data-act="rdel" aria-label="حذف">حذف</button></td></tr>`;
+}
+function rosterModalHTML(c, rows, hist, d){
+  const R = rosterOf(c.id), idx = new Map();
+  rows.forEach((r, i) => { const n = (r.name || '').trim(); if(n) idx.set(n, i); });
+  const inR = new Set(R.map(x => x.name));
+  const checked = R.filter(x => idx.has(x.name)).length;
+  const others = rows.map((r, i) => [r, i]).filter(([r]) => !inR.has((r.name || '').trim()));
+  const list = R.map((st, k) => {
+    const on = idx.has(st.name), i = idx.get(st.name), r = on ? rows[i] : null, open = on && state.rsOpen.has(st.name);
+    return `<div class="rs ${on ? 'on' : ''}" data-name="${esc(st.name)}" data-q="${esc(normAr(st.name))}" ${on ? `data-i="${i}"` : ''}>
+      <label class="rs-h"><input type="checkbox" data-rchk ${on ? 'checked' : ''}><span class="rs-n">${k+1}</span><span class="rs-name">${esc(st.name)}</span></label>
+      ${on ? `<div class="seg"><button data-act="rtype" data-v="بعذر" class="${r.type === 'بعذر' ? 'on' : ''}">بعذر</button><button data-act="rtype" data-v="بدون" class="${r.type !== 'بعذر' ? 'on' : ''}">بدون</button></div>
+        <button class="btn sm" data-act="rdet">${open ? 'إخفاء' : 'تفاصيل'}${r.phone || r.reason ? ' •' : ''}</button>` : ''}
+      ${open ? `<div class="rs-d">
+        <label class="f">رقم الهاتف<input class="input" data-rf="phone" type="tel" inputmode="tel" dir="ltr" value="${esc(r.phone)}" placeholder="05xxxxxxxx"></label>
+        <label class="f">الزمن<input class="input" data-rf="time" type="time" value="${esc(r.time)}"></label>
+        <label class="f">المجيب<input class="input" data-rf="answer" list="al-m" value="${esc(r.answer)}"></label>
+        <label class="f">سبب الغياب<input class="input" data-rf="reason" value="${esc(r.reason)}"></label></div>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="modal" role="dialog" aria-modal="true" aria-label="غياب ${esc(clsLabel(c))}">
+    <div class="card reged" data-cid="${esc(c.id)}">
+      <div class="reged-h"><b>غياب ${esc(clsLabel(c))}</b><span class="tag mute">${dayName(d)} ${dmy(d)}</span><span class="tag ${checked ? 'bad' : 'ok'}">المحدد ${checked} من ${R.length}</span><button class="modal-x" data-act="mclose" aria-label="إغلاق">×</button></div>
+      <div class="rtools">
+        <button class="btn sm" data-act="rall">الكل غائب</button>
+        <button class="btn sm" data-act="rnone">إلغاء التحديد</button>
+        <button class="btn sm" data-act="rprev">غائبو آخر يوم</button>
+        <span class="grow"></span>
+        <span class="rt-l">نوع الغياب للمحددين</span>
+        <div class="seg"><button data-act="rtypeall" data-v="بعذر">بعذر</button><button data-act="rtypeall" data-v="بدون">بدون</button></div>
+      </div>
+      <div class="rsearch"><input class="input" id="rq" type="search" placeholder="ابحث بالاسم…" value="${esc(state.rq)}" autocomplete="off"></div>
+      <div class="rlist2">${list}</div>
+      ${others.length ? `<div class="sec-h" style="margin:14px 16px 6px"><h3>أسماء أخرى</h3><small>غير موجودة في قائمة الفصل</small></div>
+      <div class="reged-tw"><table class="regt"><thead><tr><th>#</th><th style="width:26%">اسم ${G().studentDef}</th><th>نوع الغياب</th><th>رقم الهاتف</th><th>الزمن</th><th>المجيب</th><th style="width:20%">سبب الغياب</th><th></th></tr></thead><tbody>
+      ${others.map(([r, i]) => rowHTML(r, i)).join('')}</tbody></table></div>` : ''}
+      <datalist id="nl-m">${[...hist.keys()].filter(n => !inR.has(n)).map(n => `<option value="${esc(n)}">`).join('')}</datalist>
+      <datalist id="al-m">${ANSWERS.map(a => `<option value="${a}">`).join('')}</datalist>
+      <div class="reged-f"><button class="btn" data-act="radd">+ اسم آخر</button><span class="grow"></span><button class="btn" data-act="mclose">إغلاق</button><button class="btn primary" data-act="msave">حفظ</button></div>
+    </div></div>`;
+}
+function applyRq(){
+  const q = normAr(state.rq);
+  document.querySelectorAll('.modal .rs').forEach(el => { el.style.display = !q || el.dataset.q.includes(q) ? '' : 'none'; });
+}
 function closeModal(){
   const cid = state.modalCid; state.modalCid = null; renderModal();
   if(!cid) return;
   const rows = state.regDraft[cid] || [];
   state.regDraft[cid] = rows.filter(r => (r.name||'').trim() || r.phone || r.reason);
   const n = namedCount(cid);
-  if(n > (+state.draft[cid] || 0)){ state.draft[cid] = n; state.dirty = true; }
+  if(rosterOf(cid).length){ if(n !== (+state.draft[cid] || 0)){ state.draft[cid] = n; state.dirty = true; } }
+  else if(n > (+state.draft[cid] || 0)){ state.draft[cid] = n; state.dirty = true; }
   const tile = document.querySelector(`.tile[data-id="${cid}"]`);
   if(tile){ tile.querySelector('.stepper input').value = +state.draft[cid] || 0; refreshTile(tile); updateTally(); }
 }
@@ -811,6 +1075,9 @@ async function saveAll(){
     if(clean.length) students[cid] = clean;
     if(entries[cid] != null && clean.length > entries[cid]) entries[cid] = clean.length;
   });
+  let rch = false;
+  Object.entries(students).forEach(([cid, rows]) => rows.forEach(r => { const st = rosterOf(cid).find(x => x.name === r.name); if(st && r.phone && st.phone !== r.phone){ st.phone = r.phone; rch = true; } }));
+  if(rch) saveRoster();
   if(await saveDay(date, entries, students)){ if(document.activeElement) document.activeElement.blur(); loadDraft(); toast('تم حفظ غياب ' + dayName(parse(date))); render(); return true; }
   return false;
 }
@@ -1059,7 +1326,7 @@ async function downloadReport(){
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 async function backup(){
   const dl = state.downloads; if(!dl) return;
-  const data = { app:'student-absence', version:1, exportedAt:new Date().toISOString(), cfg:clone(state.cfg), days:clone(state.days) };
+  const data = { app:'student-absence', version:1, exportedAt:new Date().toISOString(), cfg:clone(state.cfg), days:clone(state.days), roster:clone(state.roster || {}) };
   try{ await dl.save({filename:`absence-backup-${iso(new Date())}.json`, data: JSON.stringify(data, null, 1)}); lsSetRaw('lastBackup', today); toast('تم تنزيل النسخة الاحتياطية'); render(); }
   catch(e){ if(!e || e.code !== 'declined') toast('تعذّر تنزيل النسخة الاحتياطية.','err'); }
 }
@@ -1070,6 +1337,7 @@ async function restore(file, btn){
   const cfg = Object.assign(clone(DEFAULT_CFG), data.cfg);
   cfg.classes = cfg.classes.filter(c => c && c.id && c.stage && c.grade).map(c => ({id:String(c.id), stage:String(c.stage), grade:String(c.grade), section:String(c.section ?? ''), count:Math.max(0, +c.count || 0)}));
   const days = Object.entries(data.days).filter(([k,v]) => DATE_RE.test(k) && v && typeof v.entries === 'object');
+  if(data.roster && typeof data.roster === 'object'){ state.roster = clone(data.roster); await saveRoster(); }
   if(state.mode === 'local'){
     state.cfg = cfg; days.forEach(([k,v]) => state.days[k] = v); lsSet('cfg', cfg); lsSet('days', state.days);
     state.dirty = false; toast(`تم استيراد ${cfg.classes.length} فصلًا و${days.length} يومًا`); onData(); return;
@@ -1132,6 +1400,7 @@ function settingsView(){
       <button class="btn primary" data-act="savereg">حفظ الترويسة</button>
     </div>
   </section>
+  ${rosterPanel()}
   <section class="panel">
     <h3>الفصول وعدد ${G().students}</h3>
     <p class="hint">عدد ${G().f ? 'طالبات' : 'طلاب'} كل فصل هو أساس حساب نسبة الحضور. التعديل يُحفظ فور الخروج من الحقل.</p>
@@ -1176,6 +1445,20 @@ function settingsView(){
     </div>
   </section>`;
 }
+function rosterPanel(){
+  const list = classes(), withR = list.filter(c => rosterOf(c.id).length), without = list.filter(c => !rosterOf(c.id).length);
+  return `<section class="panel">
+    <h3>قوائم أسماء ${G().students}</h3>
+    <p class="hint">استورد «كشف بأسماء ${G().students}» من نور بصيغة PDF مرة واحدة، فيصير إدخال الغياب بالتحديد بدل الكتابة، مع زر «الكل غائب» لأيام الغياب الجماعي.</p>
+    <div class="row-actions" style="margin-top:0">
+      <button class="btn primary" data-act="noorPick">${ICON.up} استيراد كشف نور (PDF)</button>
+      <button class="btn" data-act="pasteOpen">لصق أسماء فصل</button>
+      <input type="file" id="noorFile" accept="application/pdf,.pdf" hidden>
+    </div>
+    ${withR.length ? `<div class="chips" style="margin-top:14px">${withR.map(c => `<span class="tag ok">${esc(clsLabel(c))}: ${rosterOf(c.id).length}</span>`).join('')}</div>` : ''}
+    ${list.length && without.length && withR.length ? `<p class="hint" style="margin:10px 0 0">فصول بلا قائمة: ${without.map(c => esc(clsLabel(c))).join('، ')}</p>` : ''}
+  </section>`;
+}
 const newId = () => 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const exists = (stage, grade, section) => state.cfg.classes.some(c => c.stage === stage && c.grade === grade && String(c.section).trim() === String(section).trim());
 
@@ -1196,12 +1479,45 @@ document.addEventListener('click', async e => {
     const card = t.closest('.reged'), cid = card.dataset.cid;
     const rows = state.regDraft[cid] = state.regDraft[cid] || [];
     if(act === 'radd'){ rows.push(newRow()); renderModal(); const ins = document.querySelectorAll('.modal input[data-rf="name"]'); if(ins.length){ const el = ins[ins.length-1]; el.focus(); el.closest('tr').scrollIntoView({block:'nearest'}); } return; }
-    const i = +t.closest('tr').dataset.i;
+    const i = +t.closest('[data-i]').dataset.i;
     if(act === 'rdel'){ rows.splice(i, 1); state.regDirty = true; renderModal(); return; }
     rows[i].type = t.dataset.v; state.regDirty = true;
     t.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); refreshRegPreview(); return;
   }
   if(act === 'names'){ openNames(t.closest('.tile').dataset.id); return; }
+  if(['rall','rnone','rprev','rtypeall','rdet'].includes(act)){
+    const cid = state.modalCid; if(!cid) return;
+    const rows = state.regDraft[cid] = state.regDraft[cid] || [], R = rosterOf(cid), inR = new Set(R.map(x => x.name));
+    if(act === 'rall'){ const have = new Set(rows.map(r => (r.name||'').trim())); R.forEach(st => { if(!have.has(st.name)) rows.push(rosterRow(cid, st.name)); }); }
+    if(act === 'rnone'){ state.regDraft[cid] = rows.filter(r => !inR.has((r.name||'').trim())); }
+    if(act === 'rprev'){
+      const k = Object.keys(state.days).filter(x => x < state.entryDate && ((state.days[x].students || {})[cid] || []).length).sort().pop();
+      if(!k){ toast('لا يوجد يوم سابق فيه أسماء غائبين لهذا الفصل.','err'); return; }
+      state.regDraft[cid] = state.days[k].students[cid].map(r => ({name:r.name, type:r.type, phone:r.phone || '', time:'', answer:'', reason:''}));
+      toast(`تم نسخ ${state.regDraft[cid].length} من غائبي ${dayName(parse(k))} ${dmy(parse(k))}`);
+    }
+    if(act === 'rtypeall'){ state.bulkType = t.dataset.v; rows.forEach(r => r.type = t.dataset.v); }
+    if(act === 'rdet'){ const nm = t.closest('.rs').dataset.name; state.rsOpen.has(nm) ? state.rsOpen.delete(nm) : state.rsOpen.add(nm); renderModal(true); return; }
+    state.regDirty = true; renderModal(true); return;
+  }
+  if(act === 'dlgclose'){ closeDlg(); return; }
+  if(act === 'noorPick'){ $('#noorFile').click(); return; }
+  if(act === 'noorApply'){ t.disabled = true; await noorApply(); return; }
+  if(act === 'pasteOpen'){ openPaste(); return; }
+  if(act === 'pasteSave' || act === 'pasteClear'){
+    const cid = $('#pCls').value, c = state.cfg.classes.find(x => x.id === cid); if(!c) return;
+    if(act === 'pasteClear'){
+      if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد الحذف'; return; }
+      delete state.roster[cid]; closeDlg(); if(await saveRoster()){ toast('تم حذف قائمة الفصل'); render(); } return;
+    }
+    const list = parsePasted($('#pNames').value), old = rosterOf(cid);
+    if(!list.length){ toast('لم أجد أسماء. اكتب اسمًا في كل سطر.','err'); return; }
+    state.roster[cid] = list.map(x => { const o = old.find(y => normAr(y.name) === normAr(x.name)); return {name:x.name, phone:x.phone || (o && o.phone) || ''}; });
+    const upd = $('#pCount').checked; if(upd) c.count = list.length;
+    closeDlg();
+    if((!upd || await saveCfg()) && await saveRoster()){ toast(`تم حفظ ${list.length} اسمًا لـ ${clsLabel(c)}`); render(); }
+    return;
+  }
   if(act === 'mclose'){ closeModal(); return; }
   if(act === 'msave'){ const cid = state.modalCid; closeModal(); t.disabled = true; await saveAll(); return; }
   if(act === 'rday'){ state.rpt.date = iso(addDays(parse(state.rpt.date), +t.dataset.n)); render(); return; }
@@ -1269,15 +1585,16 @@ document.addEventListener('click', async e => {
   }
 });
 
-document.addEventListener('mousedown', e => { if(e.target && e.target.id === 'modalBg') closeModal(); });
+document.addEventListener('mousedown', e => { if(e.target && e.target.id === 'modalBg') closeModal(); if(e.target && e.target.id === 'dlgBg') closeDlg(); });
 document.querySelector('.overlay').addEventListener('click', () => $('#shell').classList.remove('open'));
 document.addEventListener('input', e => {
   const inp = e.target;
+  if(inp.id === 'rq'){ state.rq = inp.value; applyRq(); return; }
   if(inp.dataset && inp.dataset.rf && inp.closest('.reged')){
-    const cid = inp.closest('.reged').dataset.cid, i = +inp.closest('tr').dataset.i, f = inp.dataset.rf;
+    const cid = inp.closest('.reged').dataset.cid, i = +inp.closest('[data-i]').dataset.i, f = inp.dataset.rf;
     const row = (state.regDraft[cid] || [])[i]; if(!row) return;
     row[f] = inp.value; state.regDirty = true;
-    if(f === 'name'){ const ph = nameHistory(cid).get(inp.value.trim()); const pi = inp.closest('tr').querySelector('[data-rf="phone"]'); if(ph && !row.phone){ row.phone = ph; pi.value = ph; } }
+    if(f === 'name'){ const ph = nameHistory(cid).get(inp.value.trim()); const pi = inp.closest('[data-i]').querySelector('[data-rf="phone"]'); if(ph && !row.phone){ row.phone = ph; pi.value = ph; } }
     refreshRegPreview(); return;
   }
   if(inp.closest && inp.closest('.stepper')){
@@ -1295,6 +1612,15 @@ document.addEventListener('change', async e => {
   }
   if(el.closest && el.closest('.stepper')){ const tile = el.closest('.tile'); el.value = +state.draft[tile.dataset.id] || 0; return; }
   if(el.id === 'restoreFile'){ const f = el.files && el.files[0]; el.value = ''; if(f) restore(f, $('#restoreBtn')); return; }
+  if(el.hasAttribute && el.hasAttribute('data-rchk')){
+    const cid = state.modalCid; if(!cid) return;
+    const name = el.closest('.rs').dataset.name, rows = state.regDraft[cid] = state.regDraft[cid] || [];
+    const i = rows.findIndex(r => (r.name||'').trim() === name);
+    if(el.checked && i < 0) rows.push(rosterRow(cid, name)); else if(!el.checked && i >= 0) rows.splice(i, 1);
+    state.regDirty = true; renderModal(true); return;
+  }
+  if(el.id === 'noorFile'){ const f = el.files && el.files[0]; el.value = ''; if(f) noorImport(f); return; }
+  if(el.id === 'pCls'){ openPaste(el.value); return; }
   if(el.id === 'rLogo'){
     const f = el.files && el.files[0]; el.value = ''; if(!f) return;
     try{
