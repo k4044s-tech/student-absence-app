@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>متابعة غياب الطلاب</title>
+<meta name="description" content="رصد غياب الطلاب اليومي وطباعة التقارير اليومية والأسبوعية والشهرية">
+<meta name="theme-color" content="#18181b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="غياب الطلاب">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fafafa; --card:#ffffff; --ink:#09090b; --muted:#71717a; --accent:#18181b; --accent-fg:#fafafa;
+  --accent-soft:#f4f4f5; --border:#e4e4e7; --border-2:#d4d4d8; --ring:#a1a1aa;
+  --good:#16a34a; --good-soft:#f0fdf4; --good-line:#bbf7d0;
+  --bad:#dc2626; --bad-soft:#fef2f2; --bad-line:#fecaca;
+  --warn:#d97706; --warn-soft:#fffbeb; --warn-line:#fde68a; --warn-ink:#78350f;
+  --shadow:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#09090b; --card:#18181b; --ink:#fafafa; --muted:#a1a1aa; --accent:#fafafa; --accent-fg:#18181b;
+    --accent-soft:#27272a; --border:#27272a; --border-2:#3f3f46; --ring:#71717a;
+    --good:#4ade80; --good-soft:#0f2417; --good-line:#14532d; --bad:#f87171; --bad-soft:#2a1212; --bad-line:#7f1d1d;
+    --warn:#fbbf24; --warn-soft:#271d08; --warn-line:#78350f; --warn-ink:#fde68a; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#09090b; --card:#18181b; --ink:#fafafa; --muted:#a1a1aa; --accent:#fafafa; --accent-fg:#18181b;
+  --accent-soft:#27272a; --border:#27272a; --border-2:#3f3f46; --ring:#71717a;
+  --good:#4ade80; --good-soft:#0f2417; --good-line:#14532d; --bad:#f87171; --bad-soft:#2a1212; --bad-line:#7f1d1d;
+  --warn:#fbbf24; --warn-soft:#271d08; --warn-line:#78350f; --warn-ink:#fde68a; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
+}
+:root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+*,*::before,*::after{ box-sizing:inherit; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:"IBM Plex Sans Arabic",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; -webkit-font-smoothing:antialiased; font-size:14px; line-height:1.55; }
+h1,h2,h3,h4{ margin:0; }
+button,input,select{ font-family:inherit; color:inherit; }
+button{ cursor:pointer; }
+:focus-visible{ outline:2px solid var(--ring); outline-offset:2px; }
+.grow{ flex:1 1 auto; min-width:0; }
+svg{ display:block; flex:none; }
+
+/* shell */
+.topbar{ display:none; align-items:center; gap:10px; padding:10px 14px; background:var(--card); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:25; }
+.topbar .hamburger{ background:none; border:1px solid var(--border); border-radius:6px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; color:var(--ink); }
+.topbar .tb-title{ font-weight:600; font-size:13.5px; flex:1; }
+.overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:29; }
+.shell{ display:flex; min-height:100vh; align-items:stretch; }
+.rail{ width:240px; flex-shrink:0; background:var(--card); border-left:1px solid var(--border); padding:20px 14px; display:flex; flex-direction:column; position:sticky; top:0; height:100vh; }
+.brand{ display:flex; align-items:center; gap:10px; margin-bottom:22px; padding:0 6px; }
+.brand-ic{ width:34px; height:34px; border-radius:8px; background:var(--accent); color:var(--accent-fg); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.brand h4{ font-weight:600; font-size:14px; letter-spacing:-.01em; }
+.sync{ font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+.sync::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--good); }
+.sync.local::before{ background:var(--warn); }
+.nav{ display:flex; flex-direction:column; gap:1px; }
+.nav button{ position:relative; display:flex; align-items:center; gap:9px; background:none; border:0; padding:8px 10px; border-radius:6px; font-size:13.5px; color:var(--muted); text-align:right; transition:background-color .12s,color .12s; }
+.nav button svg{ opacity:.65; }
+.nav button:hover{ background:var(--accent-soft); color:var(--ink); }
+.nav button.on{ background:var(--accent-soft); color:var(--ink); font-weight:600; }
+.nav button.on svg, .nav button:hover svg{ opacity:1; }
+.nav button.on::before{ content:""; position:absolute; right:-14px; top:50%; transform:translateY(-50%); width:3px; height:16px; border-radius:3px; background:var(--accent); }
+.rail-foot{ margin-top:auto; }
+.note-card{ font-size:11.5px; color:var(--muted); padding:10px 6px 0; border-top:1px solid var(--border); line-height:1.7; }
+.note-card .btn{ margin-top:8px; width:100%; }
+.copy{ text-align:center; font-size:11.5px; color:var(--muted); padding:14px 6px 0; margin-top:12px; border-top:1px solid var(--border); }
+.main{ flex:1; min-width:0; padding:28px 32px 60px; }
+.inner{ max-width:1060px; }
+.phead{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.phead .school{ font-size:12.5px; color:var(--muted); }
+.phead h1{ font-size:22px; font-weight:600; letter-spacing:-.02em; margin:2px 0 0; }
+.phead .sub{ font-size:12.5px; color:var(--muted); margin-top:2px; }
+.view{ display:flex; flex-direction:column; gap:14px; }
+.loading{ display:inline-flex; align-items:center; gap:8px; padding:8px 2px; font-size:13px; color:var(--muted); }
+.loading::before{ content:""; width:14px; height:14px; border-radius:50%; border:2px solid var(--border); border-top-color:var(--ink); animation:spin .7s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* primitives */
+.card, .bar, .panel{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); }
+.bar{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:6px; background:var(--card); border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:13px; font-weight:500; color:var(--ink); transition:background-color .12s,border-color .12s,opacity .12s; white-space:nowrap; }
+.btn:hover{ background:var(--accent-soft); border-color:var(--border-2); }
+.btn.primary{ background:var(--accent); color:var(--accent-fg); border-color:var(--accent); padding:8px 16px; font-size:13.5px; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+.btn.primary:hover{ opacity:.88; background:var(--accent); }
+.btn.primary:active{ transform:scale(.98); }
+.btn:disabled{ opacity:.4; cursor:not-allowed; }
+.btn.danger{ color:var(--bad); }
+.btn.danger:hover{ background:var(--bad-soft); border-color:var(--bad-line); }
+.btn.danger.armed{ background:var(--bad); color:#fff; border-color:var(--bad); }
+.input{ padding:7px 10px; border:1px solid var(--border); border-radius:6px; font-size:13.5px; background:var(--card); color:var(--ink); outline:none; min-height:36px; transition:border-color .12s,box-shadow .12s; }
+.input:focus{ border-color:var(--muted); box-shadow:0 0 0 3px rgba(113,113,122,.15); }
+.day-label{ background:var(--card); border:1px solid var(--border); border-radius:6px; padding:7px 18px; font-weight:500; font-size:13.5px; flex:1; text-align:center; min-width:180px; }
+.day-label small{ color:var(--muted); font-weight:400; margin-inline-start:6px; }
+.pill{ background:var(--card); border:1px solid var(--border); border-radius:999px; padding:5px 13px; font-size:12.5px; font-weight:500; }
+.hij{ display:none; }
+.tag{ display:inline-flex; align-items:center; border-radius:999px; padding:2px 10px; font-size:12px; font-weight:600; white-space:nowrap; border:1px solid transparent; }
+.tag.ok{ background:var(--good-soft); color:var(--good); border-color:var(--good-line); }
+.tag.warn{ background:var(--warn-soft); color:var(--warn); border-color:var(--warn-line); }
+.tag.bad{ background:var(--bad-soft); color:var(--bad); border-color:var(--bad-line); }
+.tag.mute{ background:var(--accent-soft); color:var(--muted); border-color:var(--border); }
+.chips{ display:flex; gap:6px; flex-wrap:wrap; }
+.chip{ background:var(--card); border:1px solid var(--border); border-radius:999px; padding:6px 13px; font-size:12.5px; font-weight:500; color:var(--muted); }
+.chip:hover{ border-color:var(--border-2); }
+.chip.on{ background:var(--accent); color:var(--accent-fg); border-color:var(--accent); }
+.notice, .banner{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 12px; border:1px solid var(--warn-line); border-inline-start:4px solid var(--warn); border-radius:10px; background:var(--warn-soft); color:var(--warn-ink); font-size:12.5px; }
+.banner{ margin-bottom:12px; }
+.banner span{ flex:1 1 300px; line-height:1.6; }
+.banner button{ background:var(--accent); color:var(--accent-fg); border:1px solid var(--accent); border-radius:6px; padding:6px 12px; font-size:12.5px; font-weight:500; }
+.sec-h{ display:flex; align-items:center; gap:8px; margin:8px 0 -2px; }
+.sec-h h3{ font-size:14.5px; font-weight:700; }
+.sec-h small{ font-size:11.5px; color:var(--muted); }
+.sec-h::after{ content:""; flex:1; height:1px; background:var(--border); }
+
+/* kpis */
+.kpis{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; }
+.kpi{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; box-shadow:0 1px 2px rgba(16,24,40,.04); display:flex; flex-direction:column; transition:box-shadow .15s,transform .15s; }
+.kpi:hover{ box-shadow:0 4px 12px rgba(16,24,40,.08); transform:translateY(-1px); }
+.kpi .l{ font-size:11.5px; color:var(--muted); font-weight:600; margin-bottom:7px; display:flex; align-items:center; gap:6px; }
+.kpi .ki{ width:22px; height:22px; border-radius:7px; display:inline-flex; align-items:center; justify-content:center; background:var(--accent-soft); color:var(--ink); }
+.kpi .v{ font-size:24px; font-weight:800; letter-spacing:-.02em; line-height:1.2; }
+.kpi .v.t{ font-size:15px; font-weight:700; line-height:1.5; }
+.kpi .s{ font-size:11.5px; color:var(--muted); margin-top:4px; }
+.kpi.good{ border-color:var(--good-line); background:linear-gradient(180deg,var(--good-soft),var(--card) 60%); }
+.kpi.bad{ border-color:var(--bad-line); background:linear-gradient(180deg,var(--bad-soft),var(--card) 60%); }
+.kpi.warn{ border-color:var(--warn-line); background:linear-gradient(180deg,var(--warn-soft),var(--card) 60%); }
+.kpi.good .s{ color:var(--good); } .kpi.bad .s{ color:var(--bad); }
+
+/* entry tiles */
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; }
+.tile{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:8px; box-shadow:var(--shadow); transition:border-color .12s,background-color .12s; }
+.tile.has{ border-color:var(--warn-line); background:linear-gradient(180deg,var(--warn-soft),var(--card) 70%); }
+.tile.hi{ border-color:var(--bad-line); background:linear-gradient(180deg,var(--bad-soft),var(--card) 70%); }
+.tile-top{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+.tile-name{ font-weight:600; font-size:14px; }
+.tile-sub{ font-size:11.5px; color:var(--muted); white-space:nowrap; }
+.stepper{ display:flex; align-items:center; justify-content:space-between; }
+.stepper button{ width:34px; height:34px; border-radius:6px; border:1px solid var(--border); background:var(--card); font-size:18px; line-height:1; display:flex; align-items:center; justify-content:center; color:var(--ink); }
+.stepper button:hover{ background:var(--accent-soft); border-color:var(--border-2); }
+.stepper input{ width:80px; border:0; background:none; text-align:center; font-size:28px; font-weight:800; letter-spacing:-.02em; padding:0; font-variant-numeric:tabular-nums; -moz-appearance:textfield; }
+.stepper input:focus{ outline:none; }
+.stepper input:focus-visible{ outline:2px solid var(--ring); border-radius:6px; }
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+.tile-foot{ display:flex; justify-content:center; }
+
+.savebar{ position:sticky; bottom:calc(12px + env(safe-area-inset-bottom,0px)); z-index:15; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:10px 12px 10px 12px; padding-inline-start:18px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.tally{ display:flex; align-items:baseline; gap:8px; margin-inline-end:auto; }
+.tally b{ font-size:24px; font-weight:800; letter-spacing:-.02em; }
+.tally span{ font-size:12.5px; color:var(--muted); }
+
+.recent h3{ font-size:14.5px; font-weight:700; margin:8px 0 10px; }
+.rlist{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:8px; }
+.ritem{ display:flex; justify-content:space-between; align-items:center; gap:10px; text-align:start; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:9px 12px; font-size:13px; }
+.ritem:hover{ background:var(--accent-soft); }
+.ritem span{ color:var(--muted); }
+.ritem b{ font-weight:600; }
+.empty{ background:var(--card); border:1px solid var(--border); border-radius:12px; text-align:center; padding:44px 16px; box-shadow:var(--shadow); }
+.empty .ic{ width:48px; height:48px; border-radius:50%; background:var(--accent-soft); color:var(--ink); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
+.empty h2{ font-size:15px; font-weight:600; margin-bottom:6px; }
+.empty p{ color:var(--muted); font-size:13px; margin:0 auto 16px; max-width:420px; }
+
+/* reports */
+.sheet-wrap{ background:var(--accent-soft); border:1px solid var(--border); border-radius:12px; padding:20px; overflow-x:auto; }
+
+/* settings */
+.cols{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr)); gap:14px; }
+.panel{ padding:20px 22px; }
+.panel h3{ font-size:15px; font-weight:600; letter-spacing:-.01em; margin-bottom:4px; }
+.panel .hint{ color:var(--muted); font-size:13px; margin:0 0 14px; }
+.fields{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; align-items:end; }
+label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:var(--muted); font-weight:500; }
+.row-actions{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; align-items:center; }
+.ctable-wrap{ overflow-x:auto; }
+.ctable{ width:100%; border-collapse:collapse; font-size:13px; min-width:540px; }
+.ctable th{ text-align:start; color:var(--muted); font-weight:600; font-size:11.5px; padding:8px 10px; border-bottom:1px solid var(--border); }
+.ctable td{ padding:6px 10px; border-bottom:1px solid var(--border); }
+.ctable tbody tr:hover{ background:var(--bg); }
+.ctable .input{ padding:4px 6px; font-size:12.5px; min-height:32px; }
+.ctable input.cnt{ width:90px; } .ctable input.sec{ width:70px; }
+.ctable .btn{ padding:4px 10px; font-size:12px; }
+
+.toast{ position:fixed; inset-inline:0; bottom:calc(84px + env(safe-area-inset-bottom,0px)); margin:0 auto; width:max-content; max-width:calc(100% - 32px); padding:10px 14px; border-radius:6px; font-size:13.5px; z-index:50; opacity:0; transform:translateY(6px); transition:opacity .2s,transform .2s; pointer-events:none; background:var(--good-soft); color:var(--good); border:1px solid var(--good-line); box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.toast.show{ opacity:1; transform:none; }
+.toast.err{ background:var(--bad-soft); color:var(--bad); border-color:var(--bad-line); }
+
+@media (max-width:860px){
+  body{ font-size:15px; }
+  .topbar{ display:flex; top:env(safe-area-inset-top,0px); }
+  .shell{ display:block; }
+  .rail{ position:fixed; top:0; bottom:0; right:0; height:auto; width:78vw; max-width:280px; z-index:30; transform:translateX(100%); transition:transform .2s ease; box-shadow:-8px 0 24px rgba(0,0,0,.14); overflow-y:auto; padding-top:calc(20px + env(safe-area-inset-top,0px)); }
+  .shell.open .rail{ transform:none; }
+  .shell.open .overlay{ display:block; }
+  .main{ padding:14px 12px 40px; }
+  .bar{ padding:12px; }
+  .day-label{ order:-1; flex-basis:100%; }
+  .grid{ grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+  .stepper input{ width:56px; font-size:24px; }
+  .input, .btn{ font-size:14.5px; }
+  .sheet-wrap{ padding:10px; }
+}
+@media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
+@media print{
+  @page{ size:A4; margin:10mm; }
+  html,body{ background:#fff !important; }
+  :root{ padding:0 !important; }
+  .topbar,.rail,.overlay,.phead,.bar,.banner,.toast,.no-print{ display:none !important; }
+  .shell{ display:block; }
+  .main{ padding:0; } .inner{ max-width:none; }
+  .sheet-wrap{ background:none; border:0; padding:0; overflow:visible; }
+  .sheet{ box-shadow:none !important; width:auto !important; padding:0 !important; }
+  *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+<style id="report-css"></style>
+</head>
+<body>
+<div class="topbar no-print">
+  <button class="hamburger" data-act="menu" aria-label="فتح القائمة"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <div class="tb-title" id="tbTitle">متابعة الغياب</div>
+</div>
+<div class="shell" id="shell">
+  <div class="overlay no-print" data-act="menu-close"></div>
+  <aside class="rail no-print">
+    <div class="brand">
+      <div class="brand-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M3.5 9.5h17"/><path d="m8.5 14.5 2 2 4-4"/></svg></div>
+      <div style="min-width:0"><h4>متابعة غياب الطلاب</h4><div class="sync" id="sync">جارٍ الاتصال</div></div>
+    </div>
+    <nav class="nav">
+      <button type="button" data-view="entry" class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>رصد الغياب</span></button>
+      <button type="button" data-view="reports"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5M8 13h8M8 17h5"/></svg><span>التقارير</span></button>
+      <button type="button" data-view="settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الفصول والإعدادات</span></button>
+    </nav>
+    <div class="rail-foot">
+      <div class="note-card" id="railNote"></div>
+      <div class="copy">جميع الحقوق محفوظة © خالد ابراهيم سك</div>
+    </div>
+  </aside>
+  <main class="main"><div class="inner">
+    <header class="phead">
+      <div><div class="school" id="schoolName"></div><h1 id="pTitle">رصد الغياب اليومي</h1><div class="sub" id="pSub"></div></div>
+    </header>
+    <div id="banner"></div>
+    <div id="main"><div class="loading">جارٍ تحميل البيانات…</div></div>
+  </div></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- report stylesheet (shared with downloaded file) ---------- */
+const REPORT_CSS = `
+.sheet{width:794px;background:#fff;color:#1d2226;padding:46px 42px 34px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;box-shadow:0 1px 3px rgba(15,41,58,.12),0 14px 34px rgba(15,41,58,.10);line-height:1.5}
+.sheet h1{font-size:30px;font-weight:700;margin:0 0 8px;color:#15191c}
+.sheet .sub{font-size:13.5px;color:#555;line-height:1.85;margin:0 0 26px}
+.sheet .charts{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:18px;align-items:start}
+.sheet figure{margin:0}
+.sheet figcaption{font-weight:600;font-size:14px;text-align:center;margin-bottom:8px;color:#222}
+.sheet .donut{display:flex;justify-content:center}
+.sheet .legend{display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;font-size:11.5px;margin-top:10px}
+.sheet .legend .it{display:flex;align-items:center;gap:6px}
+.sheet .legend .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.sheet .legend .v{margin-inline-start:auto;text-align:left;line-height:1.2}
+.sheet .legend .v b{display:block;font-size:12.5px}
+.sheet .legend .v small{color:#999;font-size:10px}
+.sheet .tcap{text-align:center;font-size:15px;font-weight:500;margin:14px 0 10px;color:#222}
+.sheet table.rt{width:100%;border-collapse:collapse;font-size:12.5px}
+.sheet .rt th{background:#1A9BEF;color:#fff;font-weight:600;padding:7px 5px;border:1px solid #1589d8;line-height:1.25;vertical-align:middle}
+.sheet .rt th small{display:block;font-weight:400;font-size:9.5px;opacity:.85;margin-top:1px}
+.sheet .rt td{border:1px solid #d8dde2;padding:6px 5px;text-align:center;font-variant-numeric:tabular-nums}
+.sheet .rt td.name{text-align:right;padding-inline-start:10px;white-space:nowrap}
+.sheet .rt td.idx{color:#8a9197;background:#f5f6f7;width:30px}
+.sheet .rt tbody tr:nth-child(even) td{background:#f5f7f9}
+.sheet .rt tbody tr td.days{background:#FFF8E1}
+.sheet .rt td.zero{color:#b9bfc5}
+.sheet .rt td.bad{color:#E03A3A;font-weight:700}
+.sheet .rt td.na{color:#c3c8cc}
+.sheet .rt .rin{display:flex;align-items:center;justify-content:center;gap:8px}
+.sheet .rt .rin b{font-weight:600;min-width:36px}
+.sheet .rbarx{width:40px;height:5px;border-radius:3px;background:#e6e9ec;overflow:hidden;display:inline-block}
+.sheet .rbarx i{display:block;height:100%;background:#22C55E;border-radius:3px}
+.sheet .rt td.rate.bad .rbarx i{background:#EF4444}
+.sheet .rt tr.total td{background:#e8ebee !important;font-weight:700;border-top:2px solid #c9cfd4}
+.sheet .note{font-size:10.5px;color:#666;margin:9px 0 20px}
+.sheet .sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:6px 0 26px;text-align:center;font-size:12.5px;break-inside:avoid}
+.sheet .sigs .role{font-weight:600;color:#222;margin-bottom:4px}
+.sheet .sigs .nm{min-height:20px;color:#333}
+.sheet .sigs .ln{margin-top:14px;color:#888;font-size:11.5px}
+.sheet .foot{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#777}
+.sheet .nodata{padding:50px 0;text-align:center;color:#888;border:1px dashed #d8dde2;border-radius:12px;margin:10px 0 24px}
+.sheet .rt tr{break-inside:avoid}
+`;
+document.getElementById('report-css').textContent = REPORT_CSS;
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const AR = v => String(v ?? '');
+const arN = n => AR(Number(n).toLocaleString('en-US',{maximumFractionDigits:1}));
+const clone = o => JSON.parse(JSON.stringify(o));
+const pad = n => String(n).padStart(2,'0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const fmtN = n => Number(n).toLocaleString('en-US', {maximumFractionDigits:1});
+const dayName = d => new Intl.DateTimeFormat('ar-EG',{weekday:'long'}).format(d);
+const gMonth = d => new Intl.DateTimeFormat('ar-EG',{month:'long'}).format(d);
+const dmy = d => `${pad(d.getDate())} / ${pad(d.getMonth()+1)} / ${d.getFullYear()}`;
+function hijri(d){
+  try{
+    const o = {};
+    new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).formatToParts(d).forEach(p => o[p.type] = p.value);
+    return o;
+  }catch(e){ return null; }
+}
+const hijriFull = d => { const h = hijri(d); return h ? `${h.day} ${h.month} ${h.year} هـ` : ''; };
+function hijriRange(a,b){
+  const x = hijri(a), y = hijri(b); if(!x || !y) return '';
+  if(x.year !== y.year) return `${x.month} ${x.year} – ${y.month} ${y.year} هـ`;
+  return `${x.month === y.month ? x.month : x.month + ' – ' + y.month} ${y.year} هـ`;
+}
+const GRADES = ['الأول','الثاني','الثالث','الرابع','الخامس','السادس'];
+const STAGES = [{k:'ابتدائي', n:6}, {k:'متوسط', n:3}];
+const clsLabel = c => `${c.grade} ${c.stage} / ${c.section}`;
+function sortClasses(list){
+  const si = s => STAGES.findIndex(x => x.k === s);
+  return [...list].sort((a,b) => si(a.stage)-si(b.stage) || GRADES.indexOf(a.grade)-GRADES.indexOf(b.grade) || String(a.section).localeCompare(String(b.section),'ar'));
+}
+const HIGH = 0.10; // نسبة غياب تُعدّ مرتفعة
+const COPYRIGHT = 'خالد ابراهيم سك';
+
+let toastT;
+function toast(msg, kind){
+  const t = $('#toast'), err = kind === 'err'; t.textContent = msg; t.className = 'toast show' + (err ? ' err' : '');
+  clearTimeout(toastT); toastT = setTimeout(() => t.className = 'toast' + (err ? ' err' : ''), err ? 5200 : 3000);
+}
+
+/* ---------- state & storage ---------- */
+const DEFAULT_CFG = { school:'مدرسة سلامة الدراج الابتدائية و المتوسطة', preparer:'', principalTitle:'المدير', principal:'', deputyTitle:'الوكيل', deputy:'', classes:[] };
+const today = iso(new Date());
+const state = {
+  cfg: null, days: {}, mode: 'local', db: null, downloads: null, ready: {cfg:false, days:false},
+  view: 'entry', entryDate: today, draft: {}, dirty: false,
+  rpt: { type:'daily', date: today, month: today.slice(0,7) }
+};
+
+function lsGet(k, d){ try{ const v = localStorage.getItem('absence:' + k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function lsSetRaw(k, v){ try{ localStorage.setItem('absence:' + k, v); }catch(e){} }
+function lsSet(k, v){ try{ localStorage.setItem('absence:' + k, JSON.stringify(v)); }catch(e){} }
+
+function writeErr(e){
+  const c = e && e.code;
+  if(c === 'invalid_argument') toast('لا تملك صلاحية الحفظ. اطلب من مالك التطبيق منحك صلاحية «مساهم».','err');
+  else if(c === 'quota_exceeded') toast('امتلأت سعة التخزين. احذف أيامًا قديمة ثم أعد المحاولة.','err');
+  else toast('تعذّر الحفظ. تحقق من الاتصال ثم أعد المحاولة.','err');
+}
+async function dbWrite(fn){
+  try{ await fn(); return true; }
+  catch(e){
+    if(e && e.code === 'unavailable'){ await new Promise(r => setTimeout(r, 600 + Math.random()*600)); try{ await fn(); return true; }catch(e2){ writeErr(e2); return false; } }
+    writeErr(e); return false;
+  }
+}
+async function saveCfg(){
+  if(state.mode === 'db') return dbWrite(() => state.db.doc('config/main').set(clone(state.cfg)));
+  lsSet('cfg', state.cfg); onData(); return true;
+}
+async function saveDay(date, entries){
+  const total = Object.values(entries).reduce((a,b) => a + (+b||0), 0);
+  const body = { date, entries, total, savedAt: new Date().toISOString() };
+  if(state.mode === 'db') return dbWrite(() => state.db.doc('days/' + date).set(body));
+  state.days[date] = body; lsSet('days', state.days); return true;
+}
+async function deleteDay(date){
+  if(state.mode === 'db') return dbWrite(() => state.db.doc('days/' + date).delete());
+  delete state.days[date]; lsSet('days', state.days); return true;
+}
+
+function useLocal(){
+  state.mode = 'local';
+  state.cfg = Object.assign(clone(DEFAULT_CFG), lsGet('cfg', {}));
+  state.days = lsGet('days', {});
+  state.ready = {cfg:true, days:true};
+  onData();
+}
+async function init(){
+  state.downloads = {
+    save: async ({filename, data}) => {
+      const type = filename.endsWith('.json') ? 'application/json' : 'text/html';
+      const url = URL.createObjectURL(new Blob([data], {type: type + ';charset=utf-8'}));
+      const a = document.createElement('a'); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }
+  };
+  try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+  useLocal();
+}
+
+/* ---------- install (PWA) ---------- */
+let installEvt = null;
+const isStandalone = () => (window.matchMedia ? window.matchMedia('(display-mode: standalone)').matches : false) || window.navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; if(state.cfg) render(); });
+window.addEventListener('appinstalled', () => { installEvt = null; toast('تم تثبيت التطبيق'); if(state.cfg) render(); });
+function installHTML(compact){
+  if(isStandalone()) return compact ? '' : `<span class="tag ok">التطبيق مثبّت على هذا الجهاز</span>`;
+  if(installEvt) return `<button type="button" class="btn primary" data-act="install">${ICON.down} تثبيت التطبيق</button>`;
+  if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
+  return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
+}
+if('serviceWorker' in navigator && location.protocol !== 'file:'){
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
+function loadDraft(){
+  const rec = state.days[state.entryDate];
+  state.draft = rec ? clone(rec.entries || {}) : {};
+  state.dirty = false;
+}
+function onData(){
+  if(!state.ready.cfg || !state.ready.days) return;
+  if(!state.dirty) loadDraft();
+  $('#schoolName').textContent = state.cfg.school || '';
+  const ae = document.activeElement;
+  if(state.view === 'entry' && ae && ae.closest && ae.closest('.tile')) { updateTally(); return; }
+  if(state.view === 'settings' && ae && ae.closest && ae.closest('.panel') && ae.tagName === 'INPUT') return;
+  render();
+}
+
+/* ---------- views ---------- */
+const ICON = {
+  print:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4v-6h16v6h-2"/><rect x="6" y="14" width="12" height="7" rx="1.5"/></svg>',
+  down:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M4 16v2.5A2.5 2.5 0 0 0 6.5 21h11A2.5 2.5 0 0 0 20 18.5V16"/></svg>',
+  up:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v2.5A2.5 2.5 0 0 0 6.5 21h11A2.5 2.5 0 0 0 20 18.5V16"/></svg>',
+  users:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.2A6.5 6.5 0 0 1 21.5 20"/></svg>'
+};
+const KI = {
+  abs:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 8l5 5M22 8l-5 5"/></svg>',
+  rate:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+  cls:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  top:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>'
+};
+const lastBackup = () => { try{ return localStorage.getItem('absence:lastBackup'); }catch(e){ return null; } };
+function railNote(){
+  const lb = lastBackup();
+  const where = 'البيانات محفوظة على هذا الجهاز. انقلها لجهاز آخر بالنسخة الاحتياطية.';
+  return `${where}${lb ? `<div>آخر نسخة احتياطية: ${lb.replace(/-/g,'/')}</div>` : ''}${state.downloads ? `<button type="button" class="btn" data-act="backup">${ICON.down} نسخة احتياطية</button>` : ''}${installHTML(true).replace('btn primary','btn primary" style="margin-top:6px;width:100%')}`;
+}
+function bannerHTML(){
+  if(!state.downloads || !Object.keys(state.days).length) return '';
+  const lb = lastBackup();
+  const days = lb ? Math.round((parse(today) - parse(lb)) / 86400000) : null;
+  if(lb && days <= 7) return '';
+  const txt = lb ? `مرّ ${AR(days)} يومًا على آخر نسخة احتياطية منزّلة. نزّل نسخة جديدة احتياطًا.` : 'لم تنزّل نسخة احتياطية بعد. احتفظ بنسخة من بيانات الغياب على جهازك.';
+  return `<div class="banner no-print"><span aria-hidden="true">⚠️</span><span><strong>النسخة الاحتياطية</strong> ${txt}</span><button type="button" data-act="backup">حفظ نسخة الآن</button></div>`;
+}
+function render(){
+  if(!state.cfg) return;
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.view === state.view));
+  $('#schoolName').textContent = state.cfg.school || '';
+  const sy = $('#sync'); sy.textContent = isStandalone() ? 'تطبيق مثبّت · حفظ على الجهاز' : 'حفظ على الجهاز'; sy.className = 'sync' + (state.mode === 'db' ? '' : ' local');
+  $('#railNote').innerHTML = railNote();
+  $('#banner').innerHTML = bannerHTML();
+  const d = parse(state.entryDate);
+  const head = {
+    entry: ['رصد الغياب اليومي', `${dayName(d)} ${AR(dmy(d))} · ${AR(classes().length)} فصلًا · ${arN(totalStudents())} طالبًا`],
+    reports: ['التقارير', 'يومية وأسبوعية وشهرية، جاهزة للطباعة'],
+    settings: ['الفصول والإعدادات', 'تُضبط مرة واحدة وتُستخدم في الرصد والتقارير']
+  }[state.view];
+  $('#pTitle').textContent = head[0]; $('#pSub').textContent = head[1]; $('#tbTitle').textContent = head[0];
+  $('#shell').classList.remove('open');
+  const m = $('#main');
+  m.innerHTML = `<div class="view">${state.view === 'entry' ? entryView() : state.view === 'reports' ? reportsView() : settingsView()}</div>`;
+  if(state.view === 'entry') updateTally();
+}
+
+function classes(){ return sortClasses((state.cfg && state.cfg.classes) || []); }
+const totalStudents = () => classes().reduce((a,c) => a + (+c.count||0), 0);
+
+function entryView(){
+  const list = classes();
+  if(!list.length) return `<div class="empty"><div class="ic">${ICON.users}</div><h2>أضف فصول المدرسة أولًا</h2><p>حدّد الفصول وعدد طلاب كل فصل مرة واحدة، ثم ابدأ رصد الغياب اليومي.</p><button class="btn primary" data-go="settings">إضافة الفصول</button></div>`;
+  const d = parse(state.entryDate), rec = state.days[state.entryDate];
+  const wk = d.getDay() === 5 || d.getDay() === 6;
+  let html = `<div class="bar">
+    <button class="btn" data-act="day" data-n="-1">◀ السابق</button>
+    <div class="day-label">${dayName(d)} ${dmy(d)}<small>${hijriFull(d)}</small></div>
+    <button class="btn" data-act="day" data-n="1">التالي ▶</button>
+    <input class="input" type="date" id="entryDate" value="${state.entryDate}" aria-label="تاريخ الرصد">
+    ${rec ? `<span class="tag ok">محفوظ ${AR(new Date(rec.savedAt).toLocaleTimeString('ar-EG-u-nu-latn',{hour:'numeric',minute:'2-digit'}))}</span>` : `<span class="tag mute">لم يُرصد بعد</span>`}
+  </div>`;
+  if(wk) html += `<div class="notice">هذا اليوم عطلة نهاية الأسبوع. تأكد من التاريخ قبل الحفظ.</div>`;
+  html += `<div class="kpis" id="kpis"></div>`;
+  STAGES.forEach(st => {
+    const cl = list.filter(c => c.stage === st.k); if(!cl.length) return;
+    const n = cl.reduce((a,c) => a + (+c.count||0), 0);
+    html += `<div class="sec-h"><h3>المرحلة ال${st.k === 'متوسط' ? 'متوسطة' : 'ابتدائية'}</h3><small>${AR(cl.length)} فصول · ${arN(n)} طالبًا</small></div><div class="grid">${cl.map(tileHTML).join('')}</div>`;
+  });
+  html += `<div class="savebar">
+    <div class="tally"><b id="tAbs">0</b><span id="tTxt"></span></div>
+    <span id="dirtyActs"></span>
+    ${rec ? `<button class="btn danger" data-act="delday">حذف رصد اليوم</button>` : ''}
+    <button class="btn primary" data-act="save" id="saveBtn">حفظ غياب اليوم</button>
+  </div>`;
+  const recent = Object.keys(state.days).sort().reverse().slice(0, 9);
+  if(recent.length){
+    const ts = totalStudents();
+    html += `<section class="recent"><h3>آخر الأيام المرصودة</h3><div class="rlist">` + recent.map(k => {
+      const r = state.days[k], dd = parse(k), t = +r.total || 0;
+      return `<button class="ritem" data-open="${k}"><span>${dayName(dd)} ${AR(dmy(dd))}</span><b>${arN(t)} غائبًا${ts ? ` · ${AR(Math.round((1 - t/ts)*100))}٪` : ''}</b></button>`;
+    }).join('') + `</div></section>`;
+  }
+  return html;
+}
+function tileState(c){
+  const v = +state.draft[c.id] || 0, cnt = +c.count || 0, r = cnt ? v/cnt : 0;
+  return {
+    v, cnt,
+    cls: v ? (r >= HIGH ? 'hi' : 'has') : '',
+    tag: !v ? `<span class="tag ok">لا غياب</span>` : `<span class="tag ${r >= HIGH ? 'bad' : 'warn'}">${AR(Math.round(r*100))}٪ من الفصل</span>`
+  };
+}
+function tileHTML(c){
+  const s = tileState(c);
+  return `<div class="tile ${s.cls}" data-id="${esc(c.id)}">
+    <div class="tile-top"><span class="tile-name">${esc(c.grade)} / ${esc(c.section)}</span><span class="tile-sub">${arN(s.cnt)} طالبًا</span></div>
+    <div class="stepper"><button data-act="inc" aria-label="زيادة">+</button><input type="number" inputmode="numeric" min="0" max="${s.cnt}" value="${s.v}" aria-label="غائبو ${esc(clsLabel(c))}"><button data-act="dec" aria-label="إنقاص">−</button></div>
+    <div class="tile-foot">${s.tag}</div>
+  </div>`;
+}
+function refreshTile(tile){
+  const c = state.cfg.classes.find(x => x.id === tile.dataset.id); if(!c) return;
+  const s = tileState(c);
+  tile.className = 'tile ' + s.cls;
+  tile.querySelector('.tile-foot').innerHTML = s.tag;
+}
+function updateTally(){
+  const a = $('#tAbs'); if(!a) return;
+  const list = classes();
+  let abs = 0, withAbs = 0, top = null;
+  list.forEach(c => { const v = +state.draft[c.id] || 0; abs += v; if(v){ withAbs++; const r = c.count ? v/c.count : 0; if(!top || r > top.r) top = {c, v, r}; } });
+  const ts = totalStudents(), rate = ts ? Math.round((1 - abs/ts)*1000)/10 : 0;
+  a.textContent = arN(abs);
+  $('#tTxt').textContent = `غائبًا من ${arN(ts)} طالبًا`;
+  const k = (cls, l, v, s, t, ic) => `<div class="kpi ${cls}"><span class="l"><span class="ki">${KI[ic]}</span>${l}</span><span class="v ${t ? 't' : ''}">${v}</span><span class="s">${s}</span></div>`;
+  $('#kpis').innerHTML =
+    k(abs ? 'warn' : 'good', 'الغائبون', arN(abs), `من ${arN(ts)} طالبًا`, false, 'abs') +
+    k(rate >= 90 ? 'good' : 'bad', 'نسبة الحضور', AR(rate) + '٪', rate >= 90 ? 'ضمن المعدل المقبول' : 'أقل من 90٪', false, 'rate') +
+    k('', 'فصول بها غياب', `${AR(withAbs)} / ${AR(list.length)}`, withAbs ? `${AR(list.length - withAbs)} فصلًا بلا غياب` : 'كل الفصول مكتملة', false, 'cls') +
+    k(top && top.r >= HIGH ? 'bad' : '', 'أعلى فصل غيابًا', top ? esc(`${top.c.grade} ${top.c.stage} / ${top.c.section}`) : '—', top ? `${arN(top.v)} غائبين · ${AR(Math.round(top.r*100))}٪` : 'لا يوجد غياب', true, 'top');
+  const rec = state.days[state.entryDate];
+  $('#saveBtn').disabled = !state.dirty && !!rec;
+  $('#saveBtn').textContent = rec ? (state.dirty ? 'حفظ التعديلات' : 'محفوظ') : 'حفظ غياب اليوم';
+  $('#dirtyActs').innerHTML = state.dirty && rec ? `<button class="btn" data-act="revert">تراجع</button>` : '';
+}
+
+/* ---------- reports ---------- */
+function rangeDates(r){
+  if(r.type === 'daily') return [parse(r.date)];
+  if(r.type === 'weekly'){ const d = parse(r.date), sun = addDays(d, -d.getDay()); return [0,1,2,3,4].map(i => addDays(sun, i)); }
+  const [y,m] = r.month.split('-').map(Number), out = [];
+  for(let i = 1; i <= new Date(y, m, 0).getDate(); i++) out.push(new Date(y, m-1, i));
+  return out;
+}
+function reportsView(){
+  const r = state.rpt;
+  const picker = r.type === 'monthly'
+    ? `<input class="input" type="month" id="rMonth" value="${r.month}" aria-label="الشهر">`
+    : `<input class="input" type="date" id="rDate" value="${r.date}" aria-label="${r.type === 'weekly' ? 'أي يوم في الأسبوع' : 'اليوم'}" style="width:186px">`;
+  return `<div class="bar">
+    <div class="chips" role="group" aria-label="نوع التقرير">
+      ${[['daily','يومي'],['weekly','أسبوعي'],['monthly','شهري']].map(([k,t]) => `<button class="chip ${r.type === k ? 'on' : ''}" data-rtype="${k}" aria-pressed="${r.type === k}">${t}</button>`).join('')}
+    </div>
+    ${picker}
+    <span class="grow"></span>
+    ${state.downloads ? `<button class="btn" data-act="download">${ICON.down} تنزيل التقرير</button>` : ''}
+    <button class="btn primary" data-act="print">${ICON.print} طباعة التقرير</button>
+  </div>
+  <div class="sheet-wrap">${buildSheet()}</div>`;
+}
+
+function buildSheet(){
+  const r = state.rpt, cfg = state.cfg, list = classes();
+  const dates = rangeDates(r), keys = dates.map(iso), rec = keys.filter(k => state.days[k]);
+  const recN = rec.length;
+  const title = {daily:'التقرير اليومي لغياب الطلاب', weekly:'التقرير الأسبوعي لغياب الطلاب', monthly:'التقرير الشهري لغياب الطلاب'}[r.type];
+  const a = dates[0], b = dates[dates.length-1];
+  let sub;
+  if(r.type === 'daily') sub = `${esc(cfg.school)} — ${dayName(a)} ${dmy(a)} (${hijriFull(a)})`;
+  else if(r.type === 'weekly') sub = `${esc(cfg.school)} — الأسبوع من ${dmy(a)} إلى ${dmy(b)} (${hijriRange(a,b)}) · ${recN} يوم مرصود`;
+  else sub = `${esc(cfg.school)} — ${gMonth(a)} ${a.getFullYear()} (${hijriRange(a,b)}) — من ${dmy(a)} إلى ${dmy(b)} · ${recN} يوم مرصود`;
+
+  const sig = (role, nm) => `<div><div class="role">${role}</div><div class="nm">${esc(nm || '')}</div><div class="ln">التوقيع: ..................</div></div>`;
+  const sigs = `<div class="sigs">${sig('مسؤول الغياب', cfg.preparer)}${sig(esc(cfg.deputyTitle || 'الوكيل'), cfg.deputy)}${sig(esc(cfg.principalTitle || 'المدير'), cfg.principal)}</div>`;
+  const foot = sigs + `<div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}${cfg.preparer ? ' — ' + esc(cfg.preparer) : ''}</span><span>جميع الحقوق محفوظة © ${COPYRIGHT}</span></div>`;
+  if(!list.length || !recN){
+    return `<article class="sheet"><h1>${title}</h1><p class="sub">${sub}</p><div class="nodata">${!list.length ? 'لا توجد فصول مسجلة بعد.' : 'لا يوجد غياب مرصود في هذه الفترة.'}</div>${foot}</article>`;
+  }
+
+  const stats = list.map(c => {
+    let abs = 0, max = 0; const per = {};
+    rec.forEach(k => { const v = +((state.days[k].entries || {})[c.id]) || 0; per[k] = v; abs += v; if(v > max) max = v; });
+    const sd = (+c.count||0) * recN;
+    return { c, abs, max, per, sd, rate: sd ? 1 - abs/sd : null };
+  });
+  const TA = stats.reduce((s,x) => s + x.abs, 0), TS = stats.reduce((s,x) => s + (+x.c.count||0), 0), TSD = stats.reduce((s,x) => s + x.sd, 0);
+  const TR = TSD ? 1 - TA/TSD : null;
+
+  // donut by grade
+  const PAL = ['#1A9BEF','#F2B705','#5AD45A','#F4432C','#9B5DE5','#00B8A9','#FF8A3D','#E0457B','#8A8F98'];
+  const groups = [];
+  list.forEach(c => { const key = c.grade + ' ' + c.stage; let g = groups.find(x => x.key === key); if(!g){ g = {key, label: key, value:0}; groups.push(g); } });
+  stats.forEach(s => { groups.find(g => g.key === s.c.grade + ' ' + s.c.stage).value += s.abs; });
+  groups.forEach((g,i) => g.color = PAL[i % PAL.length]);
+
+  // bar data
+  let barItems, barCap;
+  if(r.type === 'daily'){
+    barItems = [...stats].sort((x,y) => y.abs - x.abs).slice(0, 12).map(s => ({label: `${s.c.grade} ${s.c.stage === 'متوسط' ? 'م' : 'ب'}/${s.c.section}`, value: s.abs}));
+    barCap = 'الغياب حسب الفصل (الأعلى)';
+  } else {
+    barItems = rec.map(k => { const d = parse(k); return {label: r.type === 'weekly' ? dayName(d) : pad(d.getDate()), value: stats.reduce((s,x) => s + x.per[k], 0)}; });
+    barCap = r.type === 'weekly' ? 'الغياب اليومي خلال الأسبوع' : 'الغياب اليومي خلال الشهر';
+  }
+
+  const legend = groups.map(g => `<div class="it"><span class="dot" style="background:${g.color}"></span><span>${esc(g.label)}</span><span class="v"><b>${fmtN(g.value)}</b><small>${TA ? Math.round(g.value/TA*100) : 0}٪</small></span></div>`).join('');
+  const charts = `<div class="charts">
+    <figure><figcaption>توزيع الغياب حسب الصف</figcaption><div class="donut">${donutSVG(groups, TA, recN > 1 ? 'حالة غياب' : 'طالب غائب')}</div><div class="legend">${legend}</div></figure>
+    <figure><figcaption>${barCap}</figcaption>${barsSVG(barItems, r.type === 'daily' || r.type === 'weekly')}</figure>
+  </div>`;
+
+  const badAbs = (v, base) => base && v/base >= HIGH;
+  const rateTd = rate => {
+    if(rate == null) return `<td class="na">—</td>`;
+    const p = Math.round(rate*1000)/10, bad = p < 90;
+    return `<td class="rate ${bad ? 'bad' : ''}"><div class="rin"><b>${p}%</b><span class="rbarx"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></span></div></td>`;
+  };
+  const numTd = (v, bad, cls='') => `<td class="${cls} ${v === 0 ? 'zero' : ''} ${bad ? 'bad' : ''}">${fmtN(v)}</td>`;
+
+  let thead, rows = '', total;
+  if(r.type === 'daily'){
+    thead = `<tr><th>م</th><th>الفصل</th><th>عدد الطلاب<small>طالب</small></th><th>الحاضرون<small>طالب</small></th><th>الغائبون<small>طالب</small></th><th>نسبة الحضور</th></tr>`;
+    stats.forEach((s,i) => { const n = +s.c.count||0; rows += `<tr><td class="idx">${i+1}</td><td class="name">${esc(clsLabel(s.c))}</td><td class="days">${fmtN(n)}</td>${numTd(n - s.abs, false)}${numTd(s.abs, badAbs(s.abs, n))}${rateTd(s.rate)}</tr>`; });
+    total = `<tr class="total"><td></td><td class="name">الإجمالي</td><td>${fmtN(TS)}</td><td>${fmtN(TS - TA)}</td><td>${fmtN(TA)}</td>${rateTd(TR)}</tr>`;
+  } else if(r.type === 'weekly'){
+    const dh = keys.map(k => `<th>${dayName(parse(k))}<small>${parse(k).getDate()}/${parse(k).getMonth()+1}</small></th>`).join('');
+    thead = `<tr><th>م</th><th>الفصل</th><th>عدد الطلاب<small>طالب</small></th>${dh}<th>مجموع الغياب<small>حالة</small></th><th>نسبة الحضور</th></tr>`;
+    stats.forEach((s,i) => {
+      const n = +s.c.count||0;
+      const cells = keys.map(k => state.days[k] ? numTd(s.per[k], badAbs(s.per[k], n)) : `<td class="na">—</td>`).join('');
+      rows += `<tr><td class="idx">${i+1}</td><td class="name">${esc(clsLabel(s.c))}</td><td class="days">${fmtN(n)}</td>${cells}${numTd(s.abs, badAbs(s.abs, s.sd))}${rateTd(s.rate)}</tr>`;
+    });
+    const dt = keys.map(k => state.days[k] ? `<td>${fmtN(stats.reduce((a,x) => a + x.per[k], 0))}</td>` : `<td class="na">—</td>`).join('');
+    total = `<tr class="total"><td></td><td class="name">الإجمالي</td><td>${fmtN(TS)}</td>${dt}<td>${fmtN(TA)}</td>${rateTd(TR)}</tr>`;
+  } else {
+    thead = `<tr><th>م</th><th>الفصل</th><th>عدد الطلاب<small>طالب</small></th><th>أيام الرصد<small>يوم</small></th><th>مجموع الغياب<small>حالة</small></th><th>متوسط الغياب<small>طالب/يوم</small></th><th>أعلى غياب<small>في يوم</small></th><th>نسبة الحضور</th></tr>`;
+    stats.forEach((s,i) => {
+      const n = +s.c.count||0, avg = Math.round(s.abs/recN*10)/10;
+      rows += `<tr><td class="idx">${i+1}</td><td class="name">${esc(clsLabel(s.c))}</td><td>${fmtN(n)}</td><td class="days">${recN}</td>${numTd(s.abs, badAbs(s.abs, s.sd))}${numTd(avg, false)}${numTd(s.max, badAbs(s.max, n))}${rateTd(s.rate)}</tr>`;
+    });
+    total = `<tr class="total"><td></td><td class="name">الإجمالي</td><td>${fmtN(TS)}</td><td>${recN}</td><td>${fmtN(TA)}</td><td>${fmtN(Math.round(TA/recN*10)/10)}</td><td>—</td>${rateTd(TR)}</tr>`;
+  }
+  const note = `بالأحمر: نسبة غياب ١٠٪ فأكثر من الفصل، نسبة حضور أقل من ٩٠٪${r.type === 'daily' ? '' : ' · الأيام غير المرصودة (—) لا تدخل في الحساب'}.`;
+  return `<article class="sheet"><h1>${title}</h1><p class="sub">${sub}</p>${charts}
+    <div class="tcap">الملخص حسب الفصل</div>
+    <table class="rt"><thead>${thead}</thead><tbody>${rows}${total}</tbody></table>
+    <p class="note">${note}</p>${foot}</article>`;
+}
+
+function donutSVG(segs, total, label){
+  const R = 66, C = 2*Math.PI*R, sum = segs.reduce((a,s) => a + s.value, 0), live = segs.filter(s => s.value > 0);
+  let off = 0, rings = '';
+  if(!sum) rings = `<circle r="${R}" cx="90" cy="90" fill="none" stroke="#e7eaed" stroke-width="15"/>`;
+  else live.forEach(s => {
+    const len = s.value/sum*C, gap = live.length > 1 ? 2.5 : 0;
+    rings += `<circle r="${R}" cx="90" cy="90" fill="none" stroke="${s.color}" stroke-width="15" stroke-dasharray="${Math.max(len-gap,.5)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 90 90)"/>`;
+    off += len;
+  });
+  return `<svg viewBox="0 0 180 180" width="190" height="190" role="img" aria-label="${fmtN(total)} ${label}">${rings}<text x="90" y="92" text-anchor="middle" font-size="30" font-weight="700" fill="#1d2226" font-family="IBM Plex Sans Arabic,Tahoma,sans-serif">${fmtN(total)}</text><text x="90" y="114" text-anchor="middle" font-size="11" fill="#777" font-family="IBM Plex Sans Arabic,Tahoma,sans-serif">${label}</text></svg>`;
+}
+function niceStep(x){ if(x <= 1) return 1; const e = Math.pow(10, Math.floor(Math.log10(x))), f = x/e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * e; }
+function barsSVG(items, rotate){
+  const W = 340, H = 260, pT = 16, pB = rotate ? 70 : 26, pL = 34, pR = 6, ch = H - pT - pB, cw = W - pL - pR;
+  const step = niceStep(Math.max(1, ...items.map(i => i.value)) / 4), max = step*4;
+  const n = Math.max(items.length, 1), slot = cw/n, bw = Math.max(4, Math.min(16, slot*0.55));
+  const F = `font-family="IBM Plex Sans Arabic,Tahoma,sans-serif"`;
+  let g = `<text x="${pL}" y="${pT-5}" font-size="8.5" fill="#999" text-anchor="end" ${F}>طالب</text>`;
+  for(let t = 0; t <= 4; t++){ const y = pT + ch - ch*t/4; g += `<line x1="${pL}" x2="${W-pR}" y1="${y}" y2="${y}" stroke="${t ? '#e8ebee' : '#9aa3ab'}"/><text x="${pL-6}" y="${y+3.5}" font-size="9.5" fill="#777" text-anchor="end" ${F}>${fmtN(step*t)}</text>`; }
+  items.forEach((it,i) => {
+    const cx = W - pR - slot*(i + .5), h = max ? it.value/max*ch : 0, y = pT + ch - h;
+    if(h > 0) g += `<rect x="${cx-bw/2}" y="${y}" width="${bw}" height="${h}" rx="${Math.min(bw/2, h/2)}" fill="#1A9BEF"/>`;
+    if(n <= 16 && it.value) g += `<text x="${cx}" y="${y-4}" font-size="8.5" fill="#555" text-anchor="middle" ${F}>${fmtN(it.value)}</text>`;
+    const ly = pT + ch + 12;
+    g += rotate
+      ? `<text x="${cx}" y="${ly}" font-size="9.5" fill="#444" text-anchor="end" transform="rotate(-55 ${cx} ${ly})" ${F}>${esc(it.label)}</text>`
+      : (n <= 24 || i % 2 === 0 ? `<text x="${cx}" y="${ly}" font-size="8.5" fill="#555" text-anchor="middle" ${F}>${esc(it.label)}</text>` : '');
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" style="direction:ltr">${g}</svg>`;
+}
+
+async function downloadReport(){
+  const dl = state.downloads; if(!dl) return;
+  const r = state.rpt, key = r.type === 'monthly' ? r.month : r.date;
+  const name = {daily:'daily', weekly:'weekly', monthly:'monthly'}[r.type];
+  const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>تقرير غياب الطلاب ${key}</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>${REPORT_CSS}body{margin:0;background:#eef1f4;padding:24px 0}.sheet{margin:0 auto}
+.pbtn{display:block;margin:0 auto 16px;font:600 15px 'IBM Plex Sans Arabic',Tahoma,sans-serif;background:#1A9BEF;color:#fff;border:0;border-radius:10px;padding:10px 26px;cursor:pointer}
+@media print{@page{size:A4;margin:10mm}body{background:#fff;padding:0}.pbtn{display:none}.sheet{box-shadow:none;width:auto;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head>
+<body><button class="pbtn" onclick="window.print()">طباعة / حفظ PDF</button>${buildSheet()}</body></html>`;
+  try{ await dl.save({filename:`absence-${name}-${key}.html`, data: html}); toast('تم التنزيل. افتح الملف في المتصفح ثم اضغط «طباعة».'); }
+  catch(e){ if(!e || e.code !== 'declined') toast('تعذّر تنزيل التقرير.','err'); }
+}
+
+/* ---------- backup ---------- */
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+async function backup(){
+  const dl = state.downloads; if(!dl) return;
+  const data = { app:'student-absence', version:1, exportedAt:new Date().toISOString(), cfg:clone(state.cfg), days:clone(state.days) };
+  try{ await dl.save({filename:`absence-backup-${iso(new Date())}.json`, data: JSON.stringify(data, null, 1)}); lsSetRaw('lastBackup', today); toast('تم تنزيل النسخة الاحتياطية'); render(); }
+  catch(e){ if(!e || e.code !== 'declined') toast('تعذّر تنزيل النسخة الاحتياطية.','err'); }
+}
+async function restore(file, btn){
+  let data;
+  try{ data = JSON.parse(await file.text()); }catch(e){ toast('الملف ليس نسخة احتياطية صالحة.','err'); return; }
+  if(!data || data.app !== 'student-absence' || !data.cfg || !Array.isArray(data.cfg.classes) || typeof data.days !== 'object'){ toast('الملف ليس نسخة احتياطية من هذا التطبيق.','err'); return; }
+  const cfg = Object.assign(clone(DEFAULT_CFG), data.cfg);
+  cfg.classes = cfg.classes.filter(c => c && c.id && c.stage && c.grade).map(c => ({id:String(c.id), stage:String(c.stage), grade:String(c.grade), section:String(c.section ?? ''), count:Math.max(0, +c.count || 0)}));
+  const days = Object.entries(data.days).filter(([k,v]) => DATE_RE.test(k) && v && typeof v.entries === 'object');
+  if(state.mode === 'local'){
+    state.cfg = cfg; days.forEach(([k,v]) => state.days[k] = v); lsSet('cfg', cfg); lsSet('days', state.days);
+    state.dirty = false; toast(`تم استيراد ${cfg.classes.length} فصلًا و${days.length} يومًا`); onData(); return;
+  }
+  btn.disabled = true;
+  const old = btn.innerHTML;
+  if(!(await dbWrite(() => state.db.doc('config/main').set(clone(cfg))))){ btn.disabled = false; return; }
+  let done = 0;
+  for(const [k,v] of days){
+    const body = { date:k, entries:v.entries, total:+v.total || Object.values(v.entries).reduce((a,b) => a + (+b||0), 0), savedAt:v.savedAt || new Date().toISOString() };
+    if(!(await dbWrite(() => state.db.doc('days/' + k).set(body)))){ toast(`توقف الاستيراد بعد ${done} يومًا. أعد المحاولة.`,'err'); break; }
+    done++; if(btn.isConnected) btn.textContent = `جارٍ الاستيراد ${done}/${days.length}`;
+  }
+  if(btn.isConnected){ btn.disabled = false; btn.innerHTML = old; }
+  state.dirty = false;
+  if(done === days.length) toast(`تم استيراد ${cfg.classes.length} فصلًا و${done} يومًا`);
+}
+
+/* ---------- settings ---------- */
+function settingsView(){
+  const cfg = state.cfg, list = classes();
+  const opt = (arr, cur) => arr.map(v => `<option ${v === cur ? 'selected' : ''}>${v}</option>`).join('');
+  const rows = list.map(c => `<tr data-cid="${esc(c.id)}">
+    <td><select class="input" data-f="stage">${opt(STAGES.map(s => s.k), c.stage)}</select></td>
+    <td><select class="input" data-f="grade">${opt(GRADES, c.grade)}</select></td>
+    <td><input class="input sec" data-f="section" value="${esc(c.section)}" aria-label="الشعبة"></td>
+    <td><input class="input cnt" type="number" min="0" inputmode="numeric" data-f="count" value="${+c.count||0}" aria-label="عدد الطلاب"></td>
+    <td style="text-align:end"><button class="btn danger" data-act="delcls">حذف</button></td></tr>`).join('');
+  return `
+  <section class="panel">
+    <h3>بيانات التقرير</h3>
+    <p class="hint">تظهر في رأس التقرير وفي خانات التوقيع أسفله.</p>
+    <div class="fields">
+      <label class="f">اسم المدرسة<input class="input" id="sSchool" value="${esc(cfg.school)}"></label>
+      <label class="f">اسم مسؤول الغياب (معدّ التقرير)<input class="input" id="sPrep" value="${esc(cfg.preparer)}"></label>
+    </div>
+    <div class="fields" style="margin-top:14px">
+      <label class="f">الصفة<select class="input" id="sDepT">${opt(['الوكيل','الوكيلة'], cfg.deputyTitle)}</select></label>
+      <label class="f">اسم ${esc(cfg.deputyTitle || 'الوكيل')}<input class="input" id="sDep" value="${esc(cfg.deputy)}"></label>
+      <label class="f">الصفة<select class="input" id="sPrinT">${opt(['المدير','المديرة'], cfg.principalTitle)}</select></label>
+      <label class="f">اسم ${esc(cfg.principalTitle || 'المدير')}<input class="input" id="sPrin" value="${esc(cfg.principal)}"></label>
+    </div>
+    <div class="row-actions"><button class="btn primary" data-act="savemeta">حفظ البيانات</button></div>
+  </section>
+  <section class="panel">
+    <h3>الفصول وعدد الطلاب</h3>
+    <p class="hint">عدد طلاب كل فصل هو أساس حساب نسبة الحضور. التعديل يُحفظ فور الخروج من الحقل.</p>
+    ${list.length ? `<div class="ctable-wrap"><table class="ctable"><thead><tr><th>المرحلة</th><th>الصف</th><th>الشعبة</th><th>عدد الطلاب</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="row-actions"><span class="tag mute">${AR(list.length)} فصلًا</span><span class="tag ok">${arN(totalStudents())} طالبًا</span></div>` : `<p class="hint" style="margin:0">لا توجد فصول بعد. أنشئ فصول المرحلة دفعة واحدة أو أضف فصلًا فصلًا.</p>`}
+  </section>
+  <div class="cols">
+    <section class="panel">
+      <h3>إضافة فصل</h3>
+      <p class="hint">لإضافة شعبة جديدة أو فصل منفرد.</p>
+      <div class="fields">
+        <label class="f">المرحلة<select class="input" id="aStage">${opt(STAGES.map(s => s.k))}</select></label>
+        <label class="f">الصف<select class="input" id="aGrade">${opt(GRADES)}</select></label>
+        <label class="f">الشعبة<input class="input" id="aSec" value="أ"></label>
+        <label class="f">عدد الطلاب<input class="input" id="aCnt" type="number" min="0" inputmode="numeric" value="25"></label>
+      </div>
+      <div class="row-actions"><button class="btn primary" data-act="addcls">إضافة الفصل</button></div>
+    </section>
+    <section class="panel">
+      <h3>إنشاء فصول مرحلة كاملة</h3>
+      <p class="hint">ينشئ كل صفوف المرحلة بعدد الشعب المحدد، ويتجاهل الموجود مسبقًا.</p>
+      <div class="fields">
+        <label class="f">المرحلة<select class="input" id="gStage">${opt(STAGES.map(s => s.k))}</select></label>
+        <label class="f">الشعب لكل صف<select class="input" id="gSecs">${opt(['1','2','3','4'])}</select></label>
+        <label class="f">عدد الطلاب المبدئي<input class="input" id="gCnt" type="number" min="0" inputmode="numeric" value="25"></label>
+      </div>
+      <div class="row-actions"><button class="btn" data-act="gencls">إنشاء الفصول</button></div>
+    </section>
+  </div>
+  <section class="panel">
+    <h3>تثبيت التطبيق</h3>
+    <p class="hint">ثبّته على الكمبيوتر أو الجوال ليعمل كتطبيق مستقل بأيقونة خاصة، حتى بدون إنترنت.</p>
+    <div class="row-actions" style="margin-top:0">${installHTML(false)}</div>
+  </section>
+  <section class="panel">
+    <h3>النسخ الاحتياطي</h3>
+    <p class="hint">لنقل البيانات بين الكمبيوتر والجوال: نزّل نسخة من جهاز واستوردها في الآخر. الملف فيه بيانات المدرسة والفصول وكل أيام الغياب (${AR(Object.keys(state.days).length)} يومًا حاليًا). عند الاستيراد تُستبدل الفصول والبيانات، وتُضاف أيام الملف أو تُحدَّث، ولا يُحذف أي يوم غير موجود في الملف.</p>
+    <div class="row-actions">
+      ${state.downloads ? `<button class="btn primary" data-act="backup">${ICON.down} تنزيل نسخة احتياطية</button>` : `<span class="tag mute">التنزيل غير متاح في هذا العرض</span>`}
+      <button class="btn" data-act="pickrestore" id="restoreBtn">${ICON.up} استيراد نسخة احتياطية</button>
+      <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+    </div>
+  </section>`;
+}
+const newId = () => 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const exists = (stage, grade, section) => state.cfg.classes.some(c => c.stage === stage && c.grade === grade && String(c.section).trim() === String(section).trim());
+
+/* ---------- events ---------- */
+document.addEventListener('click', async e => {
+  const t = e.target.closest('button'); if(!t) return;
+  if(t.dataset.act === 'menu'){ $('#shell').classList.add('open'); return; }
+  if(t.dataset.view){
+    if(state.dirty && t.dataset.view !== 'entry'){ toast('لديك غياب غير محفوظ. احفظه أولًا أو اضغط «تراجع».','err'); return; }
+    state.view = t.dataset.view; render(); window.scrollTo(0,0); return;
+  }
+  if(t.dataset.go){ state.view = t.dataset.go; render(); return; }
+  if(t.dataset.open){ if(state.dirty){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; } state.entryDate = t.dataset.open; loadDraft(); render(); window.scrollTo(0,0); return; }
+  if(t.dataset.rtype){ state.rpt.type = t.dataset.rtype; render(); return; }
+  const act = t.dataset.act;
+  if(act === 'inc' || act === 'dec'){
+    const tile = t.closest('.tile'), id = tile.dataset.id, c = state.cfg.classes.find(x => x.id === id);
+    let v = (+state.draft[id] || 0) + (act === 'inc' ? 1 : -1);
+    v = Math.max(0, Math.min(+c.count || 999, v));
+    state.draft[id] = v; state.dirty = true; tile.querySelector('input').value = v; refreshTile(tile); updateTally(); return;
+  }
+  if(act === 'day'){
+    if(state.dirty){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; }
+    state.entryDate = iso(addDays(parse(state.entryDate), +t.dataset.n)); loadDraft(); render(); return;
+  }
+  if(act === 'revert'){ loadDraft(); render(); return; }
+  if(act === 'save'){
+    const entries = {}; classes().forEach(c => entries[c.id] = +state.draft[c.id] || 0);
+    t.disabled = true;
+    if(await saveDay(state.entryDate, entries)){ state.dirty = false; toast('تم حفظ غياب ' + dayName(parse(state.entryDate))); if(state.mode === 'local') onData(); }
+    else t.disabled = false;
+    return;
+  }
+  if(act === 'delday'){
+    if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد الحذف'; setTimeout(() => { if(t.isConnected){ t.classList.remove('armed'); t.textContent = 'حذف رصد اليوم'; } }, 4000); return; }
+    if(await deleteDay(state.entryDate)){ state.dirty = false; toast('تم حذف رصد اليوم'); if(state.mode === 'local') onData(); }
+    return;
+  }
+  if(act === 'install'){ if(installEvt){ installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if(r && r.outcome === 'accepted') toast('جارٍ التثبيت…'); render(); } return; }
+  if(act === 'backup'){ backup(); return; }
+  if(act === 'pickrestore'){ $('#restoreFile').click(); return; }
+  if(act === 'print'){ try{ window.print(); }catch(err){ toast('الطباعة غير متاحة هنا. استخدم «تنزيل التقرير».','err'); } return; }
+  if(act === 'download'){ downloadReport(); return; }
+  if(act === 'savemeta'){
+    state.cfg.school = $('#sSchool').value.trim(); state.cfg.preparer = $('#sPrep').value.trim();
+    state.cfg.deputyTitle = $('#sDepT').value; state.cfg.deputy = $('#sDep').value.trim();
+    state.cfg.principalTitle = $('#sPrinT').value; state.cfg.principal = $('#sPrin').value.trim();
+    if(await saveCfg()) toast('تم حفظ البيانات'); return;
+  }
+  if(act === 'addcls'){
+    const stage = $('#aStage').value, grade = $('#aGrade').value, section = $('#aSec').value.trim() || 'أ', count = Math.max(0, +$('#aCnt').value || 0);
+    if(exists(stage, grade, section)){ toast('هذا الفصل موجود مسبقًا.','err'); return; }
+    state.cfg.classes.push({id:newId(), stage, grade, section, count});
+    if(await saveCfg()) toast(`تمت إضافة ${grade} ${stage} / ${section}`); return;
+  }
+  if(act === 'gencls'){
+    const stage = $('#gStage').value, secs = +$('#gSecs').value, count = Math.max(0, +$('#gCnt').value || 0);
+    const n = STAGES.find(s => s.k === stage).n, letters = ['أ','ب','ج','د']; let added = 0;
+    for(let g = 0; g < n; g++) for(let s = 0; s < secs; s++){
+      if(!exists(stage, GRADES[g], letters[s])){ state.cfg.classes.push({id:newId(), stage, grade:GRADES[g], section:letters[s], count}); added++; }
+    }
+    if(!added){ toast('كل فصول هذه المرحلة موجودة مسبقًا.'); return; }
+    if(await saveCfg()) toast(`تم إنشاء ${added} فصول`); return;
+  }
+  if(act === 'delcls'){
+    if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد'; setTimeout(() => { if(t.isConnected){ t.classList.remove('armed'); t.textContent = 'حذف'; } }, 4000); return; }
+    const id = t.closest('tr').dataset.cid; state.cfg.classes = state.cfg.classes.filter(c => c.id !== id);
+    if(await saveCfg()) toast('تم حذف الفصل'); return;
+  }
+});
+
+document.querySelector('.overlay').addEventListener('click', () => $('#shell').classList.remove('open'));
+document.addEventListener('input', e => {
+  const inp = e.target;
+  if(inp.closest && inp.closest('.stepper')){
+    const tile = inp.closest('.tile'), c = state.cfg.classes.find(x => x.id === tile.dataset.id);
+    let v = Math.floor(+inp.value || 0); v = Math.max(0, Math.min(+c.count || 999, v));
+    state.draft[c.id] = v; state.dirty = true; refreshTile(tile); updateTally();
+  }
+});
+document.addEventListener('change', async e => {
+  const el = e.target;
+  if(el.id === 'entryDate'){
+    if(!el.value) return;
+    if(state.dirty){ el.value = state.entryDate; toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; }
+    state.entryDate = el.value; loadDraft(); render(); return;
+  }
+  if(el.closest && el.closest('.stepper')){ const tile = el.closest('.tile'); el.value = +state.draft[tile.dataset.id] || 0; return; }
+  if(el.id === 'restoreFile'){ const f = el.files && el.files[0]; el.value = ''; if(f) restore(f, $('#restoreBtn')); return; }
+  if(el.id === 'rDate' && el.value){ state.rpt.date = el.value; render(); return; }
+  if(el.id === 'rMonth' && el.value){ state.rpt.month = el.value; render(); return; }
+  const tr = el.closest && el.closest('tr[data-cid]');
+  if(tr && el.dataset.f){
+    const c = state.cfg.classes.find(x => x.id === tr.dataset.cid); if(!c) return;
+    const f = el.dataset.f;
+    c[f] = f === 'count' ? Math.max(0, Math.floor(+el.value || 0)) : el.value.trim();
+    if(await saveCfg()) toast('تم الحفظ');
+  }
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.target.closest && e.target.closest('.stepper')){
+    const all = [...document.querySelectorAll('.stepper input')], i = all.indexOf(e.target);
+    if(all[i+1]){ e.preventDefault(); all[i+1].focus(); all[i+1].select(); }
+  }
+});
+document.addEventListener('focusin', e => { if(e.target.closest && e.target.closest('.stepper') && e.target.tagName === 'INPUT') e.target.select(); });
+window.addEventListener('beforeunload', e => { if(state.dirty){ e.preventDefault(); e.returnValue = ''; } });
+
+init();
+</script>
+</body>
+</html>
