@@ -43,6 +43,8 @@
 :root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
 html{ scroll-padding-top:env(safe-area-inset-top,0px); }
 *,*::before,*::after{ box-sizing:inherit; }
+html{ overflow-x:hidden; }
+body{ overflow-x:clip; }
 body{ margin:0; background:var(--bg); color:var(--ink); font-family:"IBM Plex Sans Arabic",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; -webkit-font-smoothing:antialiased; font-size:14px; line-height:1.55; }
 h1,h2,h3,h4{ margin:0; }
 button,input,select{ font-family:inherit; color:inherit; }
@@ -78,7 +80,7 @@ svg{ display:block; flex:none; }
 .main{ flex:1; min-width:0; padding:28px 32px 60px; }
 .inner{ max-width:1060px; }
 .phead{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
-.phead .school{ font-size:12.5px; color:var(--muted); }
+.phead .school{ font-size:17px; font-weight:700; color:var(--ink); letter-spacing:-.01em; }
 .phead h1{ font-size:22px; font-weight:600; letter-spacing:-.02em; margin:2px 0 0; }
 .phead .sub{ font-size:12.5px; color:var(--muted); margin-top:2px; }
 .view{ display:flex; flex-direction:column; gap:14px; }
@@ -273,7 +275,7 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
   .brand h4{ font-size:16px; } .sync{ font-size:13px; }
   .nav button{ font-size:16px; padding:11px 12px; }
   .note-card, .copy{ font-size:13px; }
-  .phead .school, .phead .sub{ font-size:14px; }
+  .phead .school{ font-size:18px; } .phead .sub{ font-size:14px; }
   .phead h1{ font-size:25px; }
   .btn{ font-size:15.5px; padding:9px 15px; }
   .btn.primary{ font-size:16px; padding:10px 18px; }
@@ -315,6 +317,14 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
   .tile-foot .tag{ justify-content:center; }
   .tile-foot .btn.sm{ width:100%; padding:7px 8px; font-size:14px; }
   .savebar{ padding-inline-start:14px; }
+  body{ touch-action:pan-y pinch-zoom; }
+  .sheet-wrap, .ctable-wrap, .reged-tw, .nav, .chips{ touch-action:pan-x pan-y pinch-zoom; overscroll-behavior-x:contain; }
+  .rail{ visibility:hidden; transition:transform .2s ease, visibility 0s linear .2s; }
+  .shell.open .rail{ visibility:visible; transition:transform .2s ease; }
+  .input, select.input, .ctable .input, .regt .input, .ctable .input:focus{ font-size:16px; }
+  .banner > span:first-child{ flex:none; }
+  .banner span{ flex:1 1 200px; }
+  .bar{ min-width:0; }
 }
 @media (max-width:360px){ .grid{ grid-template-columns:minmax(0,1fr); } }
 @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
@@ -324,7 +334,7 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
   body.printing-reg #printArea{ display:block !important; }
   html,body{ background:#fff !important; }
   :root{ padding:0 !important; }
-  .topbar,.rail,.overlay,.phead,.bar,.banner,.toast,.no-print{ display:none !important; }
+  .topbar,.rail,.overlay,.phead,.bar,.banner,.toast,.tabs2,.modal-bg,.no-print{ display:none !important; }
   .shell{ display:block; }
   .main{ padding:0; } .inner{ max-width:none; }
   .sheet-wrap{ background:none; border:0; padding:0; overflow:visible; }
@@ -373,6 +383,7 @@ const REPORT_CSS = `
 .sheet{width:794px;background:#fff;color:#1d2226;padding:46px 42px 34px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;box-shadow:0 1px 3px rgba(15,41,58,.12),0 14px 34px rgba(15,41,58,.10);line-height:1.5}
 .sheet h1{font-size:30px;font-weight:700;margin:0 0 8px;color:#15191c}
 .sheet .sub{font-size:13.5px;color:#555;line-height:1.85;margin:0 0 26px}
+.sheet .sub .sch{font-size:17px;color:#111;font-weight:700}
 .sheet .charts{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:18px;align-items:start}
 .sheet figure{margin:0}
 .sheet figcaption{font-weight:600;font-size:14px;text-align:center;margin-bottom:8px;color:#222}
@@ -413,8 +424,9 @@ const REPORT_CSS = `
 const REG_CSS = `
 .reg{width:794px;background:#fff;color:#1c2b36;padding:30px 30px 26px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;box-shadow:0 1px 3px rgba(15,41,58,.12),0 14px 34px rgba(15,41,58,.10);line-height:1.4}
 .reg + .reg{margin-top:26px}
-.reg-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:6px}
+.reg-head{display:grid;grid-template-columns:1.6fr auto 1fr;align-items:center;gap:10px;margin-bottom:6px}
 .reg-head .r{font-weight:700;font-size:12.5px;line-height:2.05}
+.reg-head .r .sch{font-size:15.5px;color:#000}
 .reg-head h1{font-size:25px;font-weight:700;margin:0;text-align:center;color:#111}
 .reg-head .l{display:flex;justify-content:flex-end;align-items:center;min-height:70px}
 .reg-head .l img{max-height:78px;max-width:150px}
@@ -835,7 +847,7 @@ function buildRegSheet(dateKey){
   const pct = TS ? Math.round(TA / TS * 1000) / 10 : 0, logo = logoSrc();
   return `<article class="reg">
     <div class="reg-head">
-      <div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br>${esc(cfg.school)}</div>
+      <div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
       <h1>سجل غياب ${G().students}</h1>
       <div class="l">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
     </div>
@@ -880,7 +892,7 @@ function reportsView(){
   const tabs = `<div class="tabs2" role="tablist"><button role="tab" class="${tab === 'stats' ? 'on' : ''}" data-rtab="stats">الإحصائية</button><button role="tab" class="${tab === 'register' ? 'on' : ''}" data-rtab="register">سجل الغياب اليومي</button></div>`;
   if(tab === 'register'){
     const rec = state.days[r.date];
-    return `<div>${tabs}</div><div class="bar">
+    return `<div class="no-print">${tabs}</div><div class="bar">
       <button class="btn" data-act="rday" data-n="-1">◀ السابق</button>
       <input class="input" type="date" id="rDate" value="${r.date}" aria-label="اليوم" style="width:186px">
       <button class="btn" data-act="rday" data-n="1">التالي ▶</button>
@@ -892,7 +904,7 @@ function reportsView(){
     </div>
     <div class="sheet-wrap">${buildRegSheet(r.date)}</div>`;
   }
-  return `<div>${tabs}</div>` + statsView();
+  return `<div class="no-print">${tabs}</div>` + statsView();
 }
 function statsView(){
   const r = state.rpt;
@@ -917,9 +929,9 @@ function buildSheet(){
   const title = {daily:'التقرير اليومي لغياب ', weekly:'التقرير الأسبوعي لغياب ', monthly:'التقرير الشهري لغياب '}[r.type] + G().students;
   const a = dates[0], b = dates[dates.length-1];
   let sub;
-  if(r.type === 'daily') sub = `${esc(cfg.school)} — ${dayName(a)} ${dmy(a)} (${hijriFull(a)})`;
-  else if(r.type === 'weekly') sub = `${esc(cfg.school)} — الأسبوع من ${dmy(a)} إلى ${dmy(b)} (${hijriRange(a,b)}) · ${recN} يوم مرصود`;
-  else sub = `${esc(cfg.school)} — ${gMonth(a)} ${a.getFullYear()} (${hijriRange(a,b)}) — من ${dmy(a)} إلى ${dmy(b)} · ${recN} يوم مرصود`;
+  if(r.type === 'daily') sub = `<b class="sch">${esc(cfg.school)}</b> — ${dayName(a)} ${dmy(a)} (${hijriFull(a)})`;
+  else if(r.type === 'weekly') sub = `<b class="sch">${esc(cfg.school)}</b> — الأسبوع من ${dmy(a)} إلى ${dmy(b)} (${hijriRange(a,b)}) · ${recN} يوم مرصود`;
+  else sub = `<b class="sch">${esc(cfg.school)}</b> — ${gMonth(a)} ${a.getFullYear()} (${hijriRange(a,b)}) — من ${dmy(a)} إلى ${dmy(b)} · ${recN} يوم مرصود`;
 
   const sig = (role, nm) => `<div><div class="role">${role}</div><div class="nm">${esc(nm || '')}</div><div class="ln">التوقيع: ..................</div></div>`;
   const sigs = `<div class="sigs">${sig(G().officer, cfg.preparer)}${sig(G().deputy, cfg.deputy)}${sig(G().principal, cfg.principal)}</div>`;
