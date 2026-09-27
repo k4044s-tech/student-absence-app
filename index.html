@@ -193,6 +193,41 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
 .toast.show{ opacity:1; transform:none; }
 .toast.err{ background:var(--bad-soft); color:var(--bad); border-color:var(--bad-line); }
 
+/* register editor */
+.reged{ padding:0; overflow:hidden; }
+.reged-h{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:12px 16px; border-bottom:1px solid var(--border); }
+.reged-h b{ font-size:14px; }
+.reged-tw{ overflow-x:auto; }
+.regt{ width:100%; border-collapse:collapse; font-size:13px; min-width:820px; }
+.regt th{ text-align:start; color:var(--muted); font-weight:600; font-size:11.5px; padding:7px 8px; border-bottom:1px solid var(--border); white-space:nowrap; }
+.regt td{ padding:5px 6px; border-bottom:1px solid var(--border); }
+.regt tr:last-child td{ border-bottom:0; }
+.regt .input{ width:100%; min-height:32px; padding:4px 8px; font-size:13px; }
+.regt td.n{ color:var(--muted); width:28px; text-align:center; }
+.seg{ display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--card); }
+.seg button{ border:0; background:none; padding:5px 10px; font-size:12px; color:var(--muted); white-space:nowrap; }
+.seg button + button{ border-inline-start:1px solid var(--border); }
+.seg button.on[data-v="بعذر"]{ background:var(--good); color:#fff; font-weight:700; }
+.seg button.on[data-v="بدون"]{ background:var(--bad); color:#fff; font-weight:700; }
+.seg button.on[data-act="setterm"], .seg button.on[data-act="setgender"]{ background:var(--accent); color:var(--accent-fg); font-weight:600; }
+.seg button[data-act="setterm"], .seg button[data-act="setgender"]{ padding:7px 16px; font-size:13px; }
+.reged-f{ padding:10px 16px; border-top:1px solid var(--border); background:var(--bg); display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.logo-prev{ width:64px; height:64px; border:1px dashed var(--border-2); border-radius:8px; display:flex; align-items:center; justify-content:center; background:#fff; overflow:hidden; color:var(--muted); font-size:11px; }
+.logo-prev img{ max-width:100%; max-height:100%; }
+#printArea{ display:none; }
+.tile-foot{ justify-content:space-between; align-items:center; gap:6px; }
+.btn.sm{ padding:3px 9px; font-size:12px; }
+.btn.sm .cnt{ background:var(--accent); color:var(--accent-fg); border-radius:999px; padding:0 6px; font-size:11px; font-weight:700; }
+.modal-bg{ position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; padding:16px; }
+.modal{ background:var(--card); border:1px solid var(--border); border-radius:12px; width:min(1000px,100%); max-height:88vh; display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,.25); overflow:hidden; }
+.modal .reged{ border:0; border-radius:0; box-shadow:none; flex:1; overflow:auto; display:flex; flex-direction:column; }
+.modal .reged-tw{ flex:1; }
+.modal-x{ margin-inline-start:auto; background:none; border:1px solid var(--border); border-radius:6px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:18px; line-height:1; }
+.tabs2{ display:inline-flex; background:var(--accent-soft); border-radius:8px; padding:3px; gap:2px; }
+.tabs2 button{ border:0; background:none; border-radius:6px; padding:7px 16px; font-size:13.5px; font-weight:500; color:var(--muted); }
+.tabs2 button.on{ background:var(--card); color:var(--ink); font-weight:600; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+@media (max-width:860px){ .modal-bg{ padding:0; align-items:flex-end; } .modal{ max-height:92vh; border-radius:14px 14px 0 0; } }
+
 @media (max-width:860px){
   body{ font-size:15px; }
   .topbar{ display:flex; top:env(safe-area-inset-top,0px); }
@@ -208,9 +243,46 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
   .input, .btn{ font-size:14.5px; }
   .sheet-wrap{ padding:10px; }
 }
+@media (max-width:860px){
+  body{ font-size:16.5px; }
+  .topbar .tb-title{ font-size:16px; }
+  .brand h4{ font-size:16px; } .sync{ font-size:13px; }
+  .nav button{ font-size:16px; padding:11px 12px; }
+  .note-card, .copy{ font-size:13px; }
+  .phead .school, .phead .sub{ font-size:14px; }
+  .phead h1{ font-size:25px; }
+  .btn{ font-size:15.5px; padding:9px 15px; }
+  .btn.primary{ font-size:16px; padding:10px 18px; }
+  .btn.sm{ font-size:13.5px; padding:5px 10px; }
+  .input, .input:focus{ font-size:16px; min-height:44px; }
+  .day-label{ font-size:15.5px; padding:9px 12px; }
+  .day-label small{ font-size:13px; }
+  .tag{ font-size:13.5px; padding:3px 11px; }
+  .chip{ font-size:14.5px; padding:8px 15px; }
+  .tabs2 button{ font-size:15.5px; padding:9px 16px; }
+  .seg button{ font-size:14.5px; padding:8px 13px; }
+  .notice, .banner{ font-size:14.5px; }
+  .banner button{ font-size:14.5px; }
+  .sec-h h3{ font-size:17px; } .sec-h small{ font-size:13.5px; }
+  .kpi .l{ font-size:13.5px; } .kpi .v{ font-size:28px; } .kpi .v.t{ font-size:17px; } .kpi .s{ font-size:13.5px; }
+  .tile-name{ font-size:16.5px; } .tile-sub{ font-size:13.5px; }
+  .stepper button{ width:40px; height:40px; font-size:21px; }
+  .tally b{ font-size:28px; } .tally span{ font-size:14.5px; }
+  .ritem{ font-size:15px; } .ritem b{ font-size:15.5px; }
+  .recent h3{ font-size:17px; }
+  .panel h3{ font-size:18px; } .panel .hint{ font-size:14.5px; }
+  label.f{ font-size:14.5px; }
+  .ctable{ font-size:15px; } .ctable th{ font-size:13.5px; } .ctable .input{ font-size:15px; min-height:40px; } .ctable .btn{ font-size:14px; }
+  .regt{ font-size:15px; } .regt th{ font-size:13.5px; } .regt .input{ font-size:16px; min-height:40px; }
+  .reged-h b{ font-size:16px; }
+  .empty h2{ font-size:18px; } .empty p{ font-size:15px; }
+  .toast{ font-size:15px; }
+}
 @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
 @media print{
   @page{ size:A4; margin:10mm; }
+  body.printing-reg .shell, body.printing-reg .topbar{ display:none !important; }
+  body.printing-reg #printArea{ display:block !important; }
   html,body{ background:#fff !important; }
   :root{ padding:0 !important; }
   .topbar,.rail,.overlay,.phead,.bar,.banner,.toast,.no-print{ display:none !important; }
@@ -233,7 +305,7 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
   <aside class="rail no-print">
     <div class="brand">
       <div class="brand-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M3.5 9.5h17"/><path d="m8.5 14.5 2 2 4-4"/></svg></div>
-      <div style="min-width:0"><h4>متابعة غياب الطلاب</h4><div class="sync" id="sync">جارٍ الاتصال</div></div>
+      <div style="min-width:0"><h4 id="appName">متابعة غياب الطلاب</h4><div class="sync" id="sync">جارٍ الاتصال</div></div>
     </div>
     <nav class="nav">
       <button type="button" data-view="entry" class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>رصد الغياب</span></button>
@@ -253,6 +325,7 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
     <div id="main"><div class="loading">جارٍ تحميل البيانات…</div></div>
   </div></main>
 </div>
+<div id="printArea"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -298,7 +371,41 @@ const REPORT_CSS = `
 .sheet .nodata{padding:50px 0;text-align:center;color:#888;border:1px dashed #d8dde2;border-radius:12px;margin:10px 0 24px}
 .sheet .rt tr{break-inside:avoid}
 `;
-document.getElementById('report-css').textContent = REPORT_CSS;
+const REG_CSS = `
+.reg{width:794px;background:#fff;color:#1c2b36;padding:30px 30px 26px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;box-shadow:0 1px 3px rgba(15,41,58,.12),0 14px 34px rgba(15,41,58,.10);line-height:1.4}
+.reg + .reg{margin-top:26px}
+.reg-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:6px}
+.reg-head .r{font-weight:700;font-size:12.5px;line-height:2.05}
+.reg-head h1{font-size:25px;font-weight:700;margin:0;text-align:center;color:#111}
+.reg-head .l{display:flex;justify-content:flex-end;align-items:center;min-height:70px}
+.reg-head .l img{max-height:78px;max-width:150px}
+.reg-year{text-align:center;font-weight:700;font-size:12.5px;margin:0 0 10px}
+.reg table.rg{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px}
+.reg .rg td,.reg .rg th{border:1px solid #3b5567;height:25px;padding:0 3px;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.reg .rg th{background:#e8e9ea;font-weight:700;font-size:10.5px;height:auto;padding:4px 2px;white-space:normal}
+.reg .rg th.vt{height:58px}
+.reg .rg th.vt span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;white-space:nowrap}
+.reg .rg .cs{background:#e7f4f5}
+.reg .rg .ca{background:#93d4dc}
+.reg .rg th.ca{background:#41b3bf;color:#fff}
+.reg .rg .gy{background:#dcdcdc}
+.reg .rg tr.thick td{border-bottom:2.5px solid #000}
+.reg .rg tr.info td{height:28px;text-align:right;font-weight:700;padding:0 8px;font-size:11.5px}
+.reg .rg tr.foot td{background:#e8e9ea;font-weight:700;text-align:right;height:28px;padding:0 8px;font-size:11.5px}
+.reg .rg td.nm{text-align:right;padding-inline-start:7px;font-size:11.5px}
+.reg .rg td.ph{direction:ltr;font-size:10.5px}
+.reg .rg td.tk{font-weight:700;font-size:13px}
+.reg .rg td.sm{font-size:10px}
+.reg .rg td.tm{font-size:10.5px;direction:ltr}
+.reg .rg td.gc{font-weight:700;font-size:11.5px}
+.reg .rg td.tb{border-bottom:2.5px solid #000}
+.reg .rg tr.foot td{border-top:2.5px solid #000}
+.reg .rg thead{display:table-header-group}
+.reg-sign{display:flex;justify-content:space-between;font-weight:700;font-size:12px;margin-top:14px;padding:0 6px}
+.reg-sign span:last-child{margin-inline-end:120px}
+@media print{.reg{box-shadow:none;width:auto;padding:0;margin:0;break-after:page}.reg:last-child{break-after:auto}.reg + .reg{margin-top:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+`;
+document.getElementById('report-css').textContent = REPORT_CSS + REG_CSS;
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -313,7 +420,7 @@ const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); retu
 const fmtN = n => Number(n).toLocaleString('en-US', {maximumFractionDigits:1});
 const dayName = d => new Intl.DateTimeFormat('ar-EG',{weekday:'long'}).format(d);
 const gMonth = d => new Intl.DateTimeFormat('ar-EG',{month:'long'}).format(d);
-const dmy = d => `${pad(d.getDate())} / ${pad(d.getMonth()+1)} / ${d.getFullYear()}`;
+const dmy = d => `\u2066${pad(d.getDate())} / ${pad(d.getMonth()+1)} / ${d.getFullYear()}\u2069`;
 function hijri(d){
   try{
     const o = {};
@@ -344,7 +451,7 @@ function toast(msg, kind){
 }
 
 /* ---------- state & storage ---------- */
-const DEFAULT_CFG = { school:'مدرسة سلامة الدراج الابتدائية و المتوسطة', preparer:'', principalTitle:'المدير', principal:'', deputyTitle:'الوكيل', deputy:'', classes:[] };
+const DEFAULT_CFG = { gender:'بنين', school:'مدرسة سلامة الدراج الابتدائية و المتوسطة', preparer:'', principalTitle:'المدير', principal:'', deputyTitle:'الوكيل', deputy:'', edu:'الإدارة العامة للتعليم بجازان', schoolType:'مدرسة ابتدائية و متوسطة', schoolShort:'سلامة الدراج بنين', year:'١٤٤٨ - ١٤٤٩', term:'', officerTitle:'مسؤول الغياب', logo:'', classes:[] };
 const today = iso(new Date());
 const state = {
   cfg: null, days: {}, mode: 'local', db: null, downloads: null, ready: {cfg:false, days:false},
@@ -373,9 +480,10 @@ async function saveCfg(){
   if(state.mode === 'db') return dbWrite(() => state.db.doc('config/main').set(clone(state.cfg)));
   lsSet('cfg', state.cfg); onData(); return true;
 }
-async function saveDay(date, entries){
+async function saveDay(date, entries, students){
   const total = Object.values(entries).reduce((a,b) => a + (+b||0), 0);
-  const body = { date, entries, total, savedAt: new Date().toISOString() };
+  const prev = state.days[date];
+  const body = { date, entries, total, students: students !== undefined ? students : ((prev && prev.students) || {}), savedAt: new Date().toISOString() };
   if(state.mode === 'db') return dbWrite(() => state.db.doc('days/' + date).set(body));
   state.days[date] = body; lsSet('days', state.days); return true;
 }
@@ -421,18 +529,32 @@ if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
+/* صيغ المذكر والمؤنث حسب نوع المدرسة */
+function G(){
+  const f = !!(state.cfg && state.cfg.gender === 'بنات');
+  return { f,
+    students: f ? 'الطالبات' : 'الطلاب', student: f ? 'طالبة' : 'طالب', studentDef: f ? 'الطالبة' : 'الطالب',
+    nStudents: f ? 'طالبة' : 'طالبًا', absentAcc: f ? 'غائبة' : 'غائبًا', absents: f ? 'غائبات' : 'غائبين',
+    absentsNom: f ? 'الغائبات' : 'الغائبون', presentNom: f ? 'الحاضرات' : 'الحاضرون', oneAbsent: f ? 'طالبة غائبة' : 'طالب غائب',
+    principal: f ? 'المديرة' : 'المدير', deputy: f ? 'الوكيلة' : 'الوكيل', officer: f ? 'مسؤولة الغياب' : 'مسؤول الغياب', teacher: f ? 'المعلمة' : 'المعلم',
+    enrolled: f ? 'المسجلات' : 'المسجلون', regEnrolled: f ? 'المقيدات' : 'المقيدين', regPresent: f ? 'الحاضرات' : 'الحاضرين', regAbsent: f ? 'الغائبات' : 'الغائبين'
+  };
+}
+const isDirty = () => state.dirty || state.regDirty;
 function loadDraft(){
   const rec = state.days[state.entryDate];
   state.draft = rec ? clone(rec.entries || {}) : {};
-  state.dirty = false;
+  state.regDraft = rec ? clone(rec.students || {}) : {};
+  state.dirty = false; state.regDirty = false;
 }
 function onData(){
   if(!state.ready.cfg || !state.ready.days) return;
-  if(!state.dirty) loadDraft();
+  if(!isDirty()) loadDraft();
   $('#schoolName').textContent = state.cfg.school || '';
   const ae = document.activeElement;
   if(state.view === 'entry' && ae && ae.closest && ae.closest('.tile')) { updateTally(); return; }
   if(state.view === 'settings' && ae && ae.closest && ae.closest('.panel') && ae.tagName === 'INPUT') return;
+  if(ae && ae.closest && ae.closest('.reged')) return;
   render();
 }
 
@@ -467,19 +589,20 @@ function render(){
   if(!state.cfg) return;
   document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.view === state.view));
   $('#schoolName').textContent = state.cfg.school || '';
+  $('#appName').textContent = document.title = 'متابعة غياب ' + G().students;
   const sy = $('#sync'); sy.textContent = isStandalone() ? 'تطبيق مثبّت · حفظ على الجهاز' : 'حفظ على الجهاز'; sy.className = 'sync' + (state.mode === 'db' ? '' : ' local');
   $('#railNote').innerHTML = railNote();
   $('#banner').innerHTML = bannerHTML();
   const d = parse(state.entryDate);
   const head = {
-    entry: ['رصد الغياب اليومي', `${dayName(d)} ${AR(dmy(d))} · ${AR(classes().length)} فصلًا · ${arN(totalStudents())} طالبًا`],
-    reports: ['التقارير', 'يومية وأسبوعية وشهرية، جاهزة للطباعة'],
+    entry: ['رصد الغياب اليومي', `${dayName(d)} ${AR(dmy(d))} · ${AR(classes().length)} فصلًا · ${arN(totalStudents())} ${G().nStudents}`],
+    reports: ['التقارير', 'الإحصائية وسجل الغياب اليومي، جاهزة للطباعة'],
     settings: ['الفصول والإعدادات', 'تُضبط مرة واحدة وتُستخدم في الرصد والتقارير']
   }[state.view];
   $('#pTitle').textContent = head[0]; $('#pSub').textContent = head[1]; $('#tbTitle').textContent = head[0];
   $('#shell').classList.remove('open');
   const m = $('#main');
-  m.innerHTML = `<div class="view">${state.view === 'entry' ? entryView() : state.view === 'reports' ? reportsView() : settingsView()}</div>`;
+  m.innerHTML = `<div class="view">${({entry:entryView, reports:reportsView, settings:settingsView})[state.view]()}</div>`;
   if(state.view === 'entry') updateTally();
 }
 
@@ -503,7 +626,7 @@ function entryView(){
   STAGES.forEach(st => {
     const cl = list.filter(c => c.stage === st.k); if(!cl.length) return;
     const n = cl.reduce((a,c) => a + (+c.count||0), 0);
-    html += `<div class="sec-h"><h3>المرحلة ال${st.k === 'متوسط' ? 'متوسطة' : 'ابتدائية'}</h3><small>${AR(cl.length)} فصول · ${arN(n)} طالبًا</small></div><div class="grid">${cl.map(tileHTML).join('')}</div>`;
+    html += `<div class="sec-h"><h3>المرحلة ال${st.k === 'متوسط' ? 'متوسطة' : 'ابتدائية'}</h3><small>${AR(cl.length)} فصول · ${arN(n)} ${G().nStudents}</small></div><div class="grid">${cl.map(tileHTML).join('')}</div>`;
   });
   html += `<div class="savebar">
     <div class="tally"><b id="tAbs">0</b><span id="tTxt"></span></div>
@@ -516,23 +639,27 @@ function entryView(){
     const ts = totalStudents();
     html += `<section class="recent"><h3>آخر الأيام المرصودة</h3><div class="rlist">` + recent.map(k => {
       const r = state.days[k], dd = parse(k), t = +r.total || 0;
-      return `<button class="ritem" data-open="${k}"><span>${dayName(dd)} ${AR(dmy(dd))}</span><b>${arN(t)} غائبًا${ts ? ` · ${AR(Math.round((1 - t/ts)*100))}٪` : ''}</b></button>`;
+      return `<button class="ritem" data-open="${k}"><span>${dayName(dd)} ${AR(dmy(dd))}</span><b>${arN(t)} ${G().absentAcc}${ts ? ` · ${AR(Math.round((1 - t/ts)*100))}٪` : ''}</b></button>`;
     }).join('') + `</div></section>`;
   }
   return html;
+}
+function namesBtn(c){
+  const n = (state.regDraft[c.id] || []).filter(r => (r.name||'').trim()).length;
+  return `<button class="btn sm" data-act="names">إدخال الغياب${n ? ` <span class="cnt">${n}</span>` : ''}</button>`;
 }
 function tileState(c){
   const v = +state.draft[c.id] || 0, cnt = +c.count || 0, r = cnt ? v/cnt : 0;
   return {
     v, cnt,
     cls: v ? (r >= HIGH ? 'hi' : 'has') : '',
-    tag: !v ? `<span class="tag ok">لا غياب</span>` : `<span class="tag ${r >= HIGH ? 'bad' : 'warn'}">${AR(Math.round(r*100))}٪ من الفصل</span>`
+    tag: (!v ? `<span class="tag ok">لا غياب</span>` : `<span class="tag ${r >= HIGH ? 'bad' : 'warn'}">${AR(Math.round(r*100))}٪ من الفصل</span>`) + namesBtn(c)
   };
 }
 function tileHTML(c){
   const s = tileState(c);
   return `<div class="tile ${s.cls}" data-id="${esc(c.id)}">
-    <div class="tile-top"><span class="tile-name">${esc(c.grade)} / ${esc(c.section)}</span><span class="tile-sub">${arN(s.cnt)} طالبًا</span></div>
+    <div class="tile-top"><span class="tile-name">${esc(c.grade)} / ${esc(c.section)}</span><span class="tile-sub">${arN(s.cnt)} ${G().nStudents}</span></div>
     <div class="stepper"><button data-act="inc" aria-label="زيادة">+</button><input type="number" inputmode="numeric" min="0" max="${s.cnt}" value="${s.v}" aria-label="غائبو ${esc(clsLabel(c))}"><button data-act="dec" aria-label="إنقاص">−</button></div>
     <div class="tile-foot">${s.tag}</div>
   </div>`;
@@ -550,17 +677,155 @@ function updateTally(){
   list.forEach(c => { const v = +state.draft[c.id] || 0; abs += v; if(v){ withAbs++; const r = c.count ? v/c.count : 0; if(!top || r > top.r) top = {c, v, r}; } });
   const ts = totalStudents(), rate = ts ? Math.round((1 - abs/ts)*1000)/10 : 0;
   a.textContent = arN(abs);
-  $('#tTxt').textContent = `غائبًا من ${arN(ts)} طالبًا`;
+  $('#tTxt').textContent = `${G().absentAcc} من ${arN(ts)} ${G().nStudents}`;
   const k = (cls, l, v, s, t, ic) => `<div class="kpi ${cls}"><span class="l"><span class="ki">${KI[ic]}</span>${l}</span><span class="v ${t ? 't' : ''}">${v}</span><span class="s">${s}</span></div>`;
   $('#kpis').innerHTML =
-    k(abs ? 'warn' : 'good', 'الغائبون', arN(abs), `من ${arN(ts)} طالبًا`, false, 'abs') +
+    k(abs ? 'warn' : 'good', G().absentsNom, arN(abs), `من ${arN(ts)} ${G().nStudents}`, false, 'abs') +
     k(rate >= 90 ? 'good' : 'bad', 'نسبة الحضور', AR(rate) + '٪', rate >= 90 ? 'ضمن المعدل المقبول' : 'أقل من 90٪', false, 'rate') +
     k('', 'فصول بها غياب', `${AR(withAbs)} / ${AR(list.length)}`, withAbs ? `${AR(list.length - withAbs)} فصلًا بلا غياب` : 'كل الفصول مكتملة', false, 'cls') +
-    k(top && top.r >= HIGH ? 'bad' : '', 'أعلى فصل غيابًا', top ? esc(`${top.c.grade} ${top.c.stage} / ${top.c.section}`) : '—', top ? `${arN(top.v)} غائبين · ${AR(Math.round(top.r*100))}٪` : 'لا يوجد غياب', true, 'top');
+    k(top && top.r >= HIGH ? 'bad' : '', 'أعلى فصل غيابًا', top ? esc(`${top.c.grade} ${top.c.stage} / ${top.c.section}`) : '—', top ? `${arN(top.v)} ${G().absents} · ${AR(Math.round(top.r*100))}٪` : 'لا يوجد غياب', true, 'top');
   const rec = state.days[state.entryDate];
-  $('#saveBtn').disabled = !state.dirty && !!rec;
-  $('#saveBtn').textContent = rec ? (state.dirty ? 'حفظ التعديلات' : 'محفوظ') : 'حفظ غياب اليوم';
-  $('#dirtyActs').innerHTML = state.dirty && rec ? `<button class="btn" data-act="revert">تراجع</button>` : '';
+  $('#saveBtn').disabled = !isDirty() && !!rec;
+  $('#saveBtn').textContent = rec ? (isDirty() ? 'حفظ التعديلات' : 'محفوظ') : 'حفظ غياب اليوم';
+  $('#dirtyActs').innerHTML = isDirty() && rec ? `<button class="btn" data-act="revert">تراجع</button>` : '';
+}
+
+/* ---------- register (سجل الغياب) ---------- */
+const DEFAULT_LOGO = 'data:image/png;base64,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';
+const logoSrc = () => state.cfg.logo === 'none' ? '' : (state.cfg.logo || DEFAULT_LOGO);
+const ANSWERS = ['الأب','الأم','الأخ','الأخت','ولي الأمر','لم يرد'];
+function gradeGroups(){
+  const out = [];
+  classes().forEach(c => { const k = c.stage + '|' + c.grade; let g = out.find(x => x.k === k); if(!g){ g = {k, stage:c.stage, grade:c.grade, label:`${c.grade} ${c.stage}`, cls:[]}; out.push(g); } g.cls.push(c); });
+  return out;
+}
+function nameHistory(cid){
+  const m = new Map();
+  Object.keys(state.days).sort().forEach(k => { ((state.days[k].students || {})[cid] || []).forEach(r => { if(r.name) m.set(r.name.trim(), r.phone || (m.get(r.name.trim()) || '')); }); });
+  return m;
+}
+const newRow = () => ({name:'', type:'بدون', phone:'', time:'', answer:'', reason:''});
+const namedCount = cid => (state.regDraft[cid] || []).filter(r => (r.name||'').trim()).length;
+
+/* نافذة إدخال أسماء الغائبين لفصل */
+function openNames(cid){
+  const c = state.cfg.classes.find(x => x.id === cid); if(!c) return;
+  const rows = state.regDraft[cid] = state.regDraft[cid] || [];
+  const want = +state.draft[cid] || 0;
+  while(rows.length < want) rows.push(newRow());
+  if(!rows.length) rows.push(newRow());
+  state.modalCid = cid; renderModal();
+  const first = document.querySelector('.modal input[data-rf="name"]'); if(first) first.focus();
+}
+function renderModal(){
+  let bg = $('#modalBg');
+  if(!state.modalCid){ if(bg) bg.remove(); return; }
+  const c = state.cfg.classes.find(x => x.id === state.modalCid); if(!c){ state.modalCid = null; if(bg) bg.remove(); return; }
+  if(!bg){ bg = document.createElement('div'); bg.id = 'modalBg'; bg.className = 'modal-bg no-print'; document.body.appendChild(bg); }
+  const rows = state.regDraft[c.id] || [], hist = nameHistory(c.id), d = parse(state.entryDate);
+  bg.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="غياب ${esc(clsLabel(c))}">
+    <div class="card reged" data-cid="${esc(c.id)}">
+      <div class="reged-h"><b>غياب ${esc(clsLabel(c))}</b><span class="tag mute">${dayName(d)} ${dmy(d)}</span><span class="tag mute">${G().enrolled} ${c.count || 0}</span><span class="tag warn">المرصود ${+state.draft[c.id] || 0}</span><button class="modal-x" data-act="mclose" aria-label="إغلاق">×</button></div>
+      <div class="reged-tw"><table class="regt"><thead><tr><th>#</th><th style="width:26%">اسم ${G().studentDef}</th><th>نوع الغياب</th><th>رقم الهاتف</th><th>الزمن</th><th>المجيب</th><th style="width:20%">سبب الغياب</th><th></th></tr></thead><tbody>
+      ${rows.map((r,i) => `<tr data-i="${i}">
+        <td class="n">${i+1}</td>
+        <td><input class="input" data-rf="name" list="nl-m" value="${esc(r.name)}" placeholder="الاسم الرباعي"></td>
+        <td><div class="seg"><button data-act="rtype" data-v="بعذر" class="${r.type === 'بعذر' ? 'on' : ''}">بعذر</button><button data-act="rtype" data-v="بدون" class="${r.type !== 'بعذر' ? 'on' : ''}">بدون</button></div></td>
+        <td><input class="input" data-rf="phone" type="tel" inputmode="tel" dir="ltr" value="${esc(r.phone)}" placeholder="05xxxxxxxx"></td>
+        <td><input class="input" data-rf="time" type="time" value="${esc(r.time)}"></td>
+        <td><input class="input" data-rf="answer" list="al-m" value="${esc(r.answer)}"></td>
+        <td><input class="input" data-rf="reason" value="${esc(r.reason)}"></td>
+        <td><button class="btn danger" data-act="rdel" aria-label="حذف">حذف</button></td></tr>`).join('')}
+      </tbody></table></div>
+      <datalist id="nl-m">${[...hist.keys()].map(n => `<option value="${esc(n)}">`).join('')}</datalist>
+      <datalist id="al-m">${ANSWERS.map(a => `<option value="${a}">`).join('')}</datalist>
+      <div class="reged-f"><button class="btn" data-act="radd">+ إضافة ${G().student}</button><span class="grow"></span><button class="btn" data-act="mclose">إغلاق</button><button class="btn primary" data-act="msave">حفظ</button></div>
+    </div></div>`;
+}
+function closeModal(){
+  const cid = state.modalCid; state.modalCid = null; renderModal();
+  if(!cid) return;
+  const rows = state.regDraft[cid] || [];
+  state.regDraft[cid] = rows.filter(r => (r.name||'').trim() || r.phone || r.reason);
+  const n = namedCount(cid);
+  if(n > (+state.draft[cid] || 0)){ state.draft[cid] = n; state.dirty = true; }
+  const tile = document.querySelector(`.tile[data-id="${cid}"]`);
+  if(tile){ tile.querySelector('.stepper input').value = +state.draft[cid] || 0; refreshTile(tile); updateTally(); }
+}
+async function saveAll(){
+  const date = state.entryDate, entries = {}, students = {};
+  classes().forEach(c => entries[c.id] = +state.draft[c.id] || 0);
+  Object.entries(state.regDraft).forEach(([cid, rows]) => {
+    const clean = rows.map(r => ({name:(r.name||'').trim(), type:r.type === 'بعذر' ? 'بعذر' : 'بدون', phone:(r.phone||'').trim(), time:r.time||'', answer:(r.answer||'').trim(), reason:(r.reason||'').trim()})).filter(r => r.name);
+    if(clean.length) students[cid] = clean;
+    if(entries[cid] != null && clean.length > entries[cid]) entries[cid] = clean.length;
+  });
+  if(await saveDay(date, entries, students)){ if(document.activeElement) document.activeElement.blur(); loadDraft(); toast('تم حفظ غياب ' + dayName(parse(date))); render(); return true; }
+  return false;
+}
+function refreshRegPreview(){}
+
+/* سجل غياب الطلاب — نموذج الطباعة (من البيانات المحفوظة) */
+const gradeCode = c => `${GRADES.indexOf(c.grade) + 1}/${c.stage === 'متوسط' ? 'م' : 'ب'}`;
+function buildRegSheet(dateKey){
+  const cfg = state.cfg, d = parse(dateKey), rec = state.days[dateKey] || {}, E = rec.entries || {}, S = rec.students || {};
+  let hij = ''; try{ hij = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'}).format(d); }catch(e){}
+  const named = c => (S[c.id] || []).filter(r => (r.name||'').trim());
+  const absOf = c => Math.max(+E[c.id] || 0, named(c).length);
+  const blankSt = `<td class="nm"></td><td class="gy"></td><td class="gy"></td><td></td><td></td><td></td><td></td><td></td>`;
+  const stCells = s => `<td class="nm">${esc(s.name)}</td><td class="gy tk">${s.type === 'بعذر' ? '✓' : ''}</td><td class="gy tk">${s.type !== 'بعذر' ? '✓' : ''}</td><td class="ph">${esc(s.phone)}</td><td class="tm">${esc(s.time)}</td><td class="sm">${esc(s.answer)}</td><td class="sm">${esc(s.reason)}</td><td></td>`;
+  let TS = 0, TA = 0, rows = 0, body = '';
+  gradeGroups().forEach(g => {
+    const crs = g.cls.map(c => { const st = named(c); return {c, st, n: Math.max(1, st.length)}; });
+    const gRows = crs.reduce((a,x) => a + x.n, 0);
+    crs.forEach((cr, ci) => {
+      const lastC = ci === crs.length - 1, n = +cr.c.count || 0, a = absOf(cr.c);
+      TS += n; TA += a;
+      for(let k = 0; k < cr.n; k++){
+        const endG = lastC && k === cr.n - 1;
+        let tds = '';
+        if(ci === 0 && k === 0) tds += `<td class="cs gc tb" rowspan="${gRows}">${gradeCode(cr.c)}</td>`;
+        if(k === 0){ const sp = cr.n > 1 ? ` rowspan="${cr.n}"` : '', tb = lastC ? ' tb' : '';
+          tds += `<td class="cs${tb}"${sp}>${esc(cr.c.section)}</td><td class="cs${tb}"${sp}>${n}</td><td class="cs${tb}"${sp}>${Math.max(0, n - a)}</td><td class="ca${tb}"${sp}>${a}</td>`; }
+        tds += cr.st[k] ? stCells(cr.st[k]) : blankSt;
+        body += `<tr class="${endG ? 'thick' : ''}">${tds}</tr>`; rows++;
+      }
+    });
+  });
+  for(; rows < 24; rows++) body += `<tr><td class="cs"></td><td class="cs"></td><td class="cs"></td><td class="cs"></td><td class="ca"></td>${blankSt}</tr>`;
+  const pct = TS ? Math.round(TA / TS * 1000) / 10 : 0, logo = logoSrc();
+  return `<article class="reg">
+    <div class="reg-head">
+      <div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br>${esc(cfg.schoolType)}<br>${esc(cfg.schoolShort)}</div>
+      <h1>سجل غياب ${G().students}</h1>
+      <div class="l">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
+    </div>
+    <div class="reg-year">للعام الدراسي ( ${esc(cfg.year)} هـ ) الفصل الدراسي ( ${esc(cfg.term) || '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'} )</div>
+    <table class="rg">
+      <colgroup><col style="width:5%"><col style="width:4.5%"><col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:23%"><col style="width:4.5%"><col style="width:4.5%"><col style="width:11.5%"><col style="width:8.5%"><col style="width:6.5%"><col style="width:10.5%"><col style="width:6.5%"></colgroup>
+      <thead>
+      <tr class="info"><td colspan="7">اليوم : ${dayName(d)}</td><td colspan="6">التاريخ : ${hij} <span style="font-weight:500;font-size:10px">(${dmy(d).replace(/ /g,'')})</span></td></tr>
+      <tr><th class="vt cs" rowspan="2"><span>الصف</span></th><th class="vt cs" rowspan="2"><span>الفصل</span></th><th class="vt cs" rowspan="2"><span>${G().enrolled}</span></th><th class="vt cs" rowspan="2"><span>الحضور</span></th><th class="vt ca" rowspan="2"><span>الغياب</span></th>
+        <th rowspan="2">اسم ${G().studentDef}</th><th colspan="2">نوع الغياب</th><th rowspan="2">رقم الهاتف</th><th rowspan="2">الزمن</th><th class="vt" rowspan="2"><span>المجيب</span></th><th rowspan="2">سبب الغياب</th><th rowspan="2" style="font-size:9.5px">توقيع ${G().teacher}</th></tr>
+      <tr><th class="gy">بعذر</th><th class="gy">بدون</th></tr>
+      </thead>
+      <tbody>${body}
+      <tr class="foot"><td colspan="5">${G().regEnrolled} : ${TS}</td><td>${G().regPresent} : ${Math.max(0, TS - TA)}</td><td colspan="3">${G().regAbsent} : ${TA}</td><td colspan="4">نسبة الغياب : ${pct}%</td></tr>
+      </tbody>
+    </table>
+    <div class="reg-sign"><span>اسم ${G().officer} : ${esc(cfg.preparer || '')}</span><span>التوقيع : ..................</span></div>
+  </article>`;
+}
+async function downloadRegister(){
+  const dl = state.downloads; if(!dl) return;
+  const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>سجل غياب ${G().students} ${state.rpt.date}</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>${REG_CSS}body{margin:0;background:#eef1f4;padding:24px 0}
+.pbtn{display:block;margin:0 auto 16px;font:600 15px 'IBM Plex Sans Arabic',Tahoma,sans-serif;background:#18181b;color:#fff;border:0;border-radius:8px;padding:10px 26px;cursor:pointer}
+@media print{@page{size:A4;margin:10mm}body{background:#fff;padding:0}.pbtn{display:none}}</style></head>
+<body><button class="pbtn" onclick="window.print()">طباعة / حفظ PDF</button>${buildRegSheet(state.rpt.date)}</body></html>`;
+  try{ await dl.save({filename:`absence-register-${state.rpt.date}.html`, data: html}); toast('تم تنزيل السجل. افتحه في المتصفح ثم اضغط «طباعة».'); }
+  catch(e){ if(!e || e.code !== 'declined') toast('تعذّر التنزيل.','err'); }
 }
 
 /* ---------- reports ---------- */
@@ -572,6 +837,25 @@ function rangeDates(r){
   return out;
 }
 function reportsView(){
+  const r = state.rpt, tab = r.tab || 'stats';
+  const tabs = `<div class="tabs2" role="tablist"><button role="tab" class="${tab === 'stats' ? 'on' : ''}" data-rtab="stats">الإحصائية</button><button role="tab" class="${tab === 'register' ? 'on' : ''}" data-rtab="register">سجل الغياب اليومي</button></div>`;
+  if(tab === 'register'){
+    const rec = state.days[r.date];
+    return `<div>${tabs}</div><div class="bar">
+      <button class="btn" data-act="rday" data-n="-1">◀ السابق</button>
+      <input class="input" type="date" id="rDate" value="${r.date}" aria-label="اليوم" style="width:186px">
+      <button class="btn" data-act="rday" data-n="1">التالي ▶</button>
+      ${rec ? `<span class="tag ok">مرصود</span>` : `<span class="tag mute">لم يُرصد هذا اليوم</span>`}
+      <span style="color:var(--muted);font-size:12.5px;margin-inline-start:8px">الفصل الدراسي</span>
+      <div class="seg">${['الأول','الثاني'].map(v => `<button type="button" data-act="setterm" data-v="${v}" class="${state.cfg.term === v ? 'on' : ''}">${v}</button>`).join('')}</div>
+      <span class="grow"></span>
+      <button class="btn primary" data-act="print">${ICON.print} طباعة السجل</button>
+    </div>
+    <div class="sheet-wrap">${buildRegSheet(r.date)}</div>`;
+  }
+  return `<div>${tabs}</div>` + statsView();
+}
+function statsView(){
   const r = state.rpt;
   const picker = r.type === 'monthly'
     ? `<input class="input" type="month" id="rMonth" value="${r.month}" aria-label="الشهر">`
@@ -582,7 +866,6 @@ function reportsView(){
     </div>
     ${picker}
     <span class="grow"></span>
-    ${state.downloads ? `<button class="btn" data-act="download">${ICON.down} تنزيل التقرير</button>` : ''}
     <button class="btn primary" data-act="print">${ICON.print} طباعة التقرير</button>
   </div>
   <div class="sheet-wrap">${buildSheet()}</div>`;
@@ -592,7 +875,7 @@ function buildSheet(){
   const r = state.rpt, cfg = state.cfg, list = classes();
   const dates = rangeDates(r), keys = dates.map(iso), rec = keys.filter(k => state.days[k]);
   const recN = rec.length;
-  const title = {daily:'التقرير اليومي لغياب الطلاب', weekly:'التقرير الأسبوعي لغياب الطلاب', monthly:'التقرير الشهري لغياب الطلاب'}[r.type];
+  const title = {daily:'التقرير اليومي لغياب ', weekly:'التقرير الأسبوعي لغياب ', monthly:'التقرير الشهري لغياب '}[r.type] + G().students;
   const a = dates[0], b = dates[dates.length-1];
   let sub;
   if(r.type === 'daily') sub = `${esc(cfg.school)} — ${dayName(a)} ${dmy(a)} (${hijriFull(a)})`;
@@ -600,7 +883,7 @@ function buildSheet(){
   else sub = `${esc(cfg.school)} — ${gMonth(a)} ${a.getFullYear()} (${hijriRange(a,b)}) — من ${dmy(a)} إلى ${dmy(b)} · ${recN} يوم مرصود`;
 
   const sig = (role, nm) => `<div><div class="role">${role}</div><div class="nm">${esc(nm || '')}</div><div class="ln">التوقيع: ..................</div></div>`;
-  const sigs = `<div class="sigs">${sig('مسؤول الغياب', cfg.preparer)}${sig(esc(cfg.deputyTitle || 'الوكيل'), cfg.deputy)}${sig(esc(cfg.principalTitle || 'المدير'), cfg.principal)}</div>`;
+  const sigs = `<div class="sigs">${sig(G().officer, cfg.preparer)}${sig(G().deputy, cfg.deputy)}${sig(G().principal, cfg.principal)}</div>`;
   const foot = sigs + `<div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}${cfg.preparer ? ' — ' + esc(cfg.preparer) : ''}</span><span>جميع الحقوق محفوظة © ${COPYRIGHT}</span></div>`;
   if(!list.length || !recN){
     return `<article class="sheet"><h1>${title}</h1><p class="sub">${sub}</p><div class="nodata">${!list.length ? 'لا توجد فصول مسجلة بعد.' : 'لا يوجد غياب مرصود في هذه الفترة.'}</div>${foot}</article>`;
@@ -634,7 +917,7 @@ function buildSheet(){
 
   const legend = groups.map(g => `<div class="it"><span class="dot" style="background:${g.color}"></span><span>${esc(g.label)}</span><span class="v"><b>${fmtN(g.value)}</b><small>${TA ? Math.round(g.value/TA*100) : 0}٪</small></span></div>`).join('');
   const charts = `<div class="charts">
-    <figure><figcaption>توزيع الغياب حسب الصف</figcaption><div class="donut">${donutSVG(groups, TA, recN > 1 ? 'حالة غياب' : 'طالب غائب')}</div><div class="legend">${legend}</div></figure>
+    <figure><figcaption>توزيع الغياب حسب الصف</figcaption><div class="donut">${donutSVG(groups, TA, recN > 1 ? 'حالة غياب' : G().oneAbsent)}</div><div class="legend">${legend}</div></figure>
     <figure><figcaption>${barCap}</figcaption>${barsSVG(barItems, r.type === 'daily' || r.type === 'weekly')}</figure>
   </div>`;
 
@@ -648,12 +931,12 @@ function buildSheet(){
 
   let thead, rows = '', total;
   if(r.type === 'daily'){
-    thead = `<tr><th>م</th><th>الفصل</th><th>عدد الطلاب<small>طالب</small></th><th>الحاضرون<small>طالب</small></th><th>الغائبون<small>طالب</small></th><th>نسبة الحضور</th></tr>`;
+    thead = `<tr><th>م</th><th>الفصل</th><th>عدد ${G().students}<small>${G().student}</small></th><th>${G().presentNom}<small>${G().student}</small></th><th>${G().absentsNom}<small>${G().student}</small></th><th>نسبة الحضور</th></tr>`;
     stats.forEach((s,i) => { const n = +s.c.count||0; rows += `<tr><td class="idx">${i+1}</td><td class="name">${esc(clsLabel(s.c))}</td><td class="days">${fmtN(n)}</td>${numTd(n - s.abs, false)}${numTd(s.abs, badAbs(s.abs, n))}${rateTd(s.rate)}</tr>`; });
     total = `<tr class="total"><td></td><td class="name">الإجمالي</td><td>${fmtN(TS)}</td><td>${fmtN(TS - TA)}</td><td>${fmtN(TA)}</td>${rateTd(TR)}</tr>`;
   } else if(r.type === 'weekly'){
     const dh = keys.map(k => `<th>${dayName(parse(k))}<small>${parse(k).getDate()}/${parse(k).getMonth()+1}</small></th>`).join('');
-    thead = `<tr><th>م</th><th>الفصل</th><th>عدد الطلاب<small>طالب</small></th>${dh}<th>مجموع الغياب<small>حالة</small></th><th>نسبة الحضور</th></tr>`;
+    thead = `<tr><th>م</th><th>الفصل</th><th>عدد ${G().students}<small>${G().student}</small></th>${dh}<th>مجموع الغياب<small>حالة</small></th><th>نسبة الحضور</th></tr>`;
     stats.forEach((s,i) => {
       const n = +s.c.count||0;
       const cells = keys.map(k => state.days[k] ? numTd(s.per[k], badAbs(s.per[k], n)) : `<td class="na">—</td>`).join('');
@@ -662,7 +945,7 @@ function buildSheet(){
     const dt = keys.map(k => state.days[k] ? `<td>${fmtN(stats.reduce((a,x) => a + x.per[k], 0))}</td>` : `<td class="na">—</td>`).join('');
     total = `<tr class="total"><td></td><td class="name">الإجمالي</td><td>${fmtN(TS)}</td>${dt}<td>${fmtN(TA)}</td>${rateTd(TR)}</tr>`;
   } else {
-    thead = `<tr><th>م</th><th>الفصل</th><th>عدد الطلاب<small>طالب</small></th><th>أيام الرصد<small>يوم</small></th><th>مجموع الغياب<small>حالة</small></th><th>متوسط الغياب<small>طالب/يوم</small></th><th>أعلى غياب<small>في يوم</small></th><th>نسبة الحضور</th></tr>`;
+    thead = `<tr><th>م</th><th>الفصل</th><th>عدد ${G().students}<small>${G().student}</small></th><th>أيام الرصد<small>يوم</small></th><th>مجموع الغياب<small>حالة</small></th><th>متوسط الغياب<small>${G().student}/يوم</small></th><th>أعلى غياب<small>في يوم</small></th><th>نسبة الحضور</th></tr>`;
     stats.forEach((s,i) => {
       const n = +s.c.count||0, avg = Math.round(s.abs/recN*10)/10;
       rows += `<tr><td class="idx">${i+1}</td><td class="name">${esc(clsLabel(s.c))}</td><td>${fmtN(n)}</td><td class="days">${recN}</td>${numTd(s.abs, badAbs(s.abs, s.sd))}${numTd(avg, false)}${numTd(s.max, badAbs(s.max, n))}${rateTd(s.rate)}</tr>`;
@@ -693,7 +976,7 @@ function barsSVG(items, rotate){
   const step = niceStep(Math.max(1, ...items.map(i => i.value)) / 4), max = step*4;
   const n = Math.max(items.length, 1), slot = cw/n, bw = Math.max(4, Math.min(16, slot*0.55));
   const F = `font-family="IBM Plex Sans Arabic,Tahoma,sans-serif"`;
-  let g = `<text x="${pL}" y="${pT-5}" font-size="8.5" fill="#999" text-anchor="end" ${F}>طالب</text>`;
+  let g = `<text x="${pL}" y="${pT-5}" font-size="8.5" fill="#999" text-anchor="end" ${F}>${G().student}</text>`;
   for(let t = 0; t <= 4; t++){ const y = pT + ch - ch*t/4; g += `<line x1="${pL}" x2="${W-pR}" y1="${y}" y2="${y}" stroke="${t ? '#e8ebee' : '#9aa3ab'}"/><text x="${pL-6}" y="${y+3.5}" font-size="9.5" fill="#777" text-anchor="end" ${F}>${fmtN(step*t)}</text>`; }
   items.forEach((it,i) => {
     const cx = W - pR - slot*(i + .5), h = max ? it.value/max*ch : 0, y = pT + ch - h;
@@ -711,7 +994,7 @@ async function downloadReport(){
   const dl = state.downloads; if(!dl) return;
   const r = state.rpt, key = r.type === 'monthly' ? r.month : r.date;
   const name = {daily:'daily', weekly:'weekly', monthly:'monthly'}[r.type];
-  const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>تقرير غياب الطلاب ${key}</title>
+  const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>تقرير غياب ${G().students} ${key}</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>${REPORT_CSS}body{margin:0;background:#eef1f4;padding:24px 0}.sheet{margin:0 auto}
 .pbtn{display:block;margin:0 auto 16px;font:600 15px 'IBM Plex Sans Arabic',Tahoma,sans-serif;background:#1A9BEF;color:#fff;border:0;border-radius:10px;padding:10px 26px;cursor:pointer}
@@ -745,7 +1028,7 @@ async function restore(file, btn){
   if(!(await dbWrite(() => state.db.doc('config/main').set(clone(cfg))))){ btn.disabled = false; return; }
   let done = 0;
   for(const [k,v] of days){
-    const body = { date:k, entries:v.entries, total:+v.total || Object.values(v.entries).reduce((a,b) => a + (+b||0), 0), savedAt:v.savedAt || new Date().toISOString() };
+    const body = { date:k, entries:v.entries, students:(v.students && typeof v.students === 'object') ? v.students : {}, total:+v.total || Object.values(v.entries).reduce((a,b) => a + (+b||0), 0), savedAt:v.savedAt || new Date().toISOString() };
     if(!(await dbWrite(() => state.db.doc('days/' + k).set(body)))){ toast(`توقف الاستيراد بعد ${done} يومًا. أعد المحاولة.`,'err'); break; }
     done++; if(btn.isConnected) btn.textContent = `جارٍ الاستيراد ${done}/${days.length}`;
   }
@@ -767,24 +1050,44 @@ function settingsView(){
   return `
   <section class="panel">
     <h3>بيانات التقرير</h3>
-    <p class="hint">تظهر في رأس التقرير وفي خانات التوقيع أسفله.</p>
+    <p class="hint">تظهر في رأس التقارير والسجل وفي خانات التوقيع. اختيار «بنات» يؤنّث كل العناوين والمسميات (الطالبات، المديرة، الوكيلة، مسؤولة الغياب…).</p>
+    <div class="fields" style="margin-bottom:14px">
+      <label class="f">نوع المدرسة<div class="seg" style="align-self:flex-start"><button type="button" data-act="setgender" data-v="بنين" class="${cfg.gender !== 'بنات' ? 'on' : ''}">بنين</button><button type="button" data-act="setgender" data-v="بنات" class="${cfg.gender === 'بنات' ? 'on' : ''}">بنات</button></div></label>
+      <label class="f">الفصل الدراسي<div class="seg" style="align-self:flex-start">${['الأول','الثاني'].map(v => `<button type="button" data-act="setterm" data-v="${v}" class="${cfg.term === v ? 'on' : ''}">${v}</button>`).join('')}</div></label>
+    </div>
     <div class="fields">
       <label class="f">اسم المدرسة<input class="input" id="sSchool" value="${esc(cfg.school)}"></label>
-      <label class="f">اسم مسؤول الغياب (معدّ التقرير)<input class="input" id="sPrep" value="${esc(cfg.preparer)}"></label>
+      <label class="f">اسم ${G().officer} (معدّ التقرير)<input class="input" id="sPrep" value="${esc(cfg.preparer)}"></label>
     </div>
     <div class="fields" style="margin-top:14px">
-      <label class="f">الصفة<select class="input" id="sDepT">${opt(['الوكيل','الوكيلة'], cfg.deputyTitle)}</select></label>
-      <label class="f">اسم ${esc(cfg.deputyTitle || 'الوكيل')}<input class="input" id="sDep" value="${esc(cfg.deputy)}"></label>
-      <label class="f">الصفة<select class="input" id="sPrinT">${opt(['المدير','المديرة'], cfg.principalTitle)}</select></label>
-      <label class="f">اسم ${esc(cfg.principalTitle || 'المدير')}<input class="input" id="sPrin" value="${esc(cfg.principal)}"></label>
+      <label class="f">اسم ${G().deputy}<input class="input" id="sDep" value="${esc(cfg.deputy)}"></label>
+      <label class="f">اسم ${G().principal}<input class="input" id="sPrin" value="${esc(cfg.principal)}"></label>
     </div>
     <div class="row-actions"><button class="btn primary" data-act="savemeta">حفظ البيانات</button></div>
   </section>
   <section class="panel">
-    <h3>الفصول وعدد الطلاب</h3>
-    <p class="hint">عدد طلاب كل فصل هو أساس حساب نسبة الحضور. التعديل يُحفظ فور الخروج من الحقل.</p>
-    ${list.length ? `<div class="ctable-wrap"><table class="ctable"><thead><tr><th>المرحلة</th><th>الصف</th><th>الشعبة</th><th>عدد الطلاب</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
-    <div class="row-actions"><span class="tag mute">${AR(list.length)} فصلًا</span><span class="tag ok">${arN(totalStudents())} طالبًا</span></div>` : `<p class="hint" style="margin:0">لا توجد فصول بعد. أنشئ فصول المرحلة دفعة واحدة أو أضف فصلًا فصلًا.</p>`}
+    <h3>ترويسة سجل الغياب</h3>
+    <p class="hint">تظهر أعلى سجل غياب ${G().students} المطبوع.</p>
+    <div class="fields">
+      <label class="f">الإدارة<input class="input" id="rEdu" value="${esc(cfg.edu)}"></label>
+      <label class="f">نوع المدرسة<input class="input" id="rType" value="${esc(cfg.schoolType)}"></label>
+      <label class="f">اسم المدرسة المختصر<input class="input" id="rShort" value="${esc(cfg.schoolShort)}"></label>
+      <label class="f">العام الدراسي (هـ)<input class="input" id="rYear" value="${esc(cfg.year)}"></label>
+    </div>
+    <div class="row-actions">
+      <div class="logo-prev">${logoSrc() ? `<img src="${logoSrc()}" alt="الشعار">` : 'بدون شعار'}</div>
+      <button class="btn" data-act="pickLogo">${ICON.up} تغيير الشعار</button>
+      ${cfg.logo === 'none' ? `<button class="btn" data-act="defLogo">شعار الوزارة</button>` : `<button class="btn danger" data-act="rmLogo">إخفاء الشعار</button>`}
+      <input type="file" id="rLogo" accept="image/*" hidden>
+      <span class="grow"></span>
+      <button class="btn primary" data-act="savereg">حفظ الترويسة</button>
+    </div>
+  </section>
+  <section class="panel">
+    <h3>الفصول وعدد ${G().students}</h3>
+    <p class="hint">عدد ${G().f ? 'طالبات' : 'طلاب'} كل فصل هو أساس حساب نسبة الحضور. التعديل يُحفظ فور الخروج من الحقل.</p>
+    ${list.length ? `<div class="ctable-wrap"><table class="ctable"><thead><tr><th>المرحلة</th><th>الصف</th><th>الشعبة</th><th>عدد ${G().students}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="row-actions"><span class="tag mute">${AR(list.length)} فصلًا</span><span class="tag ok">${arN(totalStudents())} ${G().nStudents}</span></div>` : `<p class="hint" style="margin:0">لا توجد فصول بعد. أنشئ فصول المرحلة دفعة واحدة أو أضف فصلًا فصلًا.</p>`}
   </section>
   <div class="cols">
     <section class="panel">
@@ -794,7 +1097,7 @@ function settingsView(){
         <label class="f">المرحلة<select class="input" id="aStage">${opt(STAGES.map(s => s.k))}</select></label>
         <label class="f">الصف<select class="input" id="aGrade">${opt(GRADES)}</select></label>
         <label class="f">الشعبة<input class="input" id="aSec" value="أ"></label>
-        <label class="f">عدد الطلاب<input class="input" id="aCnt" type="number" min="0" inputmode="numeric" value="25"></label>
+        <label class="f">عدد ${G().students}<input class="input" id="aCnt" type="number" min="0" inputmode="numeric" value="25"></label>
       </div>
       <div class="row-actions"><button class="btn primary" data-act="addcls">إضافة الفصل</button></div>
     </section>
@@ -804,7 +1107,7 @@ function settingsView(){
       <div class="fields">
         <label class="f">المرحلة<select class="input" id="gStage">${opt(STAGES.map(s => s.k))}</select></label>
         <label class="f">الشعب لكل صف<select class="input" id="gSecs">${opt(['1','2','3','4'])}</select></label>
-        <label class="f">عدد الطلاب المبدئي<input class="input" id="gCnt" type="number" min="0" inputmode="numeric" value="25"></label>
+        <label class="f">عدد ${G().students} المبدئي<input class="input" id="gCnt" type="number" min="0" inputmode="numeric" value="25"></label>
       </div>
       <div class="row-actions"><button class="btn" data-act="gencls">إنشاء الفصول</button></div>
     </section>
@@ -832,13 +1135,42 @@ document.addEventListener('click', async e => {
   const t = e.target.closest('button'); if(!t) return;
   if(t.dataset.act === 'menu'){ $('#shell').classList.add('open'); return; }
   if(t.dataset.view){
-    if(state.dirty && t.dataset.view !== 'entry'){ toast('لديك غياب غير محفوظ. احفظه أولًا أو اضغط «تراجع».','err'); return; }
+    if(isDirty() && t.dataset.view !== state.view){ toast('لديك تعديلات غير محفوظة. احفظها أولًا أو اضغط «تراجع».','err'); return; }
     state.view = t.dataset.view; render(); window.scrollTo(0,0); return;
   }
   if(t.dataset.go){ state.view = t.dataset.go; render(); return; }
-  if(t.dataset.open){ if(state.dirty){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; } state.entryDate = t.dataset.open; loadDraft(); render(); window.scrollTo(0,0); return; }
+  if(t.dataset.open){ if(isDirty()){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; } state.entryDate = t.dataset.open; loadDraft(); render(); window.scrollTo(0,0); return; }
   if(t.dataset.rtype){ state.rpt.type = t.dataset.rtype; render(); return; }
+  if(t.dataset.rtab){ state.rpt.tab = t.dataset.rtab; if(t.dataset.rtab === 'register') state.rpt.type = 'daily'; render(); return; }
   const act = t.dataset.act;
+  if(act === 'radd' || act === 'rdel' || act === 'rtype'){
+    const card = t.closest('.reged'), cid = card.dataset.cid;
+    const rows = state.regDraft[cid] = state.regDraft[cid] || [];
+    if(act === 'radd'){ rows.push(newRow()); renderModal(); const ins = document.querySelectorAll('.modal input[data-rf="name"]'); if(ins.length) ins[ins.length-1].focus(); return; }
+    const i = +t.closest('tr').dataset.i;
+    if(act === 'rdel'){ rows.splice(i, 1); state.regDirty = true; renderModal(); return; }
+    rows[i].type = t.dataset.v; state.regDirty = true;
+    t.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); refreshRegPreview(); return;
+  }
+  if(act === 'names'){ openNames(t.closest('.tile').dataset.id); return; }
+  if(act === 'mclose'){ closeModal(); return; }
+  if(act === 'msave'){ const cid = state.modalCid; closeModal(); t.disabled = true; await saveAll(); return; }
+  if(act === 'rday'){ state.rpt.date = iso(addDays(parse(state.rpt.date), +t.dataset.n)); render(); return; }
+  if(act === 'rdown'){ downloadRegister(); return; }
+  if(act === 'savereg'){
+    Object.assign(state.cfg, { edu:$('#rEdu').value.trim(), schoolType:$('#rType').value.trim(), schoolShort:$('#rShort').value.trim(), year:$('#rYear').value.trim() });
+    if(await saveCfg()) toast('تم حفظ ترويسة السجل'); return;
+  }
+  if(act === 'setterm'){ state.cfg.term = t.dataset.v; if(await saveCfg()) toast('الفصل الدراسي: ' + t.dataset.v); render(); return; }
+  if(act === 'setgender'){
+    const g = t.dataset.v; if(state.cfg.gender === g) return;
+    state.cfg.gender = g;
+    const sw = g === 'بنات' ? ['بنين','بنات'] : ['بنات','بنين'];
+    ['schoolShort','school'].forEach(k => { if(state.cfg[k]) state.cfg[k] = state.cfg[k].replace(new RegExp(sw[0] + '$'), sw[1]); });
+    if(await saveCfg()) toast(g === 'بنات' ? 'تم التحويل إلى صيغة المؤنث' : 'تم التحويل إلى صيغة المذكر'); render(); return;
+  }
+  if(act === 'pickLogo'){ $('#rLogo').click(); return; }
+  if(act === 'rmLogo' || act === 'defLogo'){ state.cfg.logo = act === 'rmLogo' ? 'none' : ''; if(await saveCfg()) { toast(act === 'rmLogo' ? 'تم إخفاء الشعار' : 'تمت استعادة شعار الوزارة'); if(state.mode === 'db') render(); } return; }
   if(act === 'inc' || act === 'dec'){
     const tile = t.closest('.tile'), id = tile.dataset.id, c = state.cfg.classes.find(x => x.id === id);
     let v = (+state.draft[id] || 0) + (act === 'inc' ? 1 : -1);
@@ -846,17 +1178,11 @@ document.addEventListener('click', async e => {
     state.draft[id] = v; state.dirty = true; tile.querySelector('input').value = v; refreshTile(tile); updateTally(); return;
   }
   if(act === 'day'){
-    if(state.dirty){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; }
+    if(isDirty()){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; }
     state.entryDate = iso(addDays(parse(state.entryDate), +t.dataset.n)); loadDraft(); render(); return;
   }
-  if(act === 'revert'){ loadDraft(); render(); return; }
-  if(act === 'save'){
-    const entries = {}; classes().forEach(c => entries[c.id] = +state.draft[c.id] || 0);
-    t.disabled = true;
-    if(await saveDay(state.entryDate, entries)){ state.dirty = false; toast('تم حفظ غياب ' + dayName(parse(state.entryDate))); if(state.mode === 'local') onData(); }
-    else t.disabled = false;
-    return;
-  }
+  if(act === 'revert' || act === 'rrevert'){ loadDraft(); render(); return; }
+  if(act === 'save'){ t.disabled = true; if(!(await saveAll())) t.disabled = false; return; }
   if(act === 'delday'){
     if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد الحذف'; setTimeout(() => { if(t.isConnected){ t.classList.remove('armed'); t.textContent = 'حذف رصد اليوم'; } }, 4000); return; }
     if(await deleteDay(state.entryDate)){ state.dirty = false; toast('تم حذف رصد اليوم'); if(state.mode === 'local') onData(); }
@@ -869,8 +1195,7 @@ document.addEventListener('click', async e => {
   if(act === 'download'){ downloadReport(); return; }
   if(act === 'savemeta'){
     state.cfg.school = $('#sSchool').value.trim(); state.cfg.preparer = $('#sPrep').value.trim();
-    state.cfg.deputyTitle = $('#sDepT').value; state.cfg.deputy = $('#sDep').value.trim();
-    state.cfg.principalTitle = $('#sPrinT').value; state.cfg.principal = $('#sPrin').value.trim();
+    state.cfg.deputy = $('#sDep').value.trim(); state.cfg.principal = $('#sPrin').value.trim();
     if(await saveCfg()) toast('تم حفظ البيانات'); return;
   }
   if(act === 'addcls'){
@@ -895,9 +1220,17 @@ document.addEventListener('click', async e => {
   }
 });
 
+document.addEventListener('mousedown', e => { if(e.target && e.target.id === 'modalBg') closeModal(); });
 document.querySelector('.overlay').addEventListener('click', () => $('#shell').classList.remove('open'));
 document.addEventListener('input', e => {
   const inp = e.target;
+  if(inp.dataset && inp.dataset.rf && inp.closest('.reged')){
+    const cid = inp.closest('.reged').dataset.cid, i = +inp.closest('tr').dataset.i, f = inp.dataset.rf;
+    const row = (state.regDraft[cid] || [])[i]; if(!row) return;
+    row[f] = inp.value; state.regDirty = true;
+    if(f === 'name'){ const ph = nameHistory(cid).get(inp.value.trim()); const pi = inp.closest('tr').querySelector('[data-rf="phone"]'); if(ph && !row.phone){ row.phone = ph; pi.value = ph; } }
+    refreshRegPreview(); return;
+  }
   if(inp.closest && inp.closest('.stepper')){
     const tile = inp.closest('.tile'), c = state.cfg.classes.find(x => x.id === tile.dataset.id);
     let v = Math.floor(+inp.value || 0); v = Math.max(0, Math.min(+c.count || 999, v));
@@ -908,11 +1241,23 @@ document.addEventListener('change', async e => {
   const el = e.target;
   if(el.id === 'entryDate'){
     if(!el.value) return;
-    if(state.dirty){ el.value = state.entryDate; toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; }
+    if(isDirty()){ el.value = state.entryDate; toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; }
     state.entryDate = el.value; loadDraft(); render(); return;
   }
   if(el.closest && el.closest('.stepper')){ const tile = el.closest('.tile'); el.value = +state.draft[tile.dataset.id] || 0; return; }
   if(el.id === 'restoreFile'){ const f = el.files && el.files[0]; el.value = ''; if(f) restore(f, $('#restoreBtn')); return; }
+  if(el.id === 'rLogo'){
+    const f = el.files && el.files[0]; el.value = ''; if(!f) return;
+    try{
+      const img = new Image(); img.src = URL.createObjectURL(f); await img.decode();
+      const sc = Math.min(1, 320 / Math.max(img.width, img.height)), cv = document.createElement('canvas');
+      cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      state.cfg.logo = cv.toDataURL('image/png');
+      if(await saveCfg()){ toast('تم حفظ الشعار'); if(state.mode === 'db') render(); }
+    }catch(err){ toast('تعذّر قراءة الصورة.','err'); }
+    return;
+  }
   if(el.id === 'rDate' && el.value){ state.rpt.date = el.value; render(); return; }
   if(el.id === 'rMonth' && el.value){ state.rpt.month = el.value; render(); return; }
   const tr = el.closest && el.closest('tr[data-cid]');
@@ -929,8 +1274,9 @@ document.addEventListener('keydown', e => {
     if(all[i+1]){ e.preventDefault(); all[i+1].focus(); all[i+1].select(); }
   }
 });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && state.modalCid) closeModal(); });
 document.addEventListener('focusin', e => { if(e.target.closest && e.target.closest('.stepper') && e.target.tagName === 'INPUT') e.target.select(); });
-window.addEventListener('beforeunload', e => { if(state.dirty){ e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('beforeunload', e => { if(isDirty()){ e.preventDefault(); e.returnValue = ''; } });
 
 init();
 </script>
