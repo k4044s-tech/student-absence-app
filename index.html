@@ -204,6 +204,7 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
 .regt tr:last-child td{ border-bottom:0; }
 .regt .input{ width:100%; min-height:32px; padding:4px 8px; font-size:13px; }
 .regt td.n{ color:var(--muted); width:28px; text-align:center; }
+.regt .n-l{ display:none; }
 .seg{ display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--card); }
 .seg button{ border:0; background:none; padding:5px 10px; font-size:12px; color:var(--muted); white-space:nowrap; }
 .seg button + button{ border-inline-start:1px solid var(--border); }
@@ -226,7 +227,30 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
 .tabs2{ display:inline-flex; background:var(--accent-soft); border-radius:8px; padding:3px; gap:2px; }
 .tabs2 button{ border:0; background:none; border-radius:6px; padding:7px 16px; font-size:13.5px; font-weight:500; color:var(--muted); }
 .tabs2 button.on{ background:var(--card); color:var(--ink); font-weight:600; box-shadow:0 1px 3px rgba(0,0,0,.1); }
-@media (max-width:860px){ .modal-bg{ padding:0; align-items:flex-end; } .modal{ max-height:92vh; border-radius:14px 14px 0 0; } }
+@media (max-width:860px){
+  .modal-bg{ padding:0; align-items:flex-end; }
+  .modal{ max-height:92vh; max-height:92dvh; border-radius:14px 14px 0 0; }
+  .modal .regt{ min-width:0; }
+  .modal .regt thead{ display:none; }
+  .modal .regt, .modal .regt tbody{ display:block; }
+  .modal .regt tr{ display:grid; grid-template-columns:1fr 1fr; gap:12px 10px; padding:14px 16px 16px; border-bottom:8px solid var(--bg); }
+  .modal .regt td{ display:flex; flex-direction:column; gap:5px; padding:0; border:0; min-width:0; }
+  .modal .regt td[data-l]::before{ content:attr(data-l); font-size:13.5px; color:var(--muted); font-weight:500; }
+  .modal .regt td.n{ width:auto; text-align:start; flex-direction:row; align-items:center; gap:6px; font-weight:700; color:var(--ink); font-size:16px; }
+  .modal .regt td.f-del .btn{ padding:6px 14px; font-size:14px; }
+  .modal .regt .n-l{ display:inline; }
+  .modal .regt td.f-del{ align-items:flex-end; justify-content:center; }
+  .modal .regt td.n{ order:0; } .modal .regt td.f-del{ order:1; } .modal .regt td.f-name{ order:2; } .modal .regt td.f-type{ order:3; } .modal .regt td[data-l]:not(.f-name):not(.f-type){ order:4; }
+  .modal .regt td.f-name, .modal .regt td.f-type{ grid-column:1 / -1; }
+  .modal .regt .seg{ display:flex; width:100%; }
+  .modal .regt .seg button{ flex:1; padding:11px; font-size:15.5px; }
+  .modal .regt .input{ min-height:46px; font-size:16px; }
+  .modal .reged-h{ padding:12px 16px; }
+  .modal .reged-f{ position:sticky; bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--card); }
+}
+@media (max-width:860px){
+  .modal .regt tr{ grid-template-areas:none; }
+}
 
 @media (max-width:860px){
   body{ font-size:15px; }
@@ -277,7 +301,22 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
   .reged-h b{ font-size:16px; }
   .empty h2{ font-size:18px; } .empty p{ font-size:15px; }
   .toast{ font-size:15px; }
+  .main, .inner, .view{ min-width:0; max-width:100%; }
+  .main{ overflow-x:hidden; }
+  .kpis{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .kpi{ min-width:0; padding:12px 13px; }
+  .kpi .v.t{ font-size:15.5px; overflow-wrap:anywhere; }
+  .grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .tile{ min-width:0; padding:12px 10px; }
+  .tile-top{ flex-wrap:wrap; gap:2px 8px; }
+  .stepper{ gap:4px; }
+  .stepper input{ width:auto; flex:1; min-width:0; }
+  .tile-foot{ flex-direction:column; align-items:stretch; gap:6px; }
+  .tile-foot .tag{ justify-content:center; }
+  .tile-foot .btn.sm{ width:100%; padding:7px 8px; font-size:14px; }
+  .savebar{ padding-inline-start:14px; }
 }
+@media (max-width:360px){ .grid{ grid-template-columns:minmax(0,1fr); } }
 @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
 @media print{
   @page{ size:A4; margin:10mm; }
@@ -728,14 +767,14 @@ function renderModal(){
       <div class="reged-h"><b>غياب ${esc(clsLabel(c))}</b><span class="tag mute">${dayName(d)} ${dmy(d)}</span><span class="tag mute">${G().enrolled} ${c.count || 0}</span><span class="tag warn">المرصود ${+state.draft[c.id] || 0}</span><button class="modal-x" data-act="mclose" aria-label="إغلاق">×</button></div>
       <div class="reged-tw"><table class="regt"><thead><tr><th>#</th><th style="width:26%">اسم ${G().studentDef}</th><th>نوع الغياب</th><th>رقم الهاتف</th><th>الزمن</th><th>المجيب</th><th style="width:20%">سبب الغياب</th><th></th></tr></thead><tbody>
       ${rows.map((r,i) => `<tr data-i="${i}">
-        <td class="n">${i+1}</td>
-        <td><input class="input" data-rf="name" list="nl-m" value="${esc(r.name)}" placeholder="الاسم الرباعي"></td>
-        <td><div class="seg"><button data-act="rtype" data-v="بعذر" class="${r.type === 'بعذر' ? 'on' : ''}">بعذر</button><button data-act="rtype" data-v="بدون" class="${r.type !== 'بعذر' ? 'on' : ''}">بدون</button></div></td>
-        <td><input class="input" data-rf="phone" type="tel" inputmode="tel" dir="ltr" value="${esc(r.phone)}" placeholder="05xxxxxxxx"></td>
-        <td><input class="input" data-rf="time" type="time" value="${esc(r.time)}"></td>
-        <td><input class="input" data-rf="answer" list="al-m" value="${esc(r.answer)}"></td>
-        <td><input class="input" data-rf="reason" value="${esc(r.reason)}"></td>
-        <td><button class="btn danger" data-act="rdel" aria-label="حذف">حذف</button></td></tr>`).join('')}
+        <td class="n"><span class="n-l">${G().student} </span>${i+1}</td>
+        <td class="f-name" data-l="اسم ${G().studentDef}"><input class="input" data-rf="name" list="nl-m" value="${esc(r.name)}" placeholder="الاسم الرباعي"></td>
+        <td class="f-type" data-l="نوع الغياب"><div class="seg"><button data-act="rtype" data-v="بعذر" class="${r.type === 'بعذر' ? 'on' : ''}">بعذر</button><button data-act="rtype" data-v="بدون" class="${r.type !== 'بعذر' ? 'on' : ''}">بدون</button></div></td>
+        <td data-l="رقم الهاتف"><input class="input" data-rf="phone" type="tel" inputmode="tel" dir="ltr" value="${esc(r.phone)}" placeholder="05xxxxxxxx"></td>
+        <td data-l="الزمن"><input class="input" data-rf="time" type="time" value="${esc(r.time)}"></td>
+        <td data-l="المجيب"><input class="input" data-rf="answer" list="al-m" value="${esc(r.answer)}"></td>
+        <td data-l="سبب الغياب"><input class="input" data-rf="reason" value="${esc(r.reason)}"></td>
+        <td class="f-del"><button class="btn danger" data-act="rdel" aria-label="حذف">حذف</button></td></tr>`).join('')}
       </tbody></table></div>
       <datalist id="nl-m">${[...hist.keys()].map(n => `<option value="${esc(n)}">`).join('')}</datalist>
       <datalist id="al-m">${ANSWERS.map(a => `<option value="${a}">`).join('')}</datalist>
@@ -796,7 +835,7 @@ function buildRegSheet(dateKey){
   const pct = TS ? Math.round(TA / TS * 1000) / 10 : 0, logo = logoSrc();
   return `<article class="reg">
     <div class="reg-head">
-      <div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br>${esc(cfg.schoolType)}<br>${esc(cfg.schoolShort)}</div>
+      <div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br>${esc(cfg.school)}</div>
       <h1>سجل غياب ${G().students}</h1>
       <div class="l">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
     </div>
@@ -1067,11 +1106,9 @@ function settingsView(){
   </section>
   <section class="panel">
     <h3>ترويسة سجل الغياب</h3>
-    <p class="hint">تظهر أعلى سجل غياب ${G().students} المطبوع.</p>
+    <p class="hint">تظهر أعلى سجل غياب ${G().students} المطبوع، مع اسم المدرسة المدخل في «بيانات التقرير».</p>
     <div class="fields">
       <label class="f">الإدارة<input class="input" id="rEdu" value="${esc(cfg.edu)}"></label>
-      <label class="f">نوع المدرسة<input class="input" id="rType" value="${esc(cfg.schoolType)}"></label>
-      <label class="f">اسم المدرسة المختصر<input class="input" id="rShort" value="${esc(cfg.schoolShort)}"></label>
       <label class="f">العام الدراسي (هـ)<input class="input" id="rYear" value="${esc(cfg.year)}"></label>
     </div>
     <div class="row-actions">
@@ -1146,7 +1183,7 @@ document.addEventListener('click', async e => {
   if(act === 'radd' || act === 'rdel' || act === 'rtype'){
     const card = t.closest('.reged'), cid = card.dataset.cid;
     const rows = state.regDraft[cid] = state.regDraft[cid] || [];
-    if(act === 'radd'){ rows.push(newRow()); renderModal(); const ins = document.querySelectorAll('.modal input[data-rf="name"]'); if(ins.length) ins[ins.length-1].focus(); return; }
+    if(act === 'radd'){ rows.push(newRow()); renderModal(); const ins = document.querySelectorAll('.modal input[data-rf="name"]'); if(ins.length){ const el = ins[ins.length-1]; el.focus(); el.closest('tr').scrollIntoView({block:'nearest'}); } return; }
     const i = +t.closest('tr').dataset.i;
     if(act === 'rdel'){ rows.splice(i, 1); state.regDirty = true; renderModal(); return; }
     rows[i].type = t.dataset.v; state.regDirty = true;
@@ -1158,7 +1195,7 @@ document.addEventListener('click', async e => {
   if(act === 'rday'){ state.rpt.date = iso(addDays(parse(state.rpt.date), +t.dataset.n)); render(); return; }
   if(act === 'rdown'){ downloadRegister(); return; }
   if(act === 'savereg'){
-    Object.assign(state.cfg, { edu:$('#rEdu').value.trim(), schoolType:$('#rType').value.trim(), schoolShort:$('#rShort').value.trim(), year:$('#rYear').value.trim() });
+    Object.assign(state.cfg, { edu:$('#rEdu').value.trim(), year:$('#rYear').value.trim() });
     if(await saveCfg()) toast('تم حفظ ترويسة السجل'); return;
   }
   if(act === 'setterm'){ state.cfg.term = t.dataset.v; if(await saveCfg()) toast('الفصل الدراسي: ' + t.dataset.v); render(); return; }
