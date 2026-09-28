@@ -218,6 +218,30 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
 .logo-prev{ width:64px; height:64px; border:1px dashed var(--border-2); border-radius:8px; display:flex; align-items:center; justify-content:center; background:#fff; overflow:hidden; color:var(--muted); font-size:11px; }
 .logo-prev img{ max-width:100%; max-height:100%; }
 #printArea{ display:none; }
+.rform{ background:var(--bg); }
+.rsec{ background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:12px; }
+.rsec-h{ font-weight:700; font-size:14px; margin-bottom:10px; }
+.rsec-h small{ font-weight:400; color:var(--muted); font-size:12px; margin-inline-start:6px; }
+.rsn{ display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; margin-top:6px; }
+label.chk{ display:inline-flex; align-items:center; gap:7px; font-size:14px; cursor:pointer; }
+label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; }
+.rform textarea.input{ width:100%; line-height:1.8; padding:8px 10px; resize:vertical; }
+.dlg-b.pv .refm{ box-shadow:0 1px 3px rgba(0,0,0,.12),0 10px 30px rgba(0,0,0,.08); }
+.agrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:10px; }
+.acard{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:8px; box-shadow:var(--shadow); }
+.acard.due{ border-color:var(--bad-line); background:linear-gradient(180deg,var(--bad-soft),var(--card) 70%); }
+.acard-h{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.acard-h b{ font-size:14.5px; }
+.acard-n{ display:flex; gap:12px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); }
+.acard-n b{ color:var(--ink); font-size:15px; }
+.acard-t{ display:flex; gap:6px; flex-wrap:wrap; }
+.acard-f{ display:flex; gap:6px; flex-wrap:wrap; margin-top:auto; }
+.modal.dlg.dlg-wide{ width:min(900px,100%); }
+.dlg-b.pv{ background:var(--accent-soft); padding:20px; overflow:auto; }
+.dlg-b.pv .actf{ box-shadow:0 1px 3px rgba(0,0,0,.12),0 10px 30px rgba(0,0,0,.08); }
+.dlg-b.pv .actf + .actf{ margin-top:20px; }
+.alv{ border:1px solid var(--border); border-radius:8px; margin-bottom:10px; }
+.alv .nimp{ border:0; margin:0; }
 .rtools{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px 16px; border-bottom:1px solid var(--border); background:var(--bg); }
 .rtools .rt-l{ font-size:12.5px; color:var(--muted); }
 .rsearch{ padding:10px 16px 6px; }
@@ -278,6 +302,8 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
   .rtools .btn.sm{ font-size:14px; padding:7px 10px; }
   .rtools .rt-l{ flex-basis:100%; font-size:13.5px; }
   .nimp-b{ font-size:15px; }
+  .agrid{ grid-template-columns:minmax(0,1fr); }
+  .acard-h b{ font-size:16.5px; } .acard-n{ font-size:14px; }
   .modal .reged-f{ position:sticky; bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--card); }
 }
 @media (max-width:860px){
@@ -389,6 +415,8 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
     <nav class="nav">
       <button type="button" data-view="entry" class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>رصد الغياب</span></button>
       <button type="button" data-view="reports"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5M8 13h8M8 17h5"/></svg><span>التقارير</span></button>
+      <button type="button" data-view="actions"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>إجراءات الغياب</span></button>
+      <button type="button" data-view="counsel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6M19 8v6"/></svg><span>الإرشاد الطلابي</span></button>
       <button type="button" data-view="settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الفصول والإعدادات</span></button>
     </nav>
     <div class="rail-foot">
@@ -486,7 +514,55 @@ const REG_CSS = `
 .reg-sign span:last-child{margin-inline-end:120px}
 @media print{.reg{box-shadow:none;width:auto;padding:0;margin:0;break-after:page}.reg:last-child{break-after:auto}.reg + .reg{margin-top:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 `;
-document.getElementById('report-css').textContent = REPORT_CSS + REG_CSS;
+const ACT_CSS = `
+.actf{width:794px;background:#fff;color:#1c2b36;padding:28px 36px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;line-height:1.6}
+.actf .reg-head{display:grid;grid-template-columns:1.6fr auto 1fr;align-items:center;gap:10px}
+.actf .reg-head .r{font-weight:700;font-size:12px;line-height:1.9}.actf .reg-head .r .sch{font-size:14px}
+.actf .reg-head .l{display:flex;justify-content:flex-end}.actf .reg-head .l img{max-height:64px}
+.actf .ahead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding-bottom:10px;border-bottom:2px solid #1d5f8a}
+.actf .ahead .r{font-weight:700;font-size:12px;line-height:1.9}.actf .ahead .r .sch{font-size:14px}
+.actf .ahead .c img{max-height:80px;display:block;margin:0 auto}
+.actf .ahead .d{text-align:left;font-size:12.5px;line-height:2}
+.actf .ahead .d>div{direction:rtl;display:inline-block;min-width:170px;text-align:right}
+.actf h1{text-align:center;font-size:20px;font-weight:700;color:#1d5f8a;margin:14px 0 14px}
+.actf table.at1{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:16px}
+.actf .at1 th,.actf .at1 td{border:1px solid #333;padding:6px;text-align:center}.actf .at1 th{background:#ececec}
+.actf .abody{font-size:14px;line-height:2}
+.actf .abody p{margin:0 0 4px}
+.actf .alist{margin:4px 0 10px;padding-inline-start:26px}.actf .alist li{margin-bottom:2px}
+.actf .adays{border:1px solid #ccd;border-radius:6px;padding:6px 10px;margin:8px 0;font-size:11.5px;line-height:1.7}
+.actf .adays-h{font-weight:700;margin-bottom:2px}.actf .adays-g{display:flex;flex-wrap:wrap;gap:2px 16px;color:#333}
+.actf .anote{font-size:12.5px;color:#444;margin-top:8px}
+.actf .asig3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px;font-size:12.5px;line-height:2.2}
+.actf .asig3>div{border:1px solid #bbb;border-radius:6px;padding:8px 12px}
+.actf .asig3 .st{font-weight:700;text-align:center;border-bottom:1px solid #ddd;margin-bottom:4px}
+.actf .alead{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px;font-size:13px;line-height:2.2;padding:0 10px}
+.actf .stamp{width:110px;text-align:center;font-weight:700;padding-top:40px}
+@media print{.actf{width:auto;padding:0;break-after:page}.actf:last-child{break-after:auto}}
+`;
+const REF_CSS = `
+.refm{width:794px;background:#fff;color:#1a1a1a;padding:26px 34px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;line-height:1.7;font-size:13px}
+.refm .ahead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding-bottom:10px;border-bottom:2px solid #1d5f8a;margin-bottom:14px}
+.refm .ahead .r{font-weight:700;font-size:12px;line-height:1.9}.refm .ahead .r .sch{font-size:14px}
+.refm .ahead .c img{max-height:80px;display:block;margin:0 auto}
+.refm .ahead .d{text-align:left;font-size:12.5px;line-height:2}
+.refm .ahead .d>div{direction:rtl;display:inline-block;min-width:170px;text-align:right}
+.refm .rhead .r{font-weight:700;font-size:11.5px;line-height:1.8}.refm .rhead .r .sch{font-size:13px}
+.refm .rhead .l{display:flex;justify-content:flex-end}.refm .rhead .l img{max-height:62px}
+.refm .rbox{border:1.5px dashed #555;border-radius:18px;padding:12px 18px 14px}
+.refm .rt{text-align:center;margin-bottom:8px}.refm .rt div{font-weight:700;font-size:12.5px}.refm .rt h1{font-size:17px;margin:2px 0 0;font-weight:700}
+.refm table.rtb{width:100%;border-collapse:collapse;margin:6px 0}.refm .rtb td{border:1px solid #333;padding:5px 8px;height:28px}
+.refm .rl{margin-top:8px}
+.refm .rsnp{display:flex;flex-wrap:wrap;gap:6px 34px;padding:2px 10px;font-size:13px}
+.refm .rsnp u{text-decoration:none;border-bottom:1px dotted #555}
+.refm .fl{display:flex;gap:10px;align-items:flex-end;padding:0 22px 0 12px;min-height:26px}
+.refm .fl .bl{font-size:12px}.refm .fl .ln{flex:1;border-bottom:1px solid #444;min-height:22px;font-size:12.5px}
+.refm .rsig{margin-top:12px}
+.refm .rsl{display:flex;justify-content:space-between;gap:12px;margin:10px 0 6px;padding:0 6px}
+.refm .rnotes{margin-top:12px;font-size:12px}.refm .rnotes ol{margin:4px 0 0;padding-inline-start:22px}.refm .rnotes li{margin-bottom:1px}
+@media print{.refm{width:auto;padding:0;break-after:page}.refm:last-child{break-after:auto}}
+`;
+document.getElementById('report-css').textContent = REPORT_CSS + REG_CSS + ACT_CSS + REF_CSS;
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -532,11 +608,11 @@ function toast(msg, kind){
 }
 
 /* ---------- state & storage ---------- */
-const DEFAULT_CFG = { gender:'بنين', school:'مدرسة سلامة الدراج الابتدائية و المتوسطة', preparer:'', principalTitle:'المدير', principal:'', deputyTitle:'الوكيل', deputy:'', edu:'الإدارة العامة للتعليم بجازان', schoolType:'مدرسة ابتدائية و متوسطة', schoolShort:'سلامة الدراج بنين', year:'١٤٤٨ - ١٤٤٩', term:'', officerTitle:'مسؤول الغياب', logo:'', classes:[] };
+const DEFAULT_CFG = { schoolDays:180, actFrom:'', gender:'بنين', school:'مدرسة سلامة الدراج الابتدائية و المتوسطة', preparer:'', principalTitle:'المدير', principal:'', deputyTitle:'الوكيل', deputy:'', edu:'الإدارة العامة للتعليم بجازان', schoolType:'مدرسة ابتدائية و متوسطة', schoolShort:'سلامة الدراج بنين', year:'١٤٤٨ - ١٤٤٩', term:'', officerTitle:'مسؤول الغياب', logo:'', classes:[] };
 const today = iso(new Date());
 const state = {
   cfg: null, days: {}, mode: 'local', db: null, downloads: null, ready: {cfg:false, days:false},
-  view: 'entry', entryDate: today, roster: {}, rsOpen: new Set(), rq: '', bulkType: 'بدون', draft: {}, dirty: false,
+  view: 'entry', entryDate: today, roster: {}, actions: {}, actStage: 'all', actQ: '', refs: {}, refSt: 'all', refQ: '', rsOpen: new Set(), rq: '', bulkType: 'بدون', draft: {}, dirty: false,
   rpt: { type:'daily', date: today, month: today.slice(0,7) }
 };
 
@@ -568,6 +644,18 @@ async function saveDay(date, entries, students){
   if(state.mode === 'db') return dbWrite(() => state.db.doc('days/' + date).set(body));
   state.days[date] = body; lsSet('days', state.days); return true;
 }
+async function saveRef(r){
+  if(state.mode === 'db'){ const ok = await dbWrite(() => state.db.doc('referrals/' + r.id).set(clone(r))); if(ok) state.refs[r.id] = r; return ok; }
+  state.refs[r.id] = r; lsSet('refs', state.refs); return true;
+}
+async function deleteRef(id){
+  if(state.mode === 'db'){ const ok = await dbWrite(() => state.db.doc('referrals/' + id).delete()); if(ok) delete state.refs[id]; return ok; }
+  delete state.refs[id]; lsSet('refs', state.refs); return true;
+}
+async function saveActions(){
+  if(state.mode === 'db') return dbWrite(() => state.db.doc('config/actions').set({items: clone(state.actions)}));
+  lsSet('actions', state.actions); return true;
+}
 async function saveRoster(){
   if(state.mode === 'db') return dbWrite(() => state.db.doc('config/roster').set({classes: clone(state.roster)}));
   lsSet('roster', state.roster); return true;
@@ -582,6 +670,8 @@ function useLocal(){
   state.cfg = Object.assign(clone(DEFAULT_CFG), lsGet('cfg', {}));
   state.days = lsGet('days', {});
   state.roster = lsGet('roster', {});
+  state.actions = lsGet('actions', {});
+  state.refs = lsGet('refs', {});
   state.ready = {cfg:true, days:true};
   onData();
 }
@@ -622,7 +712,7 @@ function G(){
     students: f ? 'الطالبات' : 'الطلاب', student: f ? 'طالبة' : 'طالب', studentDef: f ? 'الطالبة' : 'الطالب',
     nStudents: f ? 'طالبة' : 'طالبًا', absentAcc: f ? 'غائبة' : 'غائبًا', absents: f ? 'غائبات' : 'غائبين',
     absentsNom: f ? 'الغائبات' : 'الغائبون', presentNom: f ? 'الحاضرات' : 'الحاضرون', oneAbsent: f ? 'طالبة غائبة' : 'طالب غائب',
-    principal: f ? 'المديرة' : 'المدير', deputy: f ? 'الوكيلة' : 'الوكيل', officer: f ? 'مسؤولة الغياب' : 'مسؤول الغياب', teacher: f ? 'المعلمة' : 'المعلم',
+    principal: f ? 'المديرة' : 'المدير', counselor: f ? 'الموجهة الطلابية' : 'الموجه الطلابي', affairs: f ? 'وكيلة شؤون الطالبات' : 'وكيل شؤون الطلاب', teacherT: f ? 'المعلمة' : 'المعلم', his: f ? 'ها' : 'ه', deputy: f ? 'الوكيلة' : 'الوكيل', officer: f ? 'مسؤولة الغياب' : 'مسؤول الغياب', teacher: f ? 'المعلمة' : 'المعلم',
     enrolled: f ? 'المسجلات' : 'المسجلون', regEnrolled: f ? 'المقيدات' : 'المقيدين', regPresent: f ? 'الحاضرات' : 'الحاضرين', regAbsent: f ? 'الغائبات' : 'الغائبين'
   };
 }
@@ -683,12 +773,14 @@ function render(){
   const head = {
     entry: ['رصد الغياب اليومي', `${dayName(d)} ${AR(dmy(d))} · ${AR(classes().length)} فصلًا · ${arN(totalStudents())} ${G().nStudents}`],
     reports: ['التقارير', 'الإحصائية وسجل الغياب اليومي، جاهزة للطباعة'],
+    counsel: ['الإرشاد الطلابي', 'تحويل ' + G().students + ' لوكيل شؤون ' + G().students + ' والموجه الطلابي (نموذج 31)'],
+    actions: ['إجراءات الغياب', 'متابعة المواظبة وتطبيق إجراءات الغياب بدون عذر'],
     settings: ['الفصول والإعدادات', 'تُضبط مرة واحدة وتُستخدم في الرصد والتقارير']
   }[state.view];
   $('#pTitle').textContent = head[0]; $('#pSub').textContent = head[1]; $('#tbTitle').textContent = head[0];
   $('#shell').classList.remove('open');
   const m = $('#main');
-  m.innerHTML = `<div class="view">${({entry:entryView, reports:reportsView, settings:settingsView})[state.view]()}</div>`;
+  m.innerHTML = `<div class="view">${({entry:entryView, reports:reportsView, actions:actionsView, counsel:counselView, settings:settingsView})[state.view]()}</div>`;
   if(state.view === 'entry') updateTally();
 }
 
@@ -1146,6 +1238,307 @@ async function downloadRegister(){
   catch(e){ if(!e || e.code !== 'declined') toast('تعذّر التنزيل.','err'); }
 }
 
+/* ---------- إجراءات الغياب ---------- */
+const ACT_LEVELS = [
+  {id:'l3', short:'3 أيام متصلة أو 5 منفصلة', crit:'3 أيام متصلة أو 5 أيام منفصلة', type:'تحويل',
+   action:'نظرًا لتكرر غيابك فقد حُوّلت إلى المرشد الطلابي لدراسة حالتك.'},
+  {id:'p10', pct:10, short:'10%', type:'- إنذار\n- استدعاء ولي الأمر',
+   action:'* نظرًا لتكرار غيابك فإننا ننذرك بعدم تكرار ذلك.\n* تسليم الطالب استدعاء خطي لولي الأمر بالحضور إلى المدرسة وتوضيح الإجراءات المترتبة على الغياب.'},
+  {id:'p15', pct:15, short:'15%', type:'- إنذار\n- استدعاء ولي الأمر\n- تعهد خطي\n- التحويل لوحدة الخدمات',
+   action:'* نظرًا لتكرار غيابك فإننا ننذرك بعدم تكرار ذلك.\n* تسليم الطالب استدعاء خطي لولي الأمر بالحضور إلى المدرسة وتوضيح الإجراءات المترتبة على الغياب.\n* أخذ تعهد خطي على ولي أمر الطالب بانتظام الطالب بالدراسة.\n* تحويل الطالب إلى وحدة الخدمات الإرشادية لمتابعة حالته.'},
+  {id:'p20', pct:20, short:'20%', type:'- استدعاء ولي الأمر\n- التحويل لإدارة التعليم (إدارة التوجيه والإرشاد)\n- نقل الطالب لمدرسة أخرى\n- التزام كتابي من ولي الأمر\n- إنذار لولي الأمر',
+   action:'* تسليم الطالب استدعاء خطي لولي الأمر بالحضور إلى المدرسة.\n* تحويل الطالب لإدارة التعليم (إدارة التوجيه والإرشاد) لدراسة وضع الطالب وظروفه.\n* نقل الطالب إلى مدرسة أخرى بعد الرفع لمدير التعليم.\n* أخذ الالتزام الكتابي من ولي الأمر بانتظام الطالب في الدراسة.\n* توقيع ولي أمر الطالب على إنذار بحرمان الطالب من الانتظام بالدراسة والتحويل لطالب منتسب.'},
+  {id:'p25', pct:25, short:'25%', type:'- الرفع لإدارة التعليم\n- التحويل لطالب منتسب وفق ضوابط القبول والانتساب',
+   action:'* الرفع من قبل إدارة المدرسة لإدارة التعليم عن وضع الطالب لتقييم حالته وما قدم له من خدمات إرشادية وتربوية وطلب تحويله إلى طالب منتسب.\n* إصدار قرار من مدير التعليم بحرمان الطالب من الانتظام في الدراسة وتحويله لطالب منتسب وفق ضوابط القبول والانتساب.'}
+];
+const ACT_TITLES = {l3:'إشعار تحويل إلى المرشد الطلابي بسبب الغياب', p10:'إنذار غياب واستدعاء ولي الأمر', p15:'إنذار غياب وتعهد خطي', p20:'إنذار بالحرمان من الانتظام بسبب الغياب', p25:'إشعار الرفع لإدارة التعليم بسبب الغياب'};
+const guardianOf = s => ((state.actions[s.key] || {}).guardian) || s.name.trim().split(/\s+/).slice(1).join(' ');
+const curLevel = s => s.due[0] || s.top;
+const femTxt = t => !G().f ? t : t.replace(/طالب منتسب/g, 'طالبة منتسبة').replace(/الطالب/g, 'الطالبة').replace(/حُوّلت/g, 'حُوّلتِ');
+const actDays = () => Math.max(1, +state.cfg.schoolDays || 180);
+const pctDays = pct => Math.round(pct * actDays() / 100);
+function critLabel(L){ return L.pct ? `نسبة (${L.pct}%) دون عذر مقبول متصلة أو متقطعة خلال العام الدراسي — ${pctDays(L.pct)} يومًا` : L.crit; }
+function studentStats(){
+  const from = state.cfg.actFrom || '';
+  const keys = Object.keys(state.days).filter(k => !from || k >= from).sort();
+  const map = new Map();
+  keys.forEach((k, di) => {
+    const S = state.days[k].students || {};
+    Object.entries(S).forEach(([cid, rows]) => rows.forEach(r => {
+      const nm = (r.name || '').trim(); if(!nm) return;
+      const key = cid + '|' + nm;
+      let o = map.get(key);
+      if(!o){ o = {key, cid, name:nm, unexc:0, exc:0, streak:0, maxStreak:0, last:-9, dates:[], phone:''}; map.set(key, o); }
+      if(r.phone) o.phone = r.phone;
+      if(r.type === 'بعذر'){ o.exc++; return; }
+      o.unexc++; o.streak = o.last === di - 1 ? o.streak + 1 : 1; o.last = di; o.maxStreak = Math.max(o.maxStreak, o.streak); o.dates.push(k);
+    }));
+  });
+  return [...map.values()].map(o => {
+    const reached = ACT_LEVELS.filter(L => L.pct ? o.unexc >= pctDays(L.pct) : (o.maxStreak >= 3 || o.unexc >= 5));
+    const done = state.actions[o.key] || {};
+    const due = reached.filter(L => !done[L.id]);
+    const c = state.cfg.classes.find(x => x.id === o.cid);
+    return {...o, cls: c, reached, due, top: reached[reached.length - 1] || null};
+  });
+}
+function actionsView(){
+  const all = studentStats();
+  const stages = [...new Set(classes().map(c => c.stage))];
+  const q = normAr(state.actQ);
+  const list = all.filter(s => s.reached.length || s.unexc >= 3)
+    .filter(s => state.actStage === 'all' || (s.cls && s.cls.stage === state.actStage))
+    .filter(s => !q || normAr(s.name).includes(q))
+    .sort((a, b) => b.due.length - a.due.length || b.unexc - a.unexc);
+  const dueN = all.filter(s => s.due.length).length;
+  const cnt = id => all.filter(s => s.top && s.top.id === id).length;
+  const k = (cls, l, v, sub) => `<div class="kpi ${cls}"><span class="l">${l}</span><span class="v">${v}</span><span class="s">${sub}</span></div>`;
+  const cards = list.map(s => {
+    const lvl = s.top ? `<span class="tag ${s.top.pct >= 20 ? 'bad' : 'warn'}">${s.top.pct ? `بلغ ${s.top.pct}%` : 'تحويل للمرشد'}</span>` : `<span class="tag mute">قريب من الحد</span>`;
+    const st = !s.reached.length ? '' : s.due.length ? `<span class="tag bad">مستحق: ${s.due.map(L => L.short).join('، ')}</span>` : `<span class="tag ok">الإجراءات منفّذة</span>`;
+    return `<div class="acard ${s.due.length ? 'due' : ''}" data-key="${esc(s.key)}">
+      <div class="acard-h"><b>${esc(s.name)}</b><span class="tile-sub">${s.cls ? esc(clsLabel(s.cls)) : 'فصل محذوف'}</span></div>
+      <div class="acard-n"><span><b>${s.unexc}</b> بدون عذر</span><span><b>${s.exc}</b> بعذر</span><span><b>${s.maxStreak}</b> أطول غياب متصل</span></div>
+      <div class="acard-t">${lvl}${st}</div>
+      <div class="acard-f">${s.reached.length ? `<button class="btn sm" data-act="actRec">تسجيل الإجراء</button><button class="btn sm" data-act="actView">معاينة النموذج</button><button class="btn sm" data-act="actRefer">إحالة للإرشاد</button><button class="btn sm" data-act="actPrint">${ICON.print} طباعة</button>` : `<span style="color:var(--muted);font-size:12.5px">أول إجراء عند 3 أيام متصلة أو 5 منفصلة</span>`}</div>
+    </div>`;
+  }).join('');
+  return `<div class="bar">
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px">أيام الدراسة الفعلية<input class="input" id="actDays" type="number" min="1" inputmode="numeric" value="${actDays()}" style="width:90px"></label>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px">احتساب الغياب من<input class="input" id="actFrom" type="date" value="${esc(state.cfg.actFrom || '')}"></label>
+      <span class="grow"></span>
+      ${dueN ? `<button class="btn" data-act="actViewDue">معاينة النماذج المستحقة</button><button class="btn primary" data-act="actPrintDue">${ICON.print} طباعة النماذج المستحقة (${dueN})</button>` : ''}
+    </div>
+    <div class="panel" style="padding:12px 16px"><div style="font-size:13px;color:var(--muted);margin-bottom:8px">عدد أيام الغياب = نسبة الغياب × الأيام الفعلية للدراسة ÷ 100 · يُحتسب الغياب <b style="color:var(--ink)">بدون عذر</b> فقط من أسماء الغائبين المسجّلة</div><div class="chips">${[10,15,20,25].map(x => `<span class="tag mute">نسبة ${x}٪ ← ${pctDays(x)} يومًا</span>`).join('')}<span class="tag mute">تحويل للمرشد ← 3 أيام متصلة أو 5 منفصلة</span></div></div>
+    <div class="kpis">
+      ${k(dueN ? 'bad' : 'good', 'بحاجة إلى إجراء', dueN, dueN ? 'إجراء لم يُسجَّل بعد' : 'لا يوجد إجراء مستحق')}
+      ${k(cnt('l3') ? 'warn' : '', 'تحويل للمرشد', cnt('l3'), '3 متصلة أو 5 منفصلة')}
+      ${k(cnt('p10') + cnt('p15') ? 'warn' : '', 'بلغوا 10% – 15%', cnt('p10') + cnt('p15'), `${pctDays(10)} يومًا فأكثر`)}
+      ${k(cnt('p20') + cnt('p25') ? 'bad' : '', 'بلغوا 20% فأكثر', cnt('p20') + cnt('p25'), `${pctDays(20)} يومًا فأكثر`)}
+    </div>
+    <div class="bar">
+      <div class="chips">${[['all','الكل'], ...stages.map(x => [x, x === 'متوسط' ? 'المتوسطة' : 'الابتدائية'])].map(([v,t]) => `<button class="chip ${state.actStage === v ? 'on' : ''}" data-actstage="${v}">${t}</button>`).join('')}</div>
+      <span class="grow"></span>
+      <input class="input" id="actQ" type="search" placeholder="ابحث بالاسم…" value="${esc(state.actQ)}" style="min-width:200px">
+    </div>
+    ${list.length ? `<div class="agrid">${cards}</div>` : `<div class="empty"><div class="ic">${ICON.users}</div><h2>لا يوجد ${G().students} بلغوا حدود الإجراءات</h2><p>تُحسب الإجراءات من أسماء الغائبين المسجّلة في «إدخال الغياب»، ويظهر هنا كل من غاب بدون عذر 3 أيام فأكثر.</p></div>`}`;
+}
+function openActRec(key){
+  const s = studentStats().find(x => x.key === key); if(!s) return;
+  const done = state.actions[key] || {};
+  const rows = s.reached.map(L => { const d = done[L.id] || {};
+    return `<div class="alv"><label class="nimp"><input type="checkbox" data-lv="${L.id}" ${done[L.id] ? 'checked' : ''}><span class="nimp-b"><b>${esc(L.pct ? `نسبة ${L.pct}% (${pctDays(L.pct)} يومًا)` : L.crit)}</b><br><small>${esc(L.type.replace(/\n/g,' '))}</small></span></label>
+      <div class="fields" style="padding:0 12px 8px"><label class="f">التاريخ<input class="input" type="date" data-lvd="${L.id}" value="${esc(d.date || today)}"></label><label class="f">اسم الموظف المسؤول<input class="input" data-lve="${L.id}" value="${esc(d.by || state.cfg.preparer || '')}"></label></div></div>`; }).join('');
+  openDlg(`<div class="reged-h"><b>إجراءات: ${esc(s.name)}</b><span class="tag mute">${s.unexc} بدون عذر</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b" data-key="${esc(key)}"><label class="f" style="margin-bottom:12px">اسم ولي الأمر<input class="input" id="actG" value="${esc(guardianOf(s))}"></label><p class="hint" style="margin:0 0 12px;color:var(--muted)">حدّد الإجراءات التي نُفّذت مع تاريخها، لتظهر في النموذج المطبوع ويختفي تنبيه «مستحق».</p>${rows}</div>
+    <div class="reged-f"><span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn primary" data-act="actSave">حفظ</button></div>`);
+}
+async function saveActRec(){
+  const box = document.querySelector('#dlgBg .dlg-b'); if(!box) return;
+  const key = box.dataset.key, rec = {};
+  box.querySelectorAll('[data-lv]').forEach(cb => { if(cb.checked){ const id = cb.dataset.lv; rec[id] = {date: box.querySelector(`[data-lvd="${id}"]`).value || today, by: box.querySelector(`[data-lve="${id}"]`).value.trim()}; } });
+  const gv = ($('#actG') || {}).value || '', auto = key.split('|').slice(1).join('|').trim().split(/\s+/).slice(1).join(' ');
+  if(gv.trim() && gv.trim() !== auto) rec.guardian = gv.trim();
+  if(Object.keys(rec).length) state.actions[key] = rec; else delete state.actions[key];
+  closeDlg();
+  if(await saveActions()){ toast('تم حفظ الإجراءات'); render(); }
+}
+function hijriNum(iso){ try{ return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'}).format(parse(iso)); }catch(e){ return iso; } }
+function actFormHTML(s, lvId){
+  const cfg = state.cfg, L = ACT_LEVELS.find(x => x.id === lvId) || curLevel(s) || ACT_LEVELS[0];
+  const rec = (state.actions[s.key] || {})[L.id] || null, g = G(), f = g.f;
+  const dt = rec ? rec.date : today, dd = parse(dt), logo = logoSrc();
+  const by = (rec && rec.by) || cfg.preparer || '';
+  const pct = Math.round(s.unexc / actDays() * 1000) / 10;
+  const items = femTxt(L.action).split('\n').map(x => x.replace(/^\*\s*/, '').trim()).filter(Boolean);
+  const reason = L.pct
+    ? `بلغ غياب${f ? 'كِ' : 'ك'} بدون عذر مقبول <b>(${s.unexc}) يومًا</b>، أي ما نسبته <b>${pct}%</b> من أيام الدراسة الفعلية البالغة ${actDays()} يومًا، متجاوزًا حد <b>${L.pct}%</b> (${pctDays(L.pct)} يومًا).`
+    : `بلغ غياب${f ? 'كِ' : 'ك'} بدون عذر مقبول <b>(${s.unexc}) ${s.unexc > 10 ? 'يومًا' : 'أيام'}</b>${s.maxStreak >= 3 ? `، منها <b>${s.maxStreak} أيام متصلة</b>` : ''}.`;
+  const dates = s.dates.slice(-30).map(k => `<span>${dayName(parse(k))} ${hijriNum(k)}</span>`).join('');
+  return `<article class="actf">
+    <div class="ahead"><div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
+      <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
+      <div class="d"><div>اليوم: <b>${dayName(dd)}</b></div><div>التاريخ: <b>${hijriNum(dt)}</b></div><div>الموافق: <b>${dmy(dd).replace(/ /g,'')}</b></div></div></div>
+    <h1>${esc(ACT_TITLES[L.id])}</h1>
+    <table class="at1"><tr><th>اسم ${g.studentDef}</th><th>الصف</th><th>العام الدراسي</th><th>الغياب بدون عذر</th></tr>
+      <tr><td>${esc(s.name)}</td><td>${s.cls ? esc(clsLabel(s.cls)) : ''}</td><td>${esc(cfg.year)} هـ</td><td>${s.unexc} يومًا</td></tr></table>
+    <div class="abody">
+      <p>${f ? 'الطالبة المكرّمة' : 'الطالب المكرّم'} / <b>${esc(s.name)}</b> &nbsp;&nbsp; ${f ? 'وفقها' : 'وفقه'} الله</p>
+      <p>السلام عليكم ورحمة الله وبركاته، وبعد:</p>
+      <p>${reason}</p>
+      <p>وبناءً على قواعد السلوك والمواظبة، تقرر اتخاذ الإجراء التالي (${esc(L.type.replace(/\n/g, ' ').replace(/^-\s*/, '').replace(/\s-\s*/g, '، '))}):</p>
+      <ol class="alist">${items.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
+      ${dates ? `<div class="adays"><div class="adays-h">أيام الغياب بدون عذر</div><div class="adays-g">${dates}</div></div>` : ''}
+      <p class="anote">نأمل ${f ? 'منكِ' : 'منك'} الحرص على الانتظام في الدراسة، ونؤكد أن استمرار الغياب يترتب عليه الإجراء التالي وفق قواعد السلوك والمواظبة.</p>
+    </div>
+    <div class="asig3">
+      <div><div class="st">${g.studentDef}</div><div>الاسم: ${esc(s.name)}</div><div>التوقيع: ....................</div></div>
+      <div><div class="st">ولي الأمر</div><div>الاسم: ${esc(guardianOf(s)) || '....................'}</div><div>التوقيع: ....................</div><div>الجوال: <span dir="ltr">${esc(s.phone || '....................')}</span></div></div>
+      <div><div class="st">الموظف المسؤول</div><div>الاسم: ${esc(by) || '....................'}</div><div>التوقيع: ....................</div></div>
+    </div>
+    <div class="alead"><div>${f ? 'قائدة' : 'قائد'} المدرسة: <b>${esc(cfg.principal || '')}</b><br>التوقيع: ....................</div><div class="stamp">الختم</div></div>
+  </article>`;
+}
+function viewForms(list, title, lvId){
+  if(!list.length) return;
+  state.viewList = list.map(x => x.key); state.viewLv = lvId || null;
+  const one = list.length === 1 ? list[0] : null, cur = one ? (lvId || (curLevel(one) || {}).id) : null;
+  const chips = one && one.reached.length > 1 ? `<div class="chips" style="padding:10px 16px;border-bottom:1px solid var(--border)">${one.reached.map(L => `<button class="chip ${L.id === cur ? 'on' : ''}" data-lvsel="${L.id}">${L.pct ? L.pct + '%' : '3/5 أيام'}${(state.actions[one.key] || {})[L.id] ? ' ✓' : ''}</button>`).join('')}</div>` : '';
+  openDlg(`<div class="reged-h"><b>${esc(title)}</b>${list.length > 1 ? `<span class="tag mute">${list.length} نماذج</span>` : ''}<button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    ${chips}
+    <div class="dlg-b pv">${list.map(x => actFormHTML(x, one ? cur : null)).join('')}</div>
+    <div class="reged-f"><span class="grow"></span><button class="btn" data-act="dlgclose">إغلاق</button><button class="btn primary" data-act="actPrintView">${ICON.print} طباعة</button></div>`);
+  $('#dlgBg .modal').classList.add('dlg-wide');
+  state.viewLv = cur;
+  const pv = $('#dlgBg .pv'), z = Math.min(1, (pv.clientWidth - 40) / 794);
+  pv.querySelectorAll('.actf').forEach(el => el.style.zoom = z);
+}
+function printForms(list){
+  if(!list.length) return;
+  $('#printArea').innerHTML = list.map(x => actFormHTML(x, list.length === 1 ? state.viewLv : null)).join('');
+  document.body.classList.add('printing-reg');
+  const done = () => { document.body.classList.remove('printing-reg'); $('#printArea').innerHTML = ''; window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  try{ window.print(); }catch(e){ done(); toast('الطباعة غير متاحة هنا.','err'); }
+}
+
+/* ---------- الإرشاد الطلابي (نموذج 31) ---------- */
+const RSN = ['عدم أداء الواجب','مشاغبة','تأخر عن الحصة','ضعف دراسي','أخرى'];
+const PERIODS = ['الأولى','الثانية','الثالثة','الرابعة','الخامسة','السادسة','السابعة'];
+function refStatus(r){
+  if(r.coun && r.coun.text) return {k:'closed', t:'مغلقة', c:'ok'};
+  if(r.dep && r.dep.refer) return {k:'coun', t:'لدى ' + G().counselor, c:'bad'};
+  if(r.dep && r.dep.text) return {k:'dep', t:'عولجت لدى الوكيل', c:'ok'};
+  return {k:'new', t:'بانتظار الوكيل', c:'warn'};
+}
+function counselView(){
+  const all = Object.values(state.refs || {}).sort((a,b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || '').localeCompare(a.createdAt || ''));
+  const cnt = k => all.filter(r => refStatus(r).k === k).length;
+  const q = normAr(state.refQ);
+  const list = all.filter(r => state.refSt === 'all' || refStatus(r).k === state.refSt).filter(r => !q || normAr(r.name).includes(q));
+  const k = (cls, l, v, sub) => `<div class="kpi ${cls}"><span class="l">${l}</span><span class="v">${v}</span><span class="s">${sub}</span></div>`;
+  const cards = list.map(r => {
+    const st = refStatus(r), c = state.cfg.classes.find(x => x.id === r.cid);
+    const rs = (r.reasons || []).map(x => `<span class="tag mute">${esc(x === 'أخرى' && r.other ? r.other : x)}</span>`).join('');
+    return `<div class="acard ${st.k === 'new' || st.k === 'coun' ? 'due' : ''}" data-rid="${esc(r.id)}">
+      <div class="acard-h"><b>${esc(r.name)}</b><span class="tile-sub">${c ? esc(clsLabel(c)) : ''}</span></div>
+      <div class="acard-n"><span>${dayName(parse(r.date))} ${hijriNum(r.date)}</span>${r.subject ? `<span>المادة: <b>${esc(r.subject)}</b></span>` : ''}${r.period ? `<span>الحصة ${esc(r.period)}</span>` : ''}</div>
+      <div class="acard-t">${rs}</div>
+      <div class="acard-t"><span class="tag ${st.c}">${esc(st.t)}</span>${r.teacher ? `<span class="tag mute">${esc(r.teacher)}</span>` : ''}</div>
+      <div class="acard-f"><button class="btn sm" data-act="refOpen">فتح وتحديث</button><button class="btn sm" data-act="refView">معاينة النموذج</button><button class="btn sm" data-act="refPrint">${ICON.print} طباعة</button></div>
+    </div>`;
+  }).join('');
+  return `<div class="bar">
+      <button class="btn primary" data-act="refNew">+ تحويل جديد (نموذج 31)</button>
+      <span class="grow"></span>
+      <input class="input" id="refQ" type="search" placeholder="ابحث بالاسم…" value="${esc(state.refQ)}" style="min-width:200px">
+    </div>
+    <div class="kpis">
+      ${k(cnt('new') ? 'warn' : '', 'بانتظار الوكيل', cnt('new'), 'تحويلات لم تُعالج بعد')}
+      ${k(cnt('coun') ? 'bad' : '', 'لدى ' + G().counselor, cnt('coun'), 'بانتظار إفادة الإرشاد')}
+      ${k('', 'عولجت لدى الوكيل', cnt('dep'), 'بدون إحالة للإرشاد')}
+      ${k(cnt('closed') ? 'good' : '', 'مغلقة', cnt('closed'), 'تمت إفادة ' + G().teacherT)}
+    </div>
+    <div class="bar"><div class="chips">${[['all','الكل'],['new','بانتظار الوكيل'],['coun','لدى الموجه'],['dep','عولجت لدى الوكيل'],['closed','مغلقة']].map(([v,t]) => `<button class="chip ${state.refSt === v ? 'on' : ''}" data-refst="${v}">${t}</button>`).join('')}</div></div>
+    ${list.length ? `<div class="agrid">${cards}</div>` : `<div class="empty"><div class="ic">${ICON.users}</div><h2>لا توجد تحويلات</h2><p>ينشئ ${G().teacherT} التحويل بعد انتهاء الحصة، ثم يكمل ${G().affairs.split(' ')[0]} ما تم، ويُحال لـ${G().counselor} عند تكرار السلوك أو الضعف الدراسي.</p><button class="btn primary" data-act="refNew">+ تحويل جديد</button></div>`}`;
+}
+function namesFor(cid){ const set = new Set(rosterOf(cid).map(x => x.name)); nameHistory(cid).forEach((v, k) => set.add(k)); return [...set]; }
+function openRef(r){
+  const g = G(), list = classes(); if(!list.length){ toast('أضف الفصول أولًا.','err'); return; }
+  const isNew = !r || !r.id || !state.refs[r.id];
+  r = Object.assign({id:'', date:today, cid:list[0].id, name:'', subject:'', period:'', reasons:[], other:'', problem:'', teacher:'', dep:{text:'', refer:false, by:state.cfg.deputy || '', date:today}, coun:{text:'', by:state.cfg.counselor || '', date:''}}, clone(r || {}));
+  state.refEdit = r;
+  openDlg(`<div class="reged-h"><b>${isNew ? 'تحويل جديد' : 'تحويل: ' + esc(r.name)}</b><span class="tag mute">نموذج 31</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b rform">
+      <div class="rsec"><div class="rsec-h">بيانات التحويل <small>يعبّئها ${g.teacherT} بعد انتهاء الحصة</small></div>
+        <div class="fields">
+          <label class="f">الفصل<select class="input" id="rfCls">${list.map(c => `<option value="${esc(c.id)}" ${c.id === r.cid ? 'selected' : ''}>${esc(clsLabel(c))}</option>`).join('')}</select></label>
+          <label class="f">اسم ${g.studentDef}<input class="input" id="rfName" list="rfNames" value="${esc(r.name)}" autocomplete="off"></label>
+          <label class="f">التاريخ<input class="input" id="rfDate" type="date" value="${esc(r.date)}"></label>
+          <label class="f">المادة<input class="input" id="rfSubject" value="${esc(r.subject)}"></label>
+          <label class="f">الحصة<select class="input" id="rfPeriod"><option value=""></option>${PERIODS.map(x => `<option ${x === r.period ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+          <label class="f">اسم ${g.teacherT}<input class="input" id="rfTeacher" value="${esc(r.teacher)}"></label>
+        </div>
+        <datalist id="rfNames">${namesFor(r.cid).map(n => `<option value="${esc(n)}">`).join('')}</datalist>
+        <div class="f" style="margin-top:12px">سبب التحويل</div>
+        <div class="rsn">${RSN.map(x => `<label class="chk"><input type="checkbox" data-rsn="${x}" ${(r.reasons || []).includes(x) ? 'checked' : ''}> ${x}</label>`).join('')}
+          <input class="input" id="rfOther" placeholder="أخرى: اذكرها" value="${esc(r.other)}" style="flex:1;min-width:180px"></div>
+        <label class="f" style="margin-top:12px">إيضاح المشكلة (نقطة في كل سطر)<textarea class="input" id="rfProblem" rows="4">${esc(r.problem)}</textarea></label>
+      </div>
+      <div class="rsec"><div class="rsec-h">ما تم حيال ${g.studentDef} <small>خاص بـ${g.affairs}</small></div>
+        <label class="f"><textarea class="input" id="rfDepText" rows="3" placeholder="مثل: توجيه، تعهد، تواصل مع ولي الأمر…">${esc(r.dep.text)}</textarea></label>
+        <label class="chk" style="margin:10px 0"><input type="checkbox" id="rfRefer" ${r.dep.refer ? 'checked' : ''}> تمت إحالت${g.his} إلى ${g.counselor}</label>
+        <div class="fields"><label class="f">اسم ${g.f ? 'الوكيلة' : 'الوكيل'}<input class="input" id="rfDepBy" value="${esc(r.dep.by)}"></label><label class="f">التاريخ<input class="input" id="rfDepDate" type="date" value="${esc(r.dep.date || '')}"></label></div>
+      </div>
+      <div class="rsec"><div class="rsec-h">ما تم حيال ${g.studentDef} <small>خاص بـ${g.counselor}</small></div>
+        <label class="f"><textarea class="input" id="rfCounText" rows="3">${esc(r.coun.text)}</textarea></label>
+        <div class="fields" style="margin-top:10px"><label class="f">اسم ${g.counselor}<input class="input" id="rfCounBy" value="${esc(r.coun.by)}"></label><label class="f">التاريخ<input class="input" id="rfCounDate" type="date" value="${esc(r.coun.date || '')}"></label></div>
+      </div>
+    </div>
+    <div class="reged-f">${isNew ? '' : `<button class="btn danger" data-act="refDel">حذف</button>`}<span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn" data-act="refPreview">معاينة</button><button class="btn primary" data-act="refSave">حفظ</button></div>`);
+  $('#dlgBg .modal').classList.add('dlg-wide');
+}
+function readRef(){
+  const r = clone(state.refEdit || {}), v = id => ($('#' + id) || {}).value || '';
+  Object.assign(r, {cid:v('rfCls'), name:v('rfName').trim(), date:v('rfDate') || today, subject:v('rfSubject').trim(), period:v('rfPeriod'), teacher:v('rfTeacher').trim(), other:v('rfOther').trim(), problem:v('rfProblem').trim()});
+  r.reasons = [...document.querySelectorAll('#dlgBg [data-rsn]')].filter(x => x.checked).map(x => x.dataset.rsn);
+  if(r.other && !r.reasons.includes('أخرى')) r.reasons.push('أخرى');
+  r.dep = {text:v('rfDepText').trim(), refer:$('#rfRefer').checked, by:v('rfDepBy').trim(), date:v('rfDepDate')};
+  r.coun = {text:v('rfCounText').trim(), by:v('rfCounBy').trim(), date:v('rfCounDate') || (v('rfCounText').trim() ? today : '')};
+  if(!r.id) r.id = 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  if(!r.createdAt) r.createdAt = new Date().toISOString();
+  return r;
+}
+function refFormHTML(r){
+  const cfg = state.cfg, g = G(), c = state.cfg.classes.find(x => x.id === r.cid), logo = logoSrc();
+  const box = on => on ? '☑' : '☐';
+  const lines = (t, min) => { const L = String(t || '').split('\n').map(x => x.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean); while(L.length < min) L.push(''); return L.map(x => `<div class="fl"><span class="bl">•</span><span class="ln">${esc(x)}</span></div>`).join(''); };
+  const hd = iso => iso ? hijriNum(iso) : '&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;١٤هـ';
+  const notes = [
+    `يتم إخبار ${g.f ? 'وكيلة' : 'وكيل'} المرحلة حسب هذا النموذج بعد انتهاء الحصة الدراسية.`,
+    `${g.f ? 'تقوم وكيلة' : 'يقوم وكيل'} المرحلة باستدعاء ${g.studentDef} في وقت لا يؤثر ${g.f ? 'عليها' : 'عليه'} دراسيًا.`,
+    `يتم تحويل ${g.studentDef} إلى ${g.counselor} في حالة تكرار السلوك أو الضعف الدراسي.`,
+    `${g.f ? 'تقوم' : 'يقوم'} ${g.counselor} بإخبار ${g.teacherT} بما تم حيال ${g.studentDef}.`,
+    `يحفظ هذا النموذج لدى ${g.affairs} ونسخة لدى ${g.counselor}.`];
+  return `<article class="refm">
+    <div class="ahead"><div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
+      <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
+      <div class="d"><div>اليوم: <b>${dayName(parse(r.date || today))}</b></div><div>التاريخ: <b>${hijriNum(r.date || today)}</b></div><div>الموافق: <b>${dmy(parse(r.date || today)).replace(/ /g,'')}</b></div></div></div>
+    <div class="rbox">
+      <div class="rt"><div>نموذج رقم (31)</div><h1>تحويل ${g.student} ${g.f ? 'لوكيلة شؤون الطالبات' : 'لوكيل شؤون الطلاب'}</h1></div>
+      <table class="rtb"><tr><td><b>اسم ${g.studentDef}:</b> ${esc(r.name)}</td><td><b>المادة:</b> ${esc(r.subject)}</td></tr>
+        <tr><td><b>الشعبة:</b> ${c ? esc(clsLabel(c)) : ''}</td><td><b>الحصة:</b> ${esc(r.period)}</td></tr></table>
+      <div class="rl"><b>سبب التحويل:</b></div>
+      <div class="rsnp">${RSN.slice(0,4).map(x => `<span>${box((r.reasons || []).includes(x))} ${x}</span>`).join('')}</div>
+      <div class="rsnp"><span>${box((r.reasons || []).includes('أخرى'))} أخرى: <u>${esc(r.other) || '&nbsp;'.repeat(60)}</u></span></div>
+      <div class="rl"><b>إيضاح المشكلة:</b></div>${lines(r.problem, 4)}
+      <table class="rtb rsig"><tr><td><b>اسم ${g.teacherT}:</b> ${esc(r.teacher)}</td><td><b>التوقيع:</b></td><td><b>التاريخ:</b> ${hd(r.date)}</td></tr></table>
+      <div class="rl"><b>ما تم حيال ${g.studentDef}: ( خاص بـ${g.affairs} ):</b></div>${lines(r.dep && r.dep.text, 2)}
+      <div class="rl" style="margin-top:10px"><b>${box(r.dep && r.dep.refer)} تمت إحالت${g.his} إلى ${g.counselor}</b></div>
+      <div class="rsl"><span><b>${g.f ? 'وكيلة' : 'وكيل'} المدرسة:</b> ${esc((r.dep && r.dep.by) || '')}</span><span><b>التوقيع:</b> ............</span><span><b>التاريخ:</b> ${hd(r.dep && r.dep.text ? r.dep.date : '')}</span></div>
+      <div class="rl"><b>ما تم حيال ${g.studentDef}: ( خاص بـ${g.counselor} ):</b></div>${lines(r.coun && r.coun.text, 2)}
+      <div class="rsl"><span><b>${g.counselor}:</b> ${esc((r.coun && r.coun.by) || '')}</span><span><b>التوقيع:</b> ............</span><span><b>التاريخ:</b> ${hd(r.coun && r.coun.text ? r.coun.date : '')}</span></div>
+      <div class="rnotes"><b>ملاحظات:</b><ol>${notes.map(n => `<li>${n}</li>`).join('')}</ol></div>
+    </div>
+  </article>`;
+}
+function previewHTML(title, html){
+  state.pvHTML = html;
+  openDlg(`<div class="reged-h"><b>${esc(title)}</b><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b pv">${html}</div>
+    <div class="reged-f"><span class="grow"></span><button class="btn" data-act="dlgclose">إغلاق</button><button class="btn primary" data-act="pvPrint">${ICON.print} طباعة</button></div>`);
+  $('#dlgBg .modal').classList.add('dlg-wide');
+  const pv = $('#dlgBg .pv'), z = Math.min(1, (pv.clientWidth - 40) / 794);
+  pv.querySelectorAll('.refm,.actf').forEach(el => el.style.zoom = z);
+}
+function printHTML(html){
+  $('#printArea').innerHTML = html;
+  document.body.classList.add('printing-reg');
+  const done = () => { document.body.classList.remove('printing-reg'); $('#printArea').innerHTML = ''; window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  try{ window.print(); }catch(e){ done(); toast('الطباعة غير متاحة هنا. استخدم «معاينة».','err'); }
+}
+
 /* ---------- reports ---------- */
 function rangeDates(r){
   if(r.type === 'daily') return [parse(r.date)];
@@ -1326,7 +1719,7 @@ async function downloadReport(){
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 async function backup(){
   const dl = state.downloads; if(!dl) return;
-  const data = { app:'student-absence', version:1, exportedAt:new Date().toISOString(), cfg:clone(state.cfg), days:clone(state.days), roster:clone(state.roster || {}) };
+  const data = { app:'student-absence', version:1, exportedAt:new Date().toISOString(), cfg:clone(state.cfg), days:clone(state.days), roster:clone(state.roster || {}), actions:clone(state.actions || {}), refs:clone(state.refs || {}) };
   try{ await dl.save({filename:`absence-backup-${iso(new Date())}.json`, data: JSON.stringify(data, null, 1)}); lsSetRaw('lastBackup', today); toast('تم تنزيل النسخة الاحتياطية'); render(); }
   catch(e){ if(!e || e.code !== 'declined') toast('تعذّر تنزيل النسخة الاحتياطية.','err'); }
 }
@@ -1338,6 +1731,8 @@ async function restore(file, btn){
   cfg.classes = cfg.classes.filter(c => c && c.id && c.stage && c.grade).map(c => ({id:String(c.id), stage:String(c.stage), grade:String(c.grade), section:String(c.section ?? ''), count:Math.max(0, +c.count || 0)}));
   const days = Object.entries(data.days).filter(([k,v]) => DATE_RE.test(k) && v && typeof v.entries === 'object');
   if(data.roster && typeof data.roster === 'object'){ state.roster = clone(data.roster); await saveRoster(); }
+  if(data.actions && typeof data.actions === 'object'){ state.actions = clone(data.actions); await saveActions(); }
+  if(data.refs && typeof data.refs === 'object'){ for(const r of Object.values(data.refs)) if(r && r.id) await saveRef(r); }
   if(state.mode === 'local'){
     state.cfg = cfg; days.forEach(([k,v]) => state.days[k] = v); lsSet('cfg', cfg); lsSet('days', state.days);
     state.dirty = false; toast(`تم استيراد ${cfg.classes.length} فصلًا و${days.length} يومًا`); onData(); return;
@@ -1381,6 +1776,7 @@ function settingsView(){
     <div class="fields" style="margin-top:14px">
       <label class="f">اسم ${G().deputy}<input class="input" id="sDep" value="${esc(cfg.deputy)}"></label>
       <label class="f">اسم ${G().principal}<input class="input" id="sPrin" value="${esc(cfg.principal)}"></label>
+      <label class="f">اسم ${G().counselor}<input class="input" id="sCoun" value="${esc(cfg.counselor || '')}"></label>
     </div>
     <div class="row-actions"><button class="btn primary" data-act="savemeta">حفظ البيانات</button></div>
   </section>
@@ -1501,6 +1897,34 @@ document.addEventListener('click', async e => {
     state.regDirty = true; renderModal(true); return;
   }
   if(act === 'dlgclose'){ closeDlg(); return; }
+  if(t.dataset.refst){ state.refSt = t.dataset.refst; render(); return; }
+  if(act === 'refNew'){ openRef(null); return; }
+  if(act === 'refOpen'){ openRef(state.refs[t.closest('.acard').dataset.rid]); return; }
+  if(act === 'refView'){ const r = state.refs[t.closest('.acard').dataset.rid]; if(r) previewHTML('نموذج 31: ' + r.name, refFormHTML(r)); return; }
+  if(act === 'refPrint'){ const r = state.refs[t.closest('.acard').dataset.rid]; if(r) printHTML(refFormHTML(r)); return; }
+  if(act === 'refPreview'){ const r = readRef(); state.refEdit = r; const html = refFormHTML(r); const keep = r; previewHTML('معاينة: ' + (r.name || 'تحويل'), html); state.refBack = keep; return; }
+  if(act === 'pvPrint'){ printHTML(state.pvHTML || ''); return; }
+  if(act === 'refSave'){ const r = readRef(); if(!r.name){ toast('اكتب اسم ' + G().studentDef + '.','err'); return; } closeDlg(); if(await saveRef(r)){ toast('تم حفظ التحويل'); render(); } return; }
+  if(act === 'refDel'){
+    if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد الحذف'; return; }
+    const id = (state.refEdit || {}).id; closeDlg(); if(id && await deleteRef(id)){ toast('تم حذف التحويل'); render(); } return;
+  }
+  if(act === 'actRefer'){
+    const s = studentStats().find(x => x.key === t.closest('.acard').dataset.key); if(!s) return;
+    openRef({cid:s.cid, name:s.name, reasons:['أخرى'], other:'تكرر الغياب بدون عذر', teacher: state.cfg.preparer || '',
+      problem: `غاب${G().f ? 'ت' : ''} ${s.unexc} ${s.unexc > 10 ? 'يومًا' : 'أيام'} بدون عذر مقبول${s.maxStreak >= 3 ? `، منها ${s.maxStreak} أيام متصلة` : ''}.\nآخر أيام الغياب: ${s.dates.slice(-5).map(k => hijriNum(k)).join('، ')}`,
+      dep:{text:'تم التحويل بسبب تكرر الغياب وفق قواعد السلوك والمواظبة.', refer:true, by: state.cfg.deputy || '', date: today}});
+    return;
+  }
+  if(t.dataset.actstage){ state.actStage = t.dataset.actstage; render(); return; }
+  if(act === 'actRec'){ openActRec(t.closest('.acard').dataset.key); return; }
+  if(act === 'actSave'){ await saveActRec(); return; }
+  if(act === 'actPrint'){ const s = studentStats().find(x => x.key === t.closest('.acard').dataset.key); if(s){ state.viewLv = null; printForms([s]); } return; }
+  if(t.dataset.lvsel){ const s = studentStats().find(x => x.key === state.viewList[0]); if(s) viewForms([s], 'نموذج: ' + s.name, t.dataset.lvsel); return; }
+  if(act === 'actView'){ const s = studentStats().find(x => x.key === t.closest('.acard').dataset.key); if(s) viewForms([s], 'نموذج: ' + s.name); return; }
+  if(act === 'actViewDue'){ viewForms(studentStats().filter(x => x.due.length).sort((a,b) => b.unexc - a.unexc), 'النماذج المستحقة'); return; }
+  if(act === 'actPrintView'){ const keys = state.viewList || []; const all = studentStats(); printForms(keys.map(k => all.find(x => x.key === k)).filter(Boolean)); return; }
+  if(act === 'actPrintDue'){ state.viewLv = null;  printForms(studentStats().filter(x => x.due.length).sort((a,b) => b.unexc - a.unexc)); return; }
   if(act === 'noorPick'){ $('#noorFile').click(); return; }
   if(act === 'noorApply'){ t.disabled = true; await noorApply(); return; }
   if(act === 'pasteOpen'){ openPaste(); return; }
@@ -1560,7 +1984,7 @@ document.addEventListener('click', async e => {
   if(act === 'download'){ downloadReport(); return; }
   if(act === 'savemeta'){
     state.cfg.school = $('#sSchool').value.trim(); state.cfg.preparer = $('#sPrep').value.trim();
-    state.cfg.deputy = $('#sDep').value.trim(); state.cfg.principal = $('#sPrin').value.trim();
+    state.cfg.deputy = $('#sDep').value.trim(); state.cfg.principal = $('#sPrin').value.trim(); state.cfg.counselor = $('#sCoun').value.trim();
     if(await saveCfg()) toast('تم حفظ البيانات'); return;
   }
   if(act === 'addcls'){
@@ -1589,7 +2013,9 @@ document.addEventListener('mousedown', e => { if(e.target && e.target.id === 'mo
 document.querySelector('.overlay').addEventListener('click', () => $('#shell').classList.remove('open'));
 document.addEventListener('input', e => {
   const inp = e.target;
+  if(inp.id === 'refQ'){ state.refQ = inp.value; const q = normAr(inp.value); document.querySelectorAll('.acard[data-rid]').forEach(el => { el.style.display = !q || normAr(el.querySelector('.acard-h b').textContent).includes(q) ? '' : 'none'; }); return; }
   if(inp.id === 'rq'){ state.rq = inp.value; applyRq(); return; }
+  if(inp.id === 'actQ'){ state.actQ = inp.value; const q = normAr(inp.value); document.querySelectorAll('.acard').forEach(el => { el.style.display = !q || normAr(el.querySelector('.acard-h b').textContent).includes(q) ? '' : 'none'; }); return; }
   if(inp.dataset && inp.dataset.rf && inp.closest('.reged')){
     const cid = inp.closest('.reged').dataset.cid, i = +inp.closest('[data-i]').dataset.i, f = inp.dataset.rf;
     const row = (state.regDraft[cid] || [])[i]; if(!row) return;
@@ -1618,6 +2044,11 @@ document.addEventListener('change', async e => {
     const i = rows.findIndex(r => (r.name||'').trim() === name);
     if(el.checked && i < 0) rows.push(rosterRow(cid, name)); else if(!el.checked && i >= 0) rows.splice(i, 1);
     state.regDirty = true; renderModal(true); return;
+  }
+  if(el.id === 'rfCls'){ const dl = $('#rfNames'); if(dl) dl.innerHTML = namesFor(el.value).map(n => `<option value="${esc(n)}">`).join(''); return; }
+  if(el.id === 'actDays' || el.id === 'actFrom'){
+    if(el.id === 'actDays') state.cfg.schoolDays = Math.max(1, +el.value || 180); else state.cfg.actFrom = el.value;
+    if(await saveCfg()) toast('تم الحفظ'); render(); return;
   }
   if(el.id === 'noorFile'){ const f = el.files && el.files[0]; el.value = ''; if(f) noorImport(f); return; }
   if(el.id === 'pCls'){ openPaste(el.value); return; }
