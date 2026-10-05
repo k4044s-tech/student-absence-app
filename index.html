@@ -119,6 +119,7 @@ svg{ display:block; flex:none; }
 .banner{ margin-bottom:12px; }
 .banner span{ flex:1 1 300px; line-height:1.6; }
 .banner button{ background:var(--accent); color:var(--accent-fg); border:1px solid var(--accent); border-radius:6px; padding:6px 12px; font-size:12.5px; font-weight:500; }
+.banner button.later{ background:transparent; color:var(--warn-ink); border-color:var(--warn-line); }
 .sec-h{ display:flex; align-items:center; gap:8px; margin:8px 0 -2px; }
 .sec-h h3{ font-size:14.5px; font-weight:700; }
 .sec-h small{ font-size:11.5px; color:var(--muted); }
@@ -218,6 +219,10 @@ label.f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:v
 .logo-prev{ width:64px; height:64px; border:1px dashed var(--border-2); border-radius:8px; display:flex; align-items:center; justify-content:center; background:#fff; overflow:hidden; color:var(--muted); font-size:11px; }
 .logo-prev img{ max-width:100%; max-height:100%; }
 #printArea{ display:none; }
+.nmchip{ display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; background:var(--card); }
+.nmchip button{ border:0; background:none; padding:6px 12px; font-size:12.5px; color:var(--muted); }
+.nmchip button + button{ border-inline-start:1px solid var(--border); padding:6px 10px; }
+.nmchip.on{ border-color:var(--accent); } .nmchip.on button:first-child{ color:var(--ink); font-weight:600; }
 .rform{ background:var(--bg); }
 .rsec{ background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:12px; }
 .rsec-h{ font-weight:700; font-size:14px; margin-bottom:10px; }
@@ -562,7 +567,20 @@ const REF_CSS = `
 .refm .rnotes{margin-top:12px;font-size:12px}.refm .rnotes ol{margin:4px 0 0;padding-inline-start:22px}.refm .rnotes li{margin-bottom:1px}
 @media print{.refm{width:auto;padding:0;break-after:page}.refm:last-child{break-after:auto}}
 `;
-document.getElementById('report-css').textContent = REPORT_CSS + REG_CSS + ACT_CSS + REF_CSS;
+const NM_CSS = `
+.sheet .rk{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#eef2f7;font-weight:700;font-size:11.5px}
+.sheet .rk.top{background:#22C55E;color:#fff}
+.sheet .ins2{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin:14px 0 20px}
+.sheet .ins2.one{grid-template-columns:1fr}
+.sheet .box{border:1px solid #d8dde2;border-radius:10px;padding:10px 14px}
+.sheet .box h3{font-size:13.5px;margin:0 0 6px}
+.sheet .box ul{margin:0;padding-inline-start:18px;font-size:11.8px;line-height:1.9}
+.sheet .rt td.dl{font-size:10.5px;text-align:right;white-space:normal}
+.sheet .rt td.dl .u{color:#E03A3A;font-weight:700}
+.sheet + .sheet{margin-top:26px}
+@media print{.sheet + .sheet{break-before:page;margin-top:0}}
+`;
+document.getElementById('report-css').textContent = REPORT_CSS + REG_CSS + ACT_CSS + REF_CSS + NM_CSS;
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -612,7 +630,7 @@ const DEFAULT_CFG = { schoolDays:180, actFrom:'', gender:'بنين', school:'م�
 const today = iso(new Date());
 const state = {
   cfg: null, days: {}, mode: 'local', db: null, downloads: null, ready: {cfg:false, days:false},
-  view: 'entry', entryDate: today, roster: {}, actions: {}, actStage: 'all', actQ: '', refs: {}, refSt: 'all', refQ: '', rsOpen: new Set(), rq: '', bulkType: 'بدون', draft: {}, dirty: false,
+  view: 'entry', entryDate: today, roster: {}, actions: {}, actStage: 'all', actQ: '', refs: {}, refSt: 'all', refQ: '', cmp: {type:'daily', red:5, min:3, unOnly:false}, noorM: {files:[], days:'', red:5, min:3, unOnly:false}, rsOpen: new Set(), rq: '', bulkType: 'بدون', draft: {}, dirty: false,
   rpt: { type:'daily', date: today, month: today.slice(0,7) }
 };
 
@@ -644,6 +662,10 @@ async function saveDay(date, entries, students){
   if(state.mode === 'db') return dbWrite(() => state.db.doc('days/' + date).set(body));
   state.days[date] = body; lsSet('days', state.days); return true;
 }
+async function saveNoorM(){
+  if(state.mode === 'db') return dbWrite(() => state.db.doc('config/noorm').set(clone(state.noorM)));
+  lsSet('noorm', state.noorM); return true;
+}
 async function saveRef(r){
   if(state.mode === 'db'){ const ok = await dbWrite(() => state.db.doc('referrals/' + r.id).set(clone(r))); if(ok) state.refs[r.id] = r; return ok; }
   state.refs[r.id] = r; lsSet('refs', state.refs); return true;
@@ -672,6 +694,7 @@ function useLocal(){
   state.roster = lsGet('roster', {});
   state.actions = lsGet('actions', {});
   state.refs = lsGet('refs', {});
+  state.noorM = Object.assign({files:[], days:'', red:5, min:3, unOnly:false}, lsGet('noorm', {}));
   state.ready = {cfg:true, days:true};
   onData();
 }
@@ -754,12 +777,14 @@ function railNote(){
   return `${where}${lb ? `<div>آخر نسخة احتياطية: ${lb.replace(/-/g,'/')}</div>` : ''}${state.downloads ? `<button type="button" class="btn" data-act="backup">${ICON.down} نسخة احتياطية</button>` : ''}${installHTML(true).replace('btn primary','btn primary" style="margin-top:6px;width:100%')}`;
 }
 function bannerHTML(){
-  if(!state.downloads || !Object.keys(state.days).length) return '';
+  if(!state.downloads || !Object.keys(state.days).length || state.view !== 'entry') return '';
+  let sn = null; try{ sn = localStorage.getItem('absence:snooze'); }catch(e){}
+  if(sn && sn >= today) return '';
   const lb = lastBackup();
   const days = lb ? Math.round((parse(today) - parse(lb)) / 86400000) : null;
   if(lb && days <= 7) return '';
   const txt = lb ? `مرّ ${AR(days)} يومًا على آخر نسخة احتياطية منزّلة. نزّل نسخة جديدة احتياطًا.` : 'لم تنزّل نسخة احتياطية بعد. احتفظ بنسخة من بيانات الغياب على جهازك.';
-  return `<div class="banner no-print"><span aria-hidden="true">⚠️</span><span><strong>النسخة الاحتياطية</strong> ${txt}</span><button type="button" data-act="backup">حفظ نسخة الآن</button></div>`;
+  return `<div class="banner no-print"><span aria-hidden="true">⚠️</span><span><strong>النسخة الاحتياطية</strong> ${txt}</span><button type="button" data-act="backup">حفظ نسخة الآن</button><button type="button" class="later" data-act="snooze">تذكيري لاحقًا</button></div>`;
 }
 function render(){
   if(!state.cfg) return;
@@ -932,18 +957,81 @@ function noorParse(pages){
     const key = gr.stage + '|' + gr.grade + '|' + sec;
     if(!map.has(key)) map.set(key, {...gr, section: sec, rows: []});
     const C = map.get(key);
-    lines.forEach(L => {
-      const nums = L.items.filter(i => /^\d{1,3}$/.test(i.t));
-      const names = L.items.filter(i => /[\u0600-\u06FF]/.test(i.t) && !/[:：]/.test(i.t) && !/^(اسم الطالب|اسم الطالبة|اسم الطالب\/ة|عدد|م|التوقيع|الصف|الفصل|القسم|العام الدراسي)$/.test(i.t));
-      if(/^(الصف|الفصل|القسم|العام الدراسي)$/.test(L.items.map(i => i.t).join(' ').split(' ')[0])) return;
-      if(nums.length && names.length){
-        const n = +nums[nums.length - 1].t, name = names.map(i => i.t).join(' ').trim();
-        if(n > 0 && n < 200 && name.split(' ').length >= 2 && !C.rows.some(r => r.n === n)) C.rows.push({n, name});
-      }
+    const nums = its.filter(i => /^\d{1,3}$/.test(i.t) && +i.t > 0 && +i.t < 200);
+    if(!nums.length) return;
+    // عمود التسلسل: أقصى اليمين
+    const maxX = Math.max(...nums.map(n => n.x));
+    const ser = nums.filter(n => Math.abs(n.x - maxX) < 20).sort((a, b) => b.y - a.y);
+    if(!ser.length) return;
+    const gaps = ser.slice(1).map((n, k) => ser[k].y - n.y).filter(g => g > 2).sort((a, b) => a - b);
+    const h = gaps.length ? gaps[Math.floor(gaps.length / 2)] : 16;
+    const BAD = /الإدارة|الادارة|وزارة|المملكة|ابتدائية|متوسطة|ثانوية|الابتدائي|المتوسط|مدرسة|تحفيظ|تقرير|كشف|مجموع|مسلسل|تعني|الغياب|القسم|العام|الصف|الفصل|اسم الطالب|التوقيع|النظام|الشهر|عدد|[:：]/;
+    const MARK = /^(ب\s*)?[غعب]$|^[غع]\s*ب$/;
+    const frags = its.filter(i => /[\u0600-\u06FF]/.test(i.t) && !BAD.test(i.t) && !MARK.test(i.t) && i.x < maxX - 5);
+    ser.forEach((sn, k) => {
+      const top = k === 0 ? sn.y + h / 2 : (ser[k - 1].y + sn.y) / 2;
+      const bot = k === ser.length - 1 ? sn.y - h / 2 : (sn.y + ser[k + 1].y) / 2;
+      const parts = frags.filter(f => f.y <= top && f.y > bot).sort((a, b) => (b.y - a.y) > 2 ? 1 : (a.y - b.y) > 2 ? -1 : b.x - a.x);
+      // نأخذ الأجزاء المتجاورة في عمود الاسم فقط (الأقرب لعمود التسلسل)
+      if(!parts.length) return;
+      const nameRight = Math.max(...parts.map(p => p.x + (p.w || 0)));
+      const name = parts.filter(p => p.x > nameRight - 260).map(p => p.t).join(' ').replace(/\s+/g, ' ').trim();
+      const n = +sn.t;
+      if(name.split(' ').length >= 2 && !C.rows.some(r => r.n === n)) C.rows.push({n, name});
     });
   });
   const classes = [...map.values()].map(c => ({grade:c.grade, stage:c.stage, section:c.section, names: c.rows.sort((a,b) => a.n - b.n).map(r => r.name)})).filter(c => c.names.length);
   return {classes, female};
+}
+/* تقرير الغياب على مستوى أيام الشهر (نور) */
+function noorMonthlyParse(pages){
+  const out = {female:true, grade:'', section:'', month:'', year:'', school:'', students:[], dayCount:{}};
+  pages.forEach(({items:raw, W}) => {
+    const items = raw.map(i => ({t: noorDecode(i.str), x:i.x, y:i.y, w:i.w || 0, cx: i.x + (i.w || 0) / 2})).filter(i => i.t);
+    const nums = items.filter(i => /^\d{1,2}$/.test(i.t));
+    const groups = [];
+    nums.forEach(i => { let g = groups.find(g => Math.abs(g.y - i.y) < 3); if(!g){ g = {y:i.y, its:[]}; groups.push(g); } g.its.push(i); });
+    let hdrY = null, dayX = null;
+    groups.forEach(g => { const v = g.its.map(i => +i.t); if(v.includes(30) && v.includes(1) && v.includes(15)){ hdrY = g.y; dayX = {}; g.its.forEach(i => dayX[+i.t] = i.cx); } });
+    if(hdrY === null) return;
+    const dxs = Object.values(dayX), colW = Math.abs(dayX[1] - dayX[2]) || 15;
+    const minDayX = Math.min(...dxs) - colW, maxDayX = Math.max(...dxs) + colW;
+    const find = label => { const l = items.find(i => i.t === label || i.t.startsWith(label + ' ')); if(!l) return '';
+      return items.filter(i => Math.abs(i.y - l.y) < 5 && i !== l && i.x < l.x && !/^:$/.test(i.t) && i.x > l.x - 130).sort((a,b) => b.x - a.x).map(i => i.t).join(' ').replace(/^:\s*/, '').trim(); };
+    if(items.some(i => i.t === 'اسم الطالب')) out.female = false;
+    if(!out.grade){
+      out.grade = find('الصف'); out.section = find('الفصل'); out.month = find('الشهر');
+      out.year = (items.find(i => /\d{4}-\d{4}/.test(i.t)) || {}).t || '';
+      out.school = (items.find(i => /ابتدائية|متوسطة|ثانوية|مدرسة|ابتدائيه/.test(i.t) && i.x > (W || 800) * 0.6) || {}).t || '';
+    }
+    const below0 = nums.filter(i => i.y < hdrY - 3);
+    if(!below0.length) return;
+    const serialX = Math.max(...below0.map(i => i.x));
+    const serials = below0.filter(i => Math.abs(i.x - serialX) < 8).map(i => ({n:+i.t, y:i.y, name:[], ex:0, un:0, marks:[]}));
+    if(!serials.length) return;
+    const near = y => serials.reduce((a, b) => Math.abs(b.y - y) < Math.abs(a.y - y) ? b : a);
+    const ys = serials.map(s => s.y).sort((a,b) => b - a);
+    const rowGap = ys.length > 1 ? Math.abs(ys[0] - ys[1]) : 16;
+    const below = items.filter(i => i.y < hdrY - 3 && i.y > Math.min(...ys) - rowGap * 0.75);
+    const leftNums = below.filter(i => /^\d+$/.test(i.t) && i.x < minDayX);
+    const xs = [...new Set(leftNums.map(i => Math.round(i.x / 5) * 5))].sort((a,b) => a - b);
+    below.forEach(i => {
+      const r = near(i.y); if(Math.abs(r.y - i.y) > rowGap * 0.75) return;
+      if(/^\d+$/.test(i.t) && i.x < minDayX){ const col = Math.round(i.x / 5) * 5; if(col === xs[0]) r.un = +i.t; else r.ex = +i.t; }
+      else if(i.cx >= minDayX && i.cx <= maxDayX && /[غع]/.test(i.t) && i.t.length <= 4){
+        let best = null, bd = 1e9; for(const d in dayX){ const dd = Math.abs(dayX[d] - i.cx); if(dd < bd){ bd = dd; best = +d; } }
+        r.marks.push({day:best, un:/ب/.test(i.t)});
+      } else if(i.x + i.w > maxDayX && /[\u0621-\u064A]/.test(i.t) && !/^(ب\s*)?[غع]$|^[غع]\s*ب$/.test(i.t) && i.x < serialX - 4){ r.name.push(i); }
+    });
+    serials.forEach(r => {
+      if(out.students.some(s => s.n === r.n)) return;
+      const name = r.name.sort((a,b) => (b.y - a.y) > 2 ? 1 : (a.y - b.y) > 2 ? -1 : b.x - a.x).map(i => i.t).join(' ').replace(/\s+/g, ' ').trim();
+      out.students.push({n:r.n, name, ex:r.ex, un:r.un, marks:r.marks.sort((a,b) => a.day - b.day)});
+    });
+  });
+  out.students.sort((a,b) => a.n - b.n);
+  out.students.forEach(s => s.marks.forEach(m => out.dayCount[m.day] = (out.dayCount[m.day] || 0) + 1));
+  return out;
 }
 
 const SEC_L = ['أ','ب','ج','د','هـ','و','ز','ح','ط','ي'];
@@ -982,7 +1070,7 @@ async function noorImport(file){
       pages.push(tc.items.filter(it => it.str && it.str.trim()).map(it => ({str: it.str, x: it.transform[4], y: it.transform[5]})));
     }
     const res = noorParse(pages);
-    if(!res.classes.length){ toast('لم أتعرّف على أسماء في هذا الملف. تأكد أنه «كشف بأسماء الطلاب» من نور، أو استخدم «لصق أسماء فصل».','err'); return; }
+    if(!res.classes.length){ toast('لم أتعرّف على أسماء في هذا الملف. استخدم «كشف بأسماء الطلاب» أو «تقرير الغياب الشهري» من نور، أو «لصق أسماء فصل».','err'); return; }
     state.noorResult = res; showNoorPreview();
   }catch(e){ toast('تعذّر قراءة الملف.','err'); }
 }
@@ -1547,9 +1635,223 @@ function rangeDates(r){
   for(let i = 1; i <= new Date(y, m, 0).getDate(); i++) out.push(new Date(y, m-1, i));
   return out;
 }
+/* ---------- تقرير نور الشهري المقارن ---------- */
+const NM_COLORS = ['#1d9bf0','#f2b705','#4cd964','#ef4444','#9b5de5','#00b8a9','#fb7185','#64748b','#84cc16'];
+const nf2 = x => (Math.round(x * 100) / 100).toString();
+function nmClasses(){
+  const inc = (state.noorM.files || []).filter(f => f.include !== false && f.data && f.data.students && f.data.students.length);
+  const C = inc.map(f => {
+    const d = f.data, g = noorNormGrade(d.grade || '') || {grade: d.grade || '', stage: ''}, n = parseInt(d.section, 10);
+    const m = g.stage && n ? matchClass(g.stage, g.grade, n) : null;
+    const sec = m ? m.section : (n ? (SEC_L[n-1] || String(n)) : (d.section || ''));
+    const ex = d.students.reduce((a, s) => a + (+s.ex || 0), 0), un = d.students.reduce((a, s) => a + (+s.un || 0), 0);
+    return {id:f.id, grade:g.grade, stage:g.stage, sec, full:`${g.grade} ${g.stage} / ${sec}`, short:`${g.grade} / ${sec}`,
+      s:d.students.length, a:d.students.filter(s => s.ex + s.un > 0).length, ex, un, d:ex + un, students:d.students, dayCount:d.dayCount || {}, school:d.school, month:d.month, year:d.year};
+  });
+  const multi = new Set(C.map(c => c.stage)).size > 1;
+  if(multi) C.forEach(c => c.short = `${c.grade} ${c.stage === 'متوسط' ? 'م' : 'ب'} / ${c.sec}`);
+  const si = st => STAGES.findIndex(x => x.k === st);
+  C.sort((a, b) => si(a.stage) - si(b.stage) || GRADES.indexOf(a.grade) - GRADES.indexOf(b.grade) || String(a.sec).localeCompare(String(b.sec), 'ar'));
+  return C;
+}
+function nmDays(C){ const s = new Set(); C.forEach(c => Object.keys(c.dayCount).forEach(d => s.add(+d))); return [...s].sort((a, b) => a - b); }
+function nmWeeks(days){ const w = []; days.forEach(d => { const l = w[w.length-1]; if(l && d - l[l.length-1] <= 2) l.push(d); else w.push([d]); }); return w; }
+function nmInsights(C, T, DAYS, per){
+  per = per || 'الشهر';
+  const g = G(), fe = g.f, out = [], asc = [...C].sort((a, b) => a.r - b.r), zero = C.filter(c => c.d === 0);
+  if(zero.length) out.push(`${zero.length === 1 ? 'فصل' : zero.length + ' فصول'} بلا غياب: ${zero.map(c => '<b>' + esc(c.short) + '</b>').join('، ')}.`);
+  const withA = asc.filter(c => c.d > 0);
+  if(withA.length){ const l = withA[0], big = Math.max(...C.map(c => c.s));
+    out.push(`الأقل غيابًا${zero.length ? ' بين الفصول التي سُجّل فيها غياب' : ''}: <b>${esc(l.short)}</b> ${nf2(l.r)}٪${l.s === big && C.length > 2 ? ' رغم أنه الأكبر عددًا' : ''}${withA[1] ? `، يليه <b>${esc(withA[1].short)}</b> ${nf2(withA[1].r)}٪` : ''}.`); }
+  if(C.length > 1){ const hi = asc[asc.length-1], gg = {}; C.forEach(c => gg[c.grade + ' ' + c.stage] = (gg[c.grade + ' ' + c.stage] || 0) + c.d);
+    const top = Object.entries(gg).sort((a, b) => b[1] - a[1])[0];
+    out.push(`الأعلى غيابًا: <b>${esc(hi.short)}</b> ${nf2(hi.r)}٪${Object.keys(gg).length > 1 && T.d ? `، والصف ${esc(top[0])} يمثل ${Math.round(top[1] / T.d * 100)}٪ من غياب المدرسة` : ''}.`); }
+  if(T.d && per === 'اليوم'){ out.push(`نسبة الغياب العامة ${nf2(T.d / T.s * 100)}٪ بعدد ${T.d} من ${T.s} ${g.student}${T.ex + T.un ? `؛ منهم ${T.ex} بعذر و${T.un} بدون عذر` : ''}.`); }
+  else if(T.d){ const unC = [...C].sort((a, b) => b.un - a.un)[0];
+    out.push(`نسبة الغياب العامة ${nf2(T.d / (T.s * DAYS) * 100)}٪، و${T.a} ${g.student} (${Math.round(T.a / T.s * 100)}٪) غاب${fe ? 'ت' : ''} يومًا على الأقل${T.ex + T.un ? '؛ ' + Math.round(T.ex / (T.ex + T.un) * 100) + '٪ من الغياب بعذر' : ''}${T.un ? `، و${T.un} يومًا بدون عذر${unC.un > 1 ? ` أكثرها في ${esc(unC.short)} (${unC.un})` : ''}` : ''}.`); }
+  const DC = {}; C.forEach(c => Object.entries(c.dayCount).forEach(([d, v]) => DC[d] = (DC[d] || 0) + v));
+  const days = Object.keys(DC).map(Number).sort((a, b) => a - b);
+  if(days.length > 1){ const wk = nmWeeks(days).map(x => ({r:x, v:x.reduce((a, d) => a + DC[d], 0)})), peak = days.reduce((a, b) => DC[b] > DC[a] ? b : a);
+    if(wk.length > 1){ const mx = wk.reduce((a, b) => b.v > a.v ? b : a), others = wk.filter(x => x !== mx), avg = others.reduce((a, b) => a + b.v, 0) / others.length;
+      out.push(`أعلى أسبوع غيابًا (${mx.r[0]}–${mx.r[mx.r.length-1]}) بـ${mx.v} يومًا مقابل متوسط ${Math.round(avg)} لبقية الأسابيع${avg ? ` (زيادة ${Math.round((mx.v - avg) / avg * 100)}٪)` : ''}، وذروة ${per} يوم ${peak} بـ${DC[peak]} حالة.`); }
+    else out.push(`ذروة ${per} يوم ${peak} بـ${DC[peak]} حالة.`); }
+  let top = null; C.forEach(c => c.students.forEach(s => { const t = s.ex + s.un; if(!top || t > top.t) top = {s, t, c}; }));
+  if(top && top.t >= 5 && top.c.d){ const rest = (top.c.d - top.t) / (top.c.s * DAYS) * 100;
+    out.push(`${g.student} في <b>${esc(top.c.short)}</b> غاب${fe ? 'ت' : ''} ${top.t} يومًا (${Math.round(top.t / top.c.d * 100)}٪ من غياب الفصل)، وبدونها تصبح نسبة الفصل ${nf2(rest)}٪.`); }
+  const fam = {}; C.forEach(c => c.students.forEach(s => { const p = s.name.split(' '); if(p.length < 3 || s.marks.length < 2) return; const k = p.slice(1).join(' '); (fam[k] = fam[k] || []).push({s, c}); }));
+  Object.entries(fam).forEach(([k, arr]) => { const cl = new Set(arr.map(x => x.c.short)); if(arr.length < 2 || cl.size < 2) return;
+    const sets = arr.map(x => new Set(x.s.marks.map(m => m.day))), common = [...sets[0]].filter(d => sets.every(st => st.has(d)));
+    if(common.length >= 2 && out.length < 8){ const fn = k.split(' ').slice(-2).join(' ');
+      out.push(`${arr.length === 2 ? (fe ? 'أختان' : 'أخوان') : arr.length + ' ' + (fe ? 'أخوات' : 'إخوة')} (${esc(fn)}) في ${[...cl].map(esc).join('، ')} غاب${fe ? 'ن' : 'وا'} في الأيام نفسها (${common.join('، ')})؛ يكفي تواصل واحد مع ولي الأمر.`); } });
+  return out;
+}
+function nmBars(C, RED){
+  const S = [...C].sort((a, b) => a.r - b.r || b.s - a.s), max = Math.max(2, Math.ceil(Math.max(...S.map(c => c.r)) / 2) * 2);
+  const L = 36, B = 230, H = 200, Wd = 360, step = Wd / S.length, bw = step * 0.55, fs = S.length > 12 ? 9 : 11, F = `font-family="IBM Plex Sans Arabic,Tahoma,sans-serif"`;
+  let b = '';
+  for(let t = 0; t <= max; t += max > 10 ? Math.ceil(max / 5) : 2){ const y = B - t / max * H; b += `<line x1="${L}" x2="${L+Wd}" y1="${y}" y2="${y}" stroke="#eef0f3"/><text x="${L-6}" y="${y+4}" font-size="11" text-anchor="end" fill="#6b7280" ${F}>${t}%</text>`; }
+  S.forEach((c, i) => { const h = Math.max(c.r / max * H, 3), x = L + Wd - (i + 1) * step + (step - bw) / 2, y = B - h, col = c.r === 0 ? '#22c55e' : c.r >= RED ? '#ef4444' : '#1d9bf0';
+    b += `<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="${Math.min(bw/2, 8)}" fill="${col}"/><text x="${x+bw/2}" y="${y-5}" font-size="10" text-anchor="middle" fill="#4b5563" ${F}>${c.d}</text><text transform="translate(${x+bw/2+4},${B+10}) rotate(-45)" font-size="${fs}" text-anchor="end" fill="#4b5563" ${F}>${esc(c.short)}</text>`; });
+  return `<svg viewBox="0 0 400 300" width="100%" style="direction:ltr">${b}<line x1="${L}" x2="${L+Wd}" y1="${B}" y2="${B}" stroke="#9ca3af"/></svg>`;
+}
+function nmDaily(C){
+  const D = {}; C.forEach(c => Object.entries(c.dayCount).forEach(([d, v]) => D[d] = (D[d] || 0) + v));
+  const k = Object.keys(D).map(Number).sort((a, b) => a - b), F = `font-family="IBM Plex Sans Arabic,Tahoma,sans-serif"`;
+  if(!k.length) return `<svg viewBox="0 0 400 170" width="100%"><text x="200" y="90" text-anchor="middle" font-size="13" fill="#6b7280" ${F}>لا يوجد غياب مسجّل</text></svg>`;
+  const mx = Math.max(...k.map(d => D[d])), step = mx <= 10 ? 5 : mx <= 30 ? 10 : 20, dm = Math.ceil(mx / step) * step, n = k.length;
+  const dx = i => n === 1 ? 200 : 380 - i * (350 / (n - 1)), dy = v => 140 - v / dm * 120; let p = '', pts = [];
+  for(let t = 0; t <= dm; t += step) p += `<line x1="22" x2="385" y1="${dy(t)}" y2="${dy(t)}" stroke="#eef0f3"/><text x="16" y="${dy(t)+4}" font-size="10" text-anchor="end" fill="#6b7280" ${F}>${t}</text>`;
+  k.forEach((d, i) => pts.push(`${dx(i)},${dy(D[d])}`));
+  if(n > 1) p += `<polygon points="${dx(0)},140 ${pts.join(' ')} ${dx(n-1)},140" fill="#1d9bf0" opacity=".12"/><polyline points="${pts.join(' ')}" fill="none" stroke="#1d9bf0" stroke-width="2.5" stroke-linejoin="round"/>`;
+  const hiT = [...k.map(d => D[d])].sort((a, b) => b - a)[Math.min(2, n - 1)];
+  k.forEach((d, i) => { const hi = D[d] >= hiT && D[d] > 0; p += `<circle cx="${dx(i)}" cy="${dy(D[d])}" r="${hi ? 4.5 : 3.5}" fill="${hi ? '#ef4444' : '#1d9bf0'}"/><text x="${dx(i)}" y="${dy(D[d])-8}" font-size="9.5" text-anchor="middle" fill="#374151" ${F}>${D[d]}</text><text x="${dx(i)}" y="158" font-size="10" text-anchor="middle" fill="#6b7280" ${F}>${d}</text>`; });
+  return `<svg viewBox="0 0 400 170" width="100%" style="direction:ltr">${p}</svg>`;
+}
+function nmMonthLabel(C){ const ms = [...new Set(C.map(c => c.month).filter(Boolean))], y = (C.find(c => c.year) || {}).year || ''; return (ms.join(' و') || '') + (y ? ` ${y.replace(/^\d{4}-/, '')} هـ` : ''); }
+function cmpReportHTML(C, M){
+  const g = G(), cfg = state.cfg, days = M.days, DAYS = M.DAYS || 1, RED = +M.red || 5;
+  C.forEach(c => c.r = c.s ? c.d / (c.s * DAYS) * 100 : 0);
+  const uniq = [...new Set(C.map(c => c.r))].sort((a, b) => a - b); C.forEach(c => c.rk = uniq.indexOf(c.r) + 1);
+  const T = {s:0, a:0, d:0, ex:0, un:0}; C.forEach(c => { T.s += c.s; T.a += c.a; T.d += c.d; T.ex += c.ex; T.un += c.un; });
+  const range = days.length ? `من ${days[0]} إلى ${days[days.length-1]} · ` : '';
+  const grp = [], gmap = {}; C.forEach(c => { const k = c.grade + ' ' + c.stage; if(!(k in gmap)){ gmap[k] = {label:k, value:0, color:NM_COLORS[grp.length % NM_COLORS.length]}; grp.push(gmap[k]); } gmap[k].value += c.d; });
+  const legend = grp.map(x => `<div class="it"><span class="dot" style="background:${x.color}"></span><span>${esc(x.label)}</span><span class="v"><b>${x.value}</b><small>${T.d ? Math.round(x.value / T.d * 100) : 0}٪</small></span></div>`).join('');
+  const rows = C.map((c, i) => { const red = c.r >= RED, col = c.d ? (red ? '#EF4444' : '#22C55E') : '#22C55E', wd = c.d ? Math.max(Math.min(100, c.r / (RED * 1.6) * 100), 8) : 100;
+    if(M.daily) return `<tr><td class="idx">${i+1}</td><td class="name">${esc(c.full)}</td><td class="days">${c.s}</td><td>${Math.max(0, c.s - c.d)}</td><td class="${red ? 'bad' : c.d ? '' : 'zero'}">${c.d}</td><td class="${c.ex ? '' : 'zero'}">${c.ex}</td><td class="${c.un ? 'bad' : 'zero'}">${c.un}</td>
+      <td class="rate ${red ? 'bad' : ''}"><div class="rin"><b>${nf2(c.r)}%</b><span class="rbarx"><i style="width:${wd}%;background:${col}"></i></span></div></td><td><span class="rk ${c.rk === 1 ? 'top' : ''}">${c.rk}</span></td></tr>`;
+    return `<tr><td class="idx">${i+1}</td><td class="name">${esc(c.full)}</td><td class="days">${c.s}</td><td class="${c.a ? '' : 'zero'}">${c.a}</td><td class="${red ? 'bad' : c.d ? '' : 'zero'}">${c.d}</td><td>${(c.d / c.s).toFixed(2)}</td>
+      <td class="rate ${red ? 'bad' : ''}"><div class="rin"><b>${nf2(c.r)}%</b><span class="rbarx"><i style="width:${wd}%;background:${col}"></i></span></div></td><td><span class="rk ${c.rk === 1 ? 'top' : ''}">${c.rk}</span></td></tr>`; }).join('');
+  const sig = (role, nm) => `<div><div class="role">${role}</div><div class="nm">${esc(nm || '')}</div><div class="ln">التوقيع: ..................</div></div>`;
+  return `<article class="sheet">
+    <h1>${esc(M.title || 'تقرير مقارنة غياب الفصول')}</h1>
+    <p class="sub"><b class="sch">${esc(cfg.school || C[0].school || '')}</b> — ${M.when || `شهر ${esc(M.month)} (${range}${DAYS} يومًا دراسيًا)`}${M.src ? ' · ' + M.src : ''}</p>
+    <div class="charts">
+      <figure><figcaption>${M.daily ? 'توزيع ' + g.regAbsent + ' حسب الصف' : 'توزيع أيام الغياب حسب الصف'}</figcaption><div class="donut">${donutSVG(grp, T.d, M.daily ? g.oneAbsent : 'يوم غياب')}</div><div class="legend">${legend}</div></figure>
+      <figure><figcaption>ترتيب الفصول من الأقل غيابًا</figcaption>${nmBars(C, RED)}</figure>
+    </div>
+    <div class="tcap">الملخص المقارن حسب الفصل</div>
+    ${M.daily ? `<table class="rt"><thead><tr><th>م</th><th>الفصل</th><th>عدد ${g.students}<small>${g.student}</small></th><th>${g.presentNom}<small>${g.student}</small></th><th>${g.absentsNom}<small>${g.student}</small></th><th>بعذر<small>${g.student}</small></th><th>بدون عذر<small>${g.student}</small></th><th>نسبة الغياب</th><th>الترتيب</th></tr></thead>
+      <tbody>${rows}<tr class="total"><td></td><td class="name">الإجمالي</td><td>${T.s}</td><td>${T.s - T.d}</td><td>${T.d}</td><td>${T.ex}</td><td>${T.un}</td><td>${nf2(T.d / T.s * 100)}%</td><td></td></tr></tbody></table>
+    <p class="note">بالأحمر: نسبة غياب ${RED}٪ فأكثر. نسبة الغياب = ${g.absentsNom} ÷ عدد ${g.students}. بعذر وبدون عذر من الأسماء المسجّلة. الترتيب ١ = الأقل غيابًا.</p>`
+    : `<table class="rt"><thead><tr><th>م</th><th>الفصل</th><th>عدد ${g.students}<small>${g.student}</small></th><th>${g.absentsNom}<small>${g.student}</small></th><th>أيام الغياب<small>بعذر وبدون عذر</small></th><th>متوسط الغياب<small>يوم/${g.student}</small></th><th>نسبة الغياب</th><th>الترتيب</th></tr></thead>
+      <tbody>${rows}<tr class="total"><td></td><td class="name">الإجمالي</td><td>${T.s}</td><td>${T.a}</td><td>${T.d}</td><td>${(T.d / T.s).toFixed(2)}</td><td>${nf2(T.d / (T.s * DAYS) * 100)}%</td><td></td></tr></tbody></table>
+    <p class="note">بالأحمر: نسبة غياب ${RED}٪ فأكثر. نسبة الغياب = أيام الغياب ÷ (عدد ${g.students} × ${DAYS} يومًا). الترتيب ١ = الأقل غيابًا.</p>`}
+    <div class="ins2 ${days.length > 1 ? '' : 'one'}"><div class="box"><h3>أبرز النتائج</h3><ul>${nmInsights(C, T, DAYS, M.per).map(x => `<li>${x}</li>`).join('') || '<li>لا يوجد غياب مسجّل.</li>'}</ul></div>
+      ${days.length > 1 ? `<div class="box"><h3>الغياب اليومي خلال ${M.per || 'الشهر'}</h3>${nmDaily(C)}</div>` : ''}</div>
+    <div class="sigs">${sig(g.officer, cfg.preparer)}${sig(g.deputy, cfg.deputy)}${sig(g.principal, cfg.principal)}</div>
+    <div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}${cfg.preparer ? ' — ' + esc(cfg.preparer) : ''}</span><span>جميع الحقوق محفوظة © ${COPYRIGHT}</span></div>
+  </article>`;
+}
+function cmpStudentsHTML(C, M){
+  const g = G(), cfg = state.cfg, min = +M.min, unOnly = !!M.unOnly;
+  const rows = []; C.forEach(c => c.students.forEach(s => { const t = s.ex + s.un; if(unOnly && !s.un) return; if(t < min && min > 0) return; rows.push({s, c, t}); }));
+  rows.sort((a, b) => b.t - a.t || b.s.un - a.s.un || a.s.name.localeCompare(b.s.name, 'ar'));
+  const label = min > 0 ? `${min === 1 ? 'يومًا' : min + ' أيام'} فأكثر` : `كل ${g.students}`;
+  return `<article class="sheet">
+    <h1>${M.stTitle || 'كشف غياب ' + g.students}</h1>
+    <p class="sub"><b class="sch">${esc(cfg.school || C[0].school || '')}</b> — ${M.when ? M.when.replace(/ \(.*$/, '') : 'شهر ' + esc(M.month)} · ${label}${unOnly ? ' · بدون عذر فقط' : ''}</p>
+    <table class="rt"><thead><tr><th>م</th><th>اسم ${g.studentDef}</th><th>الفصل</th><th>بعذر<small>يوم</small></th><th>بدون عذر<small>يوم</small></th><th>الإجمالي<small>يوم</small></th><th>أيام الغياب</th></tr></thead>
+      <tbody>${rows.map((r, i) => `<tr><td class="idx">${i+1}</td><td class="name">${esc(r.s.name)}</td><td class="name">${esc(r.c.short)}</td><td class="${r.s.ex ? '' : 'zero'}">${r.s.ex}</td><td class="${r.s.un ? 'bad' : 'zero'}">${r.s.un}</td><td><b>${r.t}</b></td>
+        <td class="dl">${r.s.marks.map(m => m.un ? `<span class="u">${m.day}ب</span>` : m.day).join('، ')}</td></tr>`).join('') || `<tr><td colspan="7" class="zero" style="padding:18px">لا يوجد ${g.students} ضمن هذا الحد.</td></tr>`}</tbody></table>
+    <p class="note">${rows.length} ${g.student} · الأيام المميزة بـ«ب» غياب بدون عذر.</p>
+    <div class="sigs">${[[g.officer, cfg.preparer],[g.deputy, cfg.deputy],[g.principal, cfg.principal]].map(([a, b]) => `<div><div class="role">${a}</div><div class="nm">${esc(b || '')}</div><div class="ln">التوقيع: ..................</div></div>`).join('')}</div>
+  </article>`;
+}
+function nmMeta(C){ const days = nmDays(C); return {month: nmMonthLabel(C), src:'من تقارير نور', days, DAYS: +state.noorM.days || days.length || 1, red: state.noorM.red, min: state.noorM.min, unOnly: state.noorM.unOnly}; }
+function noorReportHTML(){ const C = nmClasses(); return C.length ? cmpReportHTML(C, nmMeta(C)) : ''; }
+function noorStudentsHTML(){ const C = nmClasses(); return C.length ? cmpStudentsHTML(C, nmMeta(C)) : ''; }
+/* التقرير المقارن من الرصد اليومي في التطبيق */
+function appCmpData(){
+  const r = state.rpt, cm = state.cmp, type = cm.type || 'daily';
+  const dates = type === 'monthly' ? rangeDates({type:'monthly', month:r.month}) : rangeDates({type, date:r.date});
+  const keys = dates.map(iso).filter(k => state.days[k]);
+  const C = classes().map(c => {
+    let d = 0; const dayCount = {}, st = new Map();
+    keys.forEach(k => {
+      const rec = state.days[k], day = +k.slice(8), v = +((rec.entries || {})[c.id]) || 0;
+      const named = ((rec.students || {})[c.id] || []).filter(x => (x.name || '').trim());
+      const tot = Math.max(v, named.length); d += tot; if(tot) dayCount[day] = (dayCount[day] || 0) + tot;
+      named.forEach(x => { const nm = x.name.trim(); let o = st.get(nm); if(!o){ o = {name:nm, ex:0, un:0, marks:[]}; st.set(nm, o); }
+        const un = x.type !== 'بعذر'; if(un) o.un++; else o.ex++; o.marks.push({day, un}); });
+    });
+    const students = [...st.values()], ex = students.reduce((a, x) => a + x.ex, 0), un = students.reduce((a, x) => a + x.un, 0);
+    return {id:c.id, grade:c.grade, stage:c.stage, sec:c.section, full:clsLabel(c), short:`${c.grade} / ${c.section}`, s:+c.count || 0, a:students.length, ex, un, d, students, dayCount};
+  }).filter(c => c.s > 0);
+  if(new Set(C.map(c => c.stage)).size > 1) C.forEach(c => c.short = `${c.grade} ${c.stage === 'متوسط' ? 'م' : 'ب'} / ${c.sec}`);
+  const a = dates[0], b = dates[dates.length-1], n = keys.length, g = G();
+  const days = [...new Set(keys.map(k => +k.slice(8)))].sort((x, y) => x - y);
+  const T = {daily:'التقرير اليومي لغياب الفصول', weekly:'التقرير الأسبوعي لغياب الفصول', monthly:'التقرير الشهري لغياب الفصول'}[type];
+  const when = type === 'daily' ? `${dayName(a)} ${dmy(a)} (${hijriFull(a)})`
+    : type === 'weekly' ? `الأسبوع من ${dmy(a)} إلى ${dmy(b)} (${hijriRange(a, b)} · ${n} ${n > 2 ? 'أيام' : 'يوم'} مرصودة)`
+    : `شهر ${gMonth(a)} ${a.getFullYear()} (${hijriRange(a, b)} · ${n} يومًا مرصودًا)`;
+  return {C, keys, M:{title:T, when, per: type === 'daily' ? 'اليوم' : type === 'weekly' ? 'الأسبوع' : 'الشهر', stTitle: type === 'daily' ? (g.f ? 'كشف الغائبات' : 'كشف الغائبين') : 'كشف غياب ' + g.students,
+    src:'', daily: type === 'daily', days, DAYS: n || 1, red: cm.red, min: type === 'daily' ? 1 : cm.min, unOnly: cm.unOnly}};
+}
+function appCmpView(){
+  const r = state.rpt, cm = state.cmp, type = cm.type || 'daily', {C, keys, M} = appCmpData();
+  const picker = type === 'monthly' ? `<input class="input" type="month" id="rMonth" value="${r.month}" aria-label="الشهر">`
+    : `<input class="input" type="date" id="rDate" value="${r.date}" aria-label="التاريخ" style="width:170px">`;
+  return `<div class="bar">
+      <div class="chips">${[['daily','يومي'],['weekly','أسبوعي'],['monthly','شهري']].map(([k, t]) => `<button class="chip ${type === k ? 'on' : ''}" data-cmptype="${k}">${t}</button>`).join('')}</div>
+      ${type !== 'monthly' ? `<button class="btn" data-act="cday" data-n="-1">◀</button>${picker}<button class="btn" data-act="cday" data-n="1">▶</button>` : picker}
+      <span class="tag ${keys.length ? 'ok' : 'mute'}">${type === 'daily' ? (keys.length ? 'مرصود' : 'لم يُرصد') : keys.length + ' يومًا مرصودًا'}</span>
+      <span class="grow"></span>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px">حد الأحمر %<input class="input" id="cmpRed" type="number" min="1" max="50" step="0.5" value="${esc(cm.red)}" style="width:80px"></label>
+      ${type !== 'daily' ? `<label class="f" style="flex-direction:row;align-items:center;gap:8px">الكشف<select class="input" id="cmpMin">${[[1,'يوم فأكثر'],[3,'٣ أيام فأكثر'],[5,'٥ أيام فأكثر'],[0,'الكل']].map(([v, t]) => `<option value="${v}" ${+cm.min === v ? 'selected' : ''}>${t}</option>`).join('')}</select></label>` : ''}
+      <label class="chk"><input type="checkbox" id="cmpUn" ${cm.unOnly ? 'checked' : ''}> بدون عذر فقط</label>
+      ${keys.length && C.length ? `<button class="btn primary" data-act="print">${ICON.print} طباعة</button>` : ''}
+    </div>
+    ${keys.length && C.length ? `<div class="sheet-wrap">${cmpReportHTML(C, M)}${cmpStudentsHTML(C, M)}</div>`
+      : `<div class="empty"><div class="ic">${ICON.users}</div><h2>${type === 'daily' ? 'لم يُرصد غياب هذا اليوم' : 'لا يوجد غياب مرصود في هذه الفترة'}</h2><p>يُبنى التقرير من الرصد اليومي في التطبيق.</p></div>`}`;
+}
+function noorView(){
+  const files = state.noorM.files || [], C = nmClasses(), days = nmDays(C), nm = state.noorM;
+  const chips = files.map(f => { const d = f.data || {}, gg = noorNormGrade(d.grade || '') || {grade:d.grade, stage:''}, n = parseInt(d.section, 10);
+    return `<span class="nmchip ${f.include !== false ? 'on' : ''}"><button data-act="nmToggle" data-fid="${esc(f.id)}" title="تضمين/استبعاد">${f.include !== false ? '✓ ' : ''}${esc(gg.grade + ' ' + gg.stage)} / ${esc(SEC_L[n-1] || d.section || '')} · ${esc(d.month || '')} · ${(d.students || []).length}</button><button data-act="nmDel" data-fid="${esc(f.id)}" aria-label="حذف">×</button></span>`; }).join('');
+  return `<div class="bar">
+      <button class="btn primary" data-act="nmPick">${ICON.up} استيراد تقارير نور الشهرية (PDF)</button>
+      <input type="file" id="nmFile" accept="application/pdf,.pdf" multiple hidden>
+      <span class="grow"></span>
+      ${files.length ? `<button class="btn danger" data-act="nmClear">مسح الكل</button>` : ''}
+      ${C.length ? `<button class="btn primary" data-act="print">${ICON.print} طباعة</button>` : ''}
+    </div>
+    ${files.length ? `<div class="bar"><span style="color:var(--muted);font-size:12.5px">الفصول:</span><div class="chips">${chips}</div></div>` : ''}
+    ${C.length ? `<div class="bar">
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px">أيام الدراسة<input class="input" id="nmDays" type="number" min="1" max="30" value="${esc(nm.days || '')}" placeholder="${days.length} تلقائي" style="width:100px"></label>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px">حد الأحمر %<input class="input" id="nmRed" type="number" min="1" max="50" step="0.5" value="${esc(nm.red || 5)}" style="width:80px"></label>
+      <span class="grow"></span>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px">الكشف<select class="input" id="nmMin">${[[1,'يوم فأكثر'],[3,'٣ أيام فأكثر'],[5,'٥ أيام فأكثر'],[0,'الكل']].map(([v, t]) => `<option value="${v}" ${+nm.min === v ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+      <label class="chk"><input type="checkbox" id="nmUn" ${nm.unOnly ? 'checked' : ''}> بدون عذر فقط</label>
+    </div>
+    <div class="sheet-wrap">${noorReportHTML()}${noorStudentsHTML()}</div>`
+    : `<div class="empty"><div class="ic">${ICON.up}</div><h2>تقرير مقارنة الفصول من نور</h2><p>من نور: التقارير ← «تقرير الغياب على مستوى أيام الشهر». نزّل ملف PDF لكل فصل، ثم استوردها هنا دفعة واحدة لتحصل على تقرير مقارن بين الفصول وكشف ${G().students} الغائبين.</p><button class="btn primary" data-act="nmPick">${ICON.up} استيراد الملفات</button></div>`}`;
+}
+async function nmImport(list){
+  const arr = [...list]; if(!arr.length) return;
+  toast(`جارٍ قراءة ${arr.length} ${arr.length > 2 ? 'ملفات' : 'ملف'}…`);
+  let lib; try{ lib = await loadPdfJs(); }catch(e){ toast('تعذّر تحميل قارئ PDF. تأكد من الاتصال بالإنترنت.','err'); return; }
+  let ok = 0; const bad = [];
+  for(const file of arr){
+    try{
+      const doc = await lib.getDocument({data: new Uint8Array(await file.arrayBuffer()), isEvalSupported:false}).promise, pages = [];
+      for(let i = 1; i <= doc.numPages; i++){ const pg = await doc.getPage(i), tc = await pg.getTextContent();
+        pages.push({W: pg.view[2], items: tc.items.filter(it => it.str && it.str.trim()).map(it => ({str:it.str, x:it.transform[4], y:it.transform[5], w:it.width}))}); }
+      const d = noorMonthlyParse(pages);
+      if(!d.students.length){ bad.push(file.name); continue; }
+      const key = [d.grade, d.section, d.month, d.year].join('|'), files = state.noorM.files = state.noorM.files || [], ix = files.findIndex(f => f.key === key);
+      const rec = {id: ix >= 0 ? files[ix].id : 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), key, fname:file.name, include:true, data:d};
+      if(ix >= 0) files[ix] = rec; else files.push(rec); ok++;
+    }catch(e){ bad.push(file.name); }
+  }
+  if(ok && await saveNoorM()) toast(`تم استيراد ${ok} ${ok > 2 ? 'فصول' : 'فصل'}${bad.length ? ` · تعذّر ${bad.length}` : ''}`);
+  if(bad.length && !ok) toast('لم أتعرّف على الملف. استخدم «تقرير الغياب على مستوى أيام الشهر» من نور.','err');
+  render();
+}
 function reportsView(){
   const r = state.rpt, tab = r.tab || 'stats';
-  const tabs = `<div class="tabs2" role="tablist"><button role="tab" class="${tab === 'stats' ? 'on' : ''}" data-rtab="stats">الإحصائية</button><button role="tab" class="${tab === 'register' ? 'on' : ''}" data-rtab="register">سجل الغياب اليومي</button></div>`;
+  const tabs = `<div class="tabs2" role="tablist"><button role="tab" class="${tab === 'stats' ? 'on' : ''}" data-rtab="stats">الإحصائية</button><button role="tab" class="${tab === 'register' ? 'on' : ''}" data-rtab="register">سجل الغياب اليومي</button><button role="tab" class="${tab === 'noor' ? 'on' : ''}" data-rtab="cmp">غياب الفصول</button><button role="tab" class="${tab === 'noor' ? 'on' : ''}" data-rtab="noor">تقرير نور الشهري</button></div>`;
+  if(tab === 'noor') return `<div class="no-print">${tabs}</div>` + noorView();
+  if(tab === 'cmp') return `<div class="no-print">${tabs}</div>` + appCmpView();
   if(tab === 'register'){
     const rec = state.days[r.date];
     return `<div class="no-print">${tabs}</div><div class="bar">
@@ -1719,7 +2021,7 @@ async function downloadReport(){
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 async function backup(){
   const dl = state.downloads; if(!dl) return;
-  const data = { app:'student-absence', version:1, exportedAt:new Date().toISOString(), cfg:clone(state.cfg), days:clone(state.days), roster:clone(state.roster || {}), actions:clone(state.actions || {}), refs:clone(state.refs || {}) };
+  const data = { app:'student-absence', version:1, exportedAt:new Date().toISOString(), cfg:clone(state.cfg), days:clone(state.days), roster:clone(state.roster || {}), actions:clone(state.actions || {}), refs:clone(state.refs || {}), noorm:clone(state.noorM || {}) };
   try{ await dl.save({filename:`absence-backup-${iso(new Date())}.json`, data: JSON.stringify(data, null, 1)}); lsSetRaw('lastBackup', today); toast('تم تنزيل النسخة الاحتياطية'); render(); }
   catch(e){ if(!e || e.code !== 'declined') toast('تعذّر تنزيل النسخة الاحتياطية.','err'); }
 }
@@ -1732,6 +2034,7 @@ async function restore(file, btn){
   const days = Object.entries(data.days).filter(([k,v]) => DATE_RE.test(k) && v && typeof v.entries === 'object');
   if(data.roster && typeof data.roster === 'object'){ state.roster = clone(data.roster); await saveRoster(); }
   if(data.actions && typeof data.actions === 'object'){ state.actions = clone(data.actions); await saveActions(); }
+  if(data.noorm && typeof data.noorm === 'object'){ state.noorM = Object.assign({files:[], days:'', red:5, min:3, unOnly:false}, clone(data.noorm)); await saveNoorM(); }
   if(data.refs && typeof data.refs === 'object'){ for(const r of Object.values(data.refs)) if(r && r.id) await saveRef(r); }
   if(state.mode === 'local'){
     state.cfg = cfg; days.forEach(([k,v]) => state.days[k] = v); lsSet('cfg', cfg); lsSet('days', state.days);
@@ -1845,9 +2148,9 @@ function rosterPanel(){
   const list = classes(), withR = list.filter(c => rosterOf(c.id).length), without = list.filter(c => !rosterOf(c.id).length);
   return `<section class="panel">
     <h3>قوائم أسماء ${G().students}</h3>
-    <p class="hint">استورد «كشف بأسماء ${G().students}» من نور بصيغة PDF مرة واحدة، فيصير إدخال الغياب بالتحديد بدل الكتابة، مع زر «الكل غائب» لأيام الغياب الجماعي.</p>
+    <p class="hint">استورد من نور ملف PDF واحدًا: «كشف بأسماء ${G().students}» أو «تقرير الغياب على مستوى أيام الشهر»، فيصير إدخال الغياب بالتحديد بدل الكتابة، مع زر «الكل غائب» لأيام الغياب الجماعي.</p>
     <div class="row-actions" style="margin-top:0">
-      <button class="btn primary" data-act="noorPick">${ICON.up} استيراد كشف نور (PDF)</button>
+      <button class="btn primary" data-act="noorPick">${ICON.up} استيراد من نور (PDF)</button>
       <button class="btn" data-act="pasteOpen">لصق أسماء فصل</button>
       <input type="file" id="noorFile" accept="application/pdf,.pdf" hidden>
     </div>
@@ -1869,6 +2172,7 @@ document.addEventListener('click', async e => {
   if(t.dataset.go){ state.view = t.dataset.go; render(); return; }
   if(t.dataset.open){ if(isDirty()){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; } state.entryDate = t.dataset.open; loadDraft(); render(); window.scrollTo(0,0); return; }
   if(t.dataset.rtype){ state.rpt.type = t.dataset.rtype; render(); return; }
+  if(t.dataset.cmptype){ state.cmp.type = t.dataset.cmptype; render(); return; }
   if(t.dataset.rtab){ state.rpt.tab = t.dataset.rtab; if(t.dataset.rtab === 'register') state.rpt.type = 'daily'; render(); return; }
   const act = t.dataset.act;
   if(act === 'radd' || act === 'rdel' || act === 'rtype'){
@@ -1880,6 +2184,11 @@ document.addEventListener('click', async e => {
     rows[i].type = t.dataset.v; state.regDirty = true;
     t.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); refreshRegPreview(); return;
   }
+  if(act === 'cday'){ state.rpt.date = iso(addDays(parse(state.rpt.date), +t.dataset.n)); render(); return; }
+  if(act === 'nmPick'){ $('#nmFile').click(); return; }
+  if(act === 'nmToggle'){ const f = (state.noorM.files || []).find(x => x.id === t.dataset.fid); if(f){ f.include = f.include === false; await saveNoorM(); render(); } return; }
+  if(act === 'nmDel'){ state.noorM.files = (state.noorM.files || []).filter(x => x.id !== t.dataset.fid); await saveNoorM(); render(); return; }
+  if(act === 'nmClear'){ if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد المسح'; return; } state.noorM.files = []; await saveNoorM(); render(); return; }
   if(act === 'names'){ openNames(t.closest('.tile').dataset.id); return; }
   if(['rall','rnone','rprev','rtypeall','rdet'].includes(act)){
     const cid = state.modalCid; if(!cid) return;
@@ -1978,6 +2287,7 @@ document.addEventListener('click', async e => {
     return;
   }
   if(act === 'install'){ if(installEvt){ installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if(r && r.outcome === 'accepted') toast('جارٍ التثبيت…'); render(); } return; }
+  if(act === 'snooze'){ lsSetRaw('snooze', iso(addDays(new Date(), 7))); $('#banner').innerHTML = ''; toast('سنذكّرك بعد أسبوع'); return; }
   if(act === 'backup'){ backup(); return; }
   if(act === 'pickrestore'){ $('#restoreFile').click(); return; }
   if(act === 'print'){ try{ window.print(); }catch(err){ toast('الطباعة غير متاحة هنا. استخدم «تنزيل التقرير».','err'); } return; }
@@ -2044,6 +2354,16 @@ document.addEventListener('change', async e => {
     const i = rows.findIndex(r => (r.name||'').trim() === name);
     if(el.checked && i < 0) rows.push(rosterRow(cid, name)); else if(!el.checked && i >= 0) rows.splice(i, 1);
     state.regDirty = true; renderModal(true); return;
+  }
+  if(el.id === 'nmFile'){ const fl = [...(el.files || [])]; el.value = ''; nmImport(fl); return; }
+  if(['cmpRed','cmpMin','cmpUn'].includes(el.id) || false){
+    const cm = state.cmp; if(el.id === 'cmpRed') cm.red = +el.value || 5; if(el.id === 'cmpMin') cm.min = +el.value; if(el.id === 'cmpUn') cm.unOnly = el.checked;
+    render(); return;
+  }
+  if(['nmDays','nmRed','nmMin','nmUn'].includes(el.id)){
+    const nm = state.noorM; if(el.id === 'nmDays') nm.days = el.value ? Math.max(1, +el.value) : ''; if(el.id === 'nmRed') nm.red = +el.value || 5;
+    if(el.id === 'nmMin') nm.min = +el.value; if(el.id === 'nmUn') nm.unOnly = el.checked;
+    await saveNoorM(); render(); return;
   }
   if(el.id === 'rfCls'){ const dl = $('#rfNames'); if(dl) dl.innerHTML = namesFor(el.value).map(n => `<option value="${esc(n)}">`).join(''); return; }
   if(el.id === 'actDays' || el.id === 'actFrom'){
