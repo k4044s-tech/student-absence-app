@@ -193,6 +193,8 @@ svg{ display:block; flex:none; }
 .entry-stage[hidden],.tile[hidden],.entry-no-results[hidden],.entry-search-clear[hidden]{ display:none !important; }
 
 .savebar{ position:sticky; bottom:calc(12px + env(safe-area-inset-bottom,0px)); z-index:15; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:10px 12px 10px 12px; padding-inline-start:18px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.savebar-info{ display:flex; align-items:center; gap:8px; flex:1 1 auto; min-width:0; }
+.savebar-info #dirtyActs:empty{ display:none; }
 .tally{ display:flex; align-items:baseline; gap:8px; margin-inline-end:auto; }
 .tally b{ font-size:24px; font-weight:800; letter-spacing:-.02em; }
 .tally span{ font-size:12.5px; color:var(--muted); }
@@ -537,6 +539,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   .view-entry .entry-datebar > .tag{ grid-column:2; }
   .view-entry .entry-datebar .entry-date-input{ min-width:0; }
   .view-entry .entry-datebar > .tag{ min-height:44px; }
+  .view-entry .entry-datebar > .btn{ min-height:48px; font-size:16px; font-weight:700; }
   .view-entry .kpis{ gap:9px; }
   .view-entry .kpi{
     min-height:118px;
@@ -564,10 +567,27 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   .view-entry .stepper input{ font-size:30px; }
   .view-entry .tile-foot .tag{ font-size:13px; }
   .view-entry .savebar{
-    padding:11px;
+    position:fixed;
+    inset-inline:12px;
+    bottom:calc(78px + env(safe-area-inset-bottom,0px));
+    z-index:27;
+    width:auto;
+    max-width:760px;
+    margin-inline:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:9px;
+    padding:10px;
     border-radius:17px;
   }
-  .view-entry .savebar .btn.primary{ flex:1 1 150px; min-height:48px; }
+  .view-entry{ padding-bottom:calc(170px + env(safe-area-inset-bottom,0px)); }
+  .view-entry .savebar-info{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; }
+  .view-entry .savebar-info .tally{ min-width:0; grid-column:1; }
+  .view-entry .savebar-info #dirtyActs:not(:empty){ grid-column:1; }
+  .view-entry .savebar-info #dirtyActs .btn{ width:100%; min-height:42px; }
+  .view-entry .savebar-info > .btn.danger{ grid-column:2; grid-row:1 / span 2; min-height:48px; padding-inline:14px; font-size:15px; }
+  .view-entry .savebar .btn.primary{ width:100%; min-height:48px; }
   .view-entry .savebar .btn.primary:disabled{ opacity:.72; }
   .view-entry .tally b{ font-size:29px; }
   .view-entry .recent h3{ font-size:18px; margin-bottom:11px; }
@@ -620,12 +640,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   .analysis-rate{ font-size:13px; }
   .grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
   .tile{ padding:12px 10px; }
-  .savebar{
-    bottom:calc(76px + env(safe-area-inset-bottom,0px));
-    border-radius:14px;
-    padding:10px;
-    box-shadow:0 8px 26px rgba(15,23,42,.14);
-  }
+  .view-entry .savebar{ border-radius:14px; box-shadow:0 8px 26px rgba(15,23,42,.14); }
   .mobile-nav{
     position:fixed;
     inset-inline:0;
@@ -1166,9 +1181,11 @@ function entryView(){
     html += `<section class="entry-stage" data-stage="${esc(st.k)}"><div class="sec-h"><h3>المرحلة ال${st.k === 'متوسط' ? 'متوسطة' : 'ابتدائية'}</h3><small>${AR(cl.length)} فصول · ${arN(n)} ${G().nStudents}</small></div><div class="grid">${cl.map(tileHTML).join('')}</div></section>`;
   });
   html += `<div class="savebar">
-    <div class="tally"><b id="tAbs">0</b><span id="tTxt"></span></div>
-    <span id="dirtyActs"></span>
-    ${rec ? `<button class="btn danger" data-act="delday">حذف رصد اليوم</button>` : ''}
+    <div class="savebar-info">
+      <div class="tally"><b id="tAbs">0</b><span id="tTxt"></span></div>
+      <span id="dirtyActs"></span>
+      ${rec ? `<button class="btn danger" data-act="delday">حذف رصد اليوم</button>` : ''}
+    </div>
     <button class="btn primary" data-act="save" id="saveBtn">حفظ غياب اليوم</button>
   </div>`;
   const recent = Object.keys(state.days).sort().reverse().slice(0, 9);
