@@ -471,16 +471,30 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   .input{ border-radius:11px; }
   .chip{ min-height:38px; display:inline-flex; align-items:center; }
   .tabs2{
-    display:flex;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
     width:100%;
     max-width:100%;
-    overflow-x:auto;
-    white-space:nowrap;
+    overflow:visible;
+    white-space:normal;
     border-radius:12px;
     scrollbar-width:none;
   }
-  .tabs2::-webkit-scrollbar{ display:none; }
-  .tabs2 button{ flex:0 0 auto; }
+  .tabs2 button{
+    min-width:0;
+    min-height:48px;
+    padding:8px 6px;
+    font-size:15px;
+    line-height:1.4;
+    white-space:normal;
+    text-wrap:balance;
+  }
+  body{ font-size:17px; }
+  .phead .sub{ font-size:14px; }
+  .panel .hint,.analysis-note{ font-size:14px; line-height:1.75; }
+  .analysis-bar{ font-size:13px; }
+  .analysis-bar-value{ min-width:54px; }
+  .analysis-rate{ font-size:13px; }
   .grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
   .tile{ padding:12px 10px; }
   .savebar{
@@ -2461,11 +2475,35 @@ async function downloadReport(){
 
 /* ---------- backup ---------- */
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+function backupPayload(){
+  return { app:'student-absence', version:1, exportedAt:new Date().toISOString(), cfg:clone(state.cfg), days:clone(state.days), roster:clone(state.roster || {}), actions:clone(state.actions || {}), refs:clone(state.refs || {}), noorm:clone(state.noorM || {}) };
+}
+const backupFilename = () => `absence-backup-${iso(new Date())}.json`;
 async function backup(){
   const dl = state.downloads; if(!dl) return;
-  const data = { app:'student-absence', version:1, exportedAt:new Date().toISOString(), cfg:clone(state.cfg), days:clone(state.days), roster:clone(state.roster || {}), actions:clone(state.actions || {}), refs:clone(state.refs || {}), noorm:clone(state.noorM || {}) };
-  try{ await dl.save({filename:`absence-backup-${iso(new Date())}.json`, data: JSON.stringify(data, null, 1)}); lsSetRaw('lastBackup', today); toast('تم تنزيل النسخة الاحتياطية'); render(); }
+  try{ await dl.save({filename:backupFilename(), data: JSON.stringify(backupPayload(), null, 1)}); lsSetRaw('lastBackup', today); toast('تم تنزيل النسخة الاحتياطية'); render(); }
   catch(e){ if(!e || e.code !== 'declined') toast('تعذّر تنزيل النسخة الاحتياطية.','err'); }
+}
+async function shareBackup(){
+  const dl = state.downloads; if(!dl) return;
+  const filename = backupFilename(), data = JSON.stringify(backupPayload(), null, 1);
+  const file = new File([data], filename, {type:'application/json'});
+  try{
+    if(!navigator.share || !navigator.canShare || !navigator.canShare({files:[file]})){
+      await dl.save({filename, data});
+      lsSetRaw('lastBackup', today);
+      toast('حُفظت النسخة على الجهاز. أرفق الملف يدويًا في واتساب.');
+      render();
+      return;
+    }
+    await navigator.share({files:[file], title:'نسخة احتياطية لغياب الطلاب', text:'نسخة احتياطية لبيانات تطبيق متابعة غياب الطلاب.'});
+    lsSetRaw('lastBackup', today);
+    toast('اختر واتساب من قائمة المشاركة لإرسال ملف النسخة الاحتياطية.');
+    render();
+  }catch(e){
+    if(e && e.name === 'AbortError') return;
+    toast('تعذّرت مشاركة النسخة. نزّلها ثم أرفقها في واتساب.','err');
+  }
 }
 async function restore(file, btn){
   let data;
@@ -2579,9 +2617,10 @@ function settingsView(){
   </section>
   <section class="panel">
     <h3>النسخ الاحتياطي</h3>
-    <p class="hint">لنقل البيانات بين الكمبيوتر والجوال: نزّل نسخة من جهاز واستوردها في الآخر. الملف فيه بيانات المدرسة والفصول وكل أيام الغياب (${AR(Object.keys(state.days).length)} يومًا حاليًا). عند الاستيراد تُستبدل الفصول والبيانات، وتُضاف أيام الملف أو تُحدَّث، ولا يُحذف أي يوم غير موجود في الملف.</p>
+    <p class="hint">لنقل البيانات بين الكمبيوتر والجوال: نزّل النسخة أو شاركها عبر واتساب ثم استورد الملف في الجهاز الآخر. الملف يشمل بيانات المدرسة والفصول وأيام الغياب (${AR(Object.keys(state.days).length)} يومًا حاليًا). عند الاستيراد تُستبدل الفصول والبيانات، وتُضاف أيام الملف أو تُحدَّث، ولا يُحذف أي يوم غير موجود في الملف.</p>
     <div class="row-actions">
       ${state.downloads ? `<button class="btn primary" data-act="backup">${ICON.down} تنزيل نسخة احتياطية</button>` : `<span class="tag mute">التنزيل غير متاح في هذا العرض</span>`}
+      <button class="btn" data-act="sharebackup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.4m-6.6 7 6.6 4.4"/></svg> مشاركة النسخة عبر واتساب</button>
       <button class="btn" data-act="pickrestore" id="restoreBtn">${ICON.up} استيراد نسخة احتياطية</button>
       <input type="file" id="restoreFile" accept=".json,application/json" hidden>
     </div>
@@ -2798,6 +2837,7 @@ document.addEventListener('click', async e => {
   if(act === 'install'){ if(installEvt){ installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if(r && r.outcome === 'accepted') toast('جارٍ التثبيت…'); render(); } return; }
   if(act === 'snooze'){ lsSetRaw('snooze', iso(addDays(new Date(), 7))); $('#banner').innerHTML = ''; toast('سنذكّرك بعد أسبوع'); return; }
   if(act === 'backup'){ backup(); return; }
+  if(act === 'sharebackup'){ shareBackup(); return; }
   if(act === 'pickrestore'){ $('#restoreFile').click(); return; }
   if(act === 'print'){ try{ window.print(); }catch(err){ toast('الطباعة غير متاحة هنا. استخدم «تنزيل التقرير».','err'); } return; }
   if(act === 'download'){ downloadReport(); return; }
