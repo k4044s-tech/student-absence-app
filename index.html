@@ -853,6 +853,13 @@ const ACT_CSS = `
 .actf .alead{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px;font-size:13px;line-height:2.2;padding:0 10px}
 .actf .stamp{width:110px;text-align:center;font-weight:700;padding-top:40px}
 @media print{.actf{width:auto;padding:0;break-after:page}.actf:last-child{break-after:auto}}
+.guardian-letter{width:794px;min-height:1050px;background:#fff;color:#1c2b36;padding:28px 36px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;line-height:1.8}
+.guardian-letter h1{text-align:center;font-size:20px;font-weight:700;color:#1d5f8a;margin:14px 0}
+.guardian-letter table{width:100%;border-collapse:collapse;font-size:12.5px;margin:14px 0 20px}
+.guardian-letter th,.guardian-letter td{border:1px solid #333;padding:7px;text-align:center}
+.guardian-letter th{background:#ececec}
+.guardian-letter .letter-body{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:2}
+@media print{.guardian-letter{width:auto;min-height:0;padding:0;break-after:page}.guardian-letter:last-child{break-after:auto}}
 `;
 const REF_CSS = `
 .refm{width:794px;background:#fff;color:#1a1a1a;padding:26px 34px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;line-height:1.7;font-size:13px}
@@ -938,7 +945,7 @@ const DEFAULT_CFG = { schoolDays:180, actFrom:'', gender:'بنين', school:'م�
 const today = iso(new Date());
 const state = {
   cfg: null, days: {}, mode: 'local', db: null, downloads: null, ready: {cfg:false, days:false},
-  view: 'entry', entryDate: today, entryQ:'', entryFilter:'all', entryCompleted: new Set(), roster: {}, phones:{}, contacts: [], actions: {}, actStage: 'all', actQ: '', refs: {}, refSt: 'all', refQ: '', whatsapp:{key:'', cid:'', type:'absence', text:'', date:'all', actionId:'', refId:'', phone:''}, cmp: {type:'daily', red:5, min:3, unOnly:false}, noorM: {files:[], days:'', red:5, min:3, unOnly:false}, rsOpen: new Set(), rq: '', bulkType: 'بدون', draft: {}, dirty: false,
+  view: 'entry', entryDate: today, entryQ:'', entryFilter:'all', entryCompleted: new Set(), roster: {}, phones:{}, contacts: [], actions: {}, actStage: 'all', actQ: '', refs: {}, refSt: 'all', refQ: '', whatsapp:{key:'', cid:'', type:'absence', text:'', date:'all', actionId:'', refId:'', phone:'', invite:{day:'', date:'', time:'', recipient:'counselor'}}, cmp: {type:'daily', red:5, min:3, unOnly:false}, noorM: {files:[], days:'', red:5, min:3, unOnly:false}, rsOpen: new Set(), rq: '', bulkType: 'بدون', draft: {}, dirty: false,
   rpt: { type:'daily', date: today, month: today.slice(0,7) },
   analytics: { min:1, unOnly:false }
 };
@@ -1758,6 +1765,12 @@ const femTxt = t => !G().f ? t : t.replace(/طالب منتسب/g, 'طالبة �
 const actDays = () => Math.max(1, +state.cfg.schoolDays || 180);
 const pctDays = pct => Math.round(pct * actDays() / 100);
 function critLabel(L){ return L.pct ? `نسبة (${L.pct}%) دون عذر مقبول متصلة أو متقطعة خلال العام الدراسي — ${pctDays(L.pct)} يومًا` : L.crit; }
+function officialLetterHeader(date){
+  const cfg = state.cfg, logo = logoSrc(), d = parse(date);
+  return `<div class="ahead"><div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
+    <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
+    <div class="d"><div>اليوم: <b>${dayName(d)}</b></div><div>التاريخ: <b>${hijriNum(date)}</b></div><div>الموافق: <b>${dmy(d).replace(/ /g,'')}</b></div></div></div>`;
+}
 function studentStats(){
   const from = state.cfg.actFrom || '';
   const keys = Object.keys(state.days).filter(k => !from || k >= from).sort();
@@ -1847,7 +1860,7 @@ function hijriNum(iso){ try{ return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-
 function actFormHTML(s, lvId){
   const cfg = state.cfg, L = ACT_LEVELS.find(x => x.id === lvId) || curLevel(s) || ACT_LEVELS[0];
   const rec = (state.actions[s.key] || {})[L.id] || null, g = G(), f = g.f;
-  const dt = rec ? rec.date : today, dd = parse(dt), logo = logoSrc();
+  const dt = rec ? rec.date : today, dd = parse(dt);
   const by = (rec && rec.by) || cfg.preparer || '';
   const pct = Math.round(s.unexc / actDays() * 1000) / 10;
   const items = femTxt(L.action).split('\n').map(x => x.replace(/^\*\s*/, '').trim()).filter(Boolean);
@@ -1856,9 +1869,7 @@ function actFormHTML(s, lvId){
     : `بلغ غياب${f ? 'كِ' : 'ك'} بدون عذر مقبول <b>(${s.unexc}) ${s.unexc > 10 ? 'يومًا' : 'أيام'}</b>${s.maxStreak >= 3 ? `، منها <b>${s.maxStreak} أيام متصلة</b>` : ''}.`;
   const dates = s.dates.slice(-30).map(k => `<span>${dayName(parse(k))} ${hijriNum(k)}</span>`).join('');
   return `<article class="actf">
-    <div class="ahead"><div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
-      <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
-      <div class="d"><div>اليوم: <b>${dayName(dd)}</b></div><div>التاريخ: <b>${hijriNum(dt)}</b></div><div>الموافق: <b>${dmy(dd).replace(/ /g,'')}</b></div></div></div>
+    ${officialLetterHeader(dt)}
     <h1>${esc(ACT_TITLES[L.id])}</h1>
     <table class="at1"><tr><th>اسم ${g.studentDef}</th><th>الصف</th><th>العام الدراسي</th><th>الغياب بدون عذر</th></tr>
       <tr><td>${esc(s.name)}</td><td>${s.cls ? esc(clsLabel(s.cls)) : ''}</td><td>${esc(cfg.year)} هـ</td><td>${s.unexc} يومًا</td></tr></table>
@@ -1991,16 +2002,32 @@ function whatsappText(s, type, detail){
   }
   if(type === 'actions'){
     const L = ACT_LEVELS.find(x => x.id === detail), record = (state.actions[s.key] || {})[detail];
-    const detailText = L
-      ? `نحيطكم علمًا بشأن الإجراء التالي بحق ${G().studentDef} ${s.name}: ${L.type.replace(/\n/g,'، ').replace(/^- /,'')}.${record ? ` تم تسجيل تنفيذه بتاريخ ${hijriNum(record.date || today)}.` : ' يرجى التواصل مع المدرسة لمتابعة تنفيذه.'}\n${femTxt(L.action).split('\n').map(x => x.replace(/^\*\s*/, '').trim()).filter(Boolean).join('\n')}`
-      : `نود التواصل معكم بشأن مواظبة ${G().studentDef} ${s.name}. لا توجد إجراءات مسجلة حاليًا؛ يرجى التواصل مع المدرسة لمتابعة الحالة.`;
-    return `${greeting}\n${detailText}\n${closing}`;
+    const invite = Object.assign({day:'', date:'', time:'', recipient:'counselor'}, state.whatsapp.invite || {});
+    const c = state.cfg.classes.find(x => x.id === s.cid), role = invite.recipient === 'deputy'
+      ? G().affairs : invite.recipient === 'principal'
+        ? `${state.cfg.principalTitle || G().principal} المدرسة` : (state.cfg.counselor || G().counselor);
+    const reason = L
+      ? `تكرار الغياب بدون عذر، حيث بلغ غياب ${G().studentDef} ${s.name} ${s.unexc || 0} يومًا، محققًا حد المتابعة (${critLabel(L)}). نأمل حضوركم لمناقشة الحالة وما يلزم لمصلحة ${G().studentDef}.`
+      : `متابعة مواظبة ${G().studentDef} ومناقشة ما يخص مصلحته الدراسية والسلوكية.`;
+    const date = invite.date.trim().replace(/\s*هـ$/,'') || '.... / .... / ١٤٤';
+    return `المكرم الفاضل/ ولي أمر ${G().studentDef}: ${guardianOf(s) || '....................................'}\nاسم ${G().studentDef}: ${s.name}\nالصف: ${c ? clsLabel(c) : '....................'}\nالسلام عليكم ورحمة الله وبركاته،،،\n\nتحية طيبة وبعد،،\n\nترجو إدارة ${state.cfg.school || 'المدرسة'} منكم التكرم بالحضور إلى المدرسة يوم ${invite.day.trim() || '................'} الموافق ${date} هـ، في تمام الساعة ${invite.time.trim() || '................'}، وذلك لمقابلة ${role}؛ للتشاور ومناقشة أمور تخص مصلحة ${G().student} الدراسية والسلوكية، وذلك بشأن ${reason}${record ? `\nالإجراء المسجل في المدرسة: ${L.short} بتاريخ ${hijriNum(record.date || today)}.` : ''}\n\nشاكرين لكم حسن تعاونكم وحرصكم على مصلحة أبنائنا وبناتنا.\n\nوتقبلوا وافر التحية والتقدير،،،\n${state.cfg.principalTitle || G().principal} المدرسة\nالاسم: ${state.cfg.principal || '....................................'}\nالتوقيع: ..................................\nختم المدرسة:\n\nــــــــــــــــــــــــــــــــــــــــ\nجزء خاص بولي الأمر (يُعاد للمدرسة):\nأنا الموقع أدناه ولي أمر ${G().studentDef} ${s.name}، أقر بتبليغي بخطاب الاستدعاء وسأحضر في الموعد المحدد.\nتوقيع ولي الأمر: ....................    رقم الجوال: ....................`;
   }
   const r = studentGuidanceRecords(s).find(x => x.id === detail);
   const detailText = r
     ? `نحيطكم علمًا بتحويل ${G().studentDef} ${s.name} إلى ${state.cfg.counselor || G().counselor} بتاريخ ${hijriNum(r.date || today)}. تفصيل المخالفة: ${(r.reasons || []).map(x => x === 'أخرى' && r.other ? r.other : x).join('، ') || 'متابعة الحالة'}.${r.problem ? `\nإيضاح الحالة: ${r.problem}` : ''}${r.dep && r.dep.text ? `\nإجراء المدرسة: ${r.dep.text}` : ''}${r.coun && r.coun.text ? `\nما تم في الإرشاد الطلابي: ${r.coun.text}` : ''}`
     : `نرغب في التواصل معكم لمناقشة سبل دعم ${G().studentDef} ${s.name} تربويًا. يرجى التواصل مع المدرسة عند الحاجة.`;
   return `${greeting}\n${detailText}\n${closing}`;
+}
+function guardianLetterHTML(s, type, text){
+  const title = {absence:'خطاب بشأن الغياب', actions:'خطاب استدعاء ولي أمر', guidance:'خطاب بشأن الإرشاد الطلابي'}[type] || 'خطاب لولي الأمر';
+  const c = state.cfg.classes.find(x => x.id === s.cid);
+  return `<article class="actf guardian-letter">
+    ${officialLetterHeader(today)}
+    <h1>${title}</h1>
+    <table class="at1"><tr><th>اسم ${esc(G().studentDef)}</th><th>الصف</th><th>العام الدراسي</th></tr>
+      <tr><td>${esc(s.name)}</td><td>${c ? esc(clsLabel(c)) : '—'}</td><td>${esc(state.cfg.year || '')} هـ</td></tr></table>
+    <div class="letter-body">${esc(text)}</div>
+  </article>`;
 }
 function whatsappNumber(value){
   const raw = String(value || '').replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 1632)).replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 1776));
@@ -2019,6 +2046,7 @@ function whatsappView(){
   const students = allStudents.filter(x => state.whatsapp.cid === 'all' || x.cid === state.whatsapp.cid);
   const type = state.whatsapp.type || 'absence', types = [['absence','الغياب'],['actions','الإجراءات المتخذة'],['guidance','الإرشاد الطلابي']];
   const marks = studentAbsenceMarks(s), records = studentGuidanceRecords(s), actions = ACT_LEVELS;
+  state.whatsapp.invite = Object.assign({day:'', date:'', time:'', recipient:'counselor'}, state.whatsapp.invite || {});
   if(state.whatsapp.actionId && !actions.some(x => x.id === state.whatsapp.actionId)) state.whatsapp.actionId = '';
   if(!state.whatsapp.actionId) state.whatsapp.actionId = [...actions].reverse().find(x => (state.actions[s.key] || {})[x.id])?.id || actions[0].id;
   if(state.whatsapp.refId && !records.some(x => x.id === state.whatsapp.refId)) state.whatsapp.refId = '';
@@ -2037,13 +2065,24 @@ function whatsappView(){
       <label class="f">الطالب<select class="input" id="waStudent">${students.map(x => `<option value="${esc(x.key)}" ${x.key === s.key ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
       <label class="f">نوع الرسالة<select class="input" id="waType">${types.map(([v,l]) => `<option value="${v}" ${type === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
       ${type === 'absence' ? `<label class="f" style="grid-column:1/-1">تاريخ الغياب<select class="input" id="waAbsenceDate"><option value="all" ${state.whatsapp.date === 'all' ? 'selected' : ''}>كل تواريخ الغياب</option>${marks.map(m => `<option value="${esc(m.date)}" ${state.whatsapp.date === m.date ? 'selected' : ''}>${esc(dmy(parse(m.date)))} — ${esc(m.type)}</option>`).join('')}</select></label>` : ''}
-      ${type === 'actions' ? `<label class="f" style="grid-column:1/-1">تفصيل الإجراء<select class="input" id="waActionDetail">${actions.map(L => { const record = (state.actions[s.key] || {})[L.id]; return `<option value="${L.id}" ${state.whatsapp.actionId === L.id ? 'selected' : ''}>${esc(L.short)} — ${esc(L.type.replace(/\n/g,'، ').replace(/^- /,''))}${record ? ` · نُفّذ ${esc(dmy(parse(record.date || today)))}` : ' · غير مسجل كتَنفيذ'}</option>`; }).join('')}</select></label>` : ''}
+      ${type === 'actions' ? `<label class="f" style="grid-column:1/-1">تفصيل الإجراء<select class="input" id="waActionDetail">${actions.map(L => { const record = (state.actions[s.key] || {})[L.id]; return `<option value="${L.id}" ${state.whatsapp.actionId === L.id ? 'selected' : ''}>${esc(L.short)} — استدعاء ولي الأمر${record ? ` · نُفّذ ${esc(dmy(parse(record.date || today)))}` : ''}</option>`; }).join('')}</select></label>
+      <div class="fields" style="grid-column:1/-1">
+        <label class="f">يوم الموعد<input class="input" id="waInviteDay" value="${esc(state.whatsapp.invite.day)}" placeholder="مثال: الأحد"></label>
+        <label class="f">التاريخ الهجري<input class="input" id="waInviteDate" value="${esc(state.whatsapp.invite.date)}" placeholder=".... / .... / ١٤٤"></label>
+        <label class="f">وقت الحضور<input class="input" id="waInviteTime" value="${esc(state.whatsapp.invite.time)}" placeholder="مثال: 9:00 صباحًا"></label>
+        <label class="f">جهة المقابلة<select class="input" id="waInviteRecipient">
+          <option value="counselor" ${state.whatsapp.invite.recipient === 'counselor' ? 'selected' : ''}>${esc(state.cfg.counselor || G().counselor)}</option>
+          <option value="deputy" ${state.whatsapp.invite.recipient === 'deputy' ? 'selected' : ''}>${esc(G().affairs)}</option>
+          <option value="principal" ${state.whatsapp.invite.recipient === 'principal' ? 'selected' : ''}>${esc(state.cfg.principalTitle || G().principal)} المدرسة</option>
+        </select></label>
+      </div>` : ''}
       ${type === 'guidance' ? `<label class="f" style="grid-column:1/-1">تفصيل المخالفة<select class="input" id="waGuidanceDetail">${records.length ? records.map(r => { const violation = (r.reasons || []).map(x => x === 'أخرى' && r.other ? r.other : x).join('، ') || 'متابعة الحالة'; return `<option value="${esc(r.id)}" ${state.whatsapp.refId === r.id ? 'selected' : ''}>${esc(violation)} — ${esc(dmy(parse(r.date || today)))}</option>`; }).join('') : '<option value="">لا توجد إحالات مسجلة لهذا الطالب</option>'}</select></label>` : ''}
       <label class="f" style="grid-column:1/-1">رقم جوال ولي الأمر<input class="input" id="waPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" value="${esc(phone)}" placeholder="05xxxxxxxx" aria-describedby="waPhoneHelp"></label>
     </div>
     <small id="waPhoneHelp" style="display:block;color:var(--muted);margin-top:6px">أدخل رقم ولي الأمر وتأكد من صحته. أرقام السعودية المحلية تبدأ عادةً بـ 05. يُحفظ الرقم ضمن بيانات التطبيق لهذا الطالب عند فتح واتساب.</small>
     <label class="f" style="margin-top:16px">معاينة الرسالة — يمكنك تعديلها<textarea class="input" id="waText" rows="10">${esc(text)}</textarea></label>
     <div class="row-actions" style="margin-top:14px"><button class="btn primary" data-act="waSend">فتح واتساب ومراجعة الرسالة</button><button class="btn" data-act="waReset">استعادة نص القالب</button></div>
+    <div class="row-actions" style="margin-top:8px"><button class="btn" data-act="waPrint">${ICON.print} طباعة الخطاب اليدوي</button></div>
     <div class="wa-log"><div class="sec-h"><h3>سجل التواصل مع ولي الأمر</h3></div>
       <p class="hint">بعد العودة من واتساب، حدّد نتيجة التواصل يدويًا. يوضح السجل ما تم توثيقه ولا يتحقق تلقائيًا من إرسال الرسالة.</p>
       <div class="fields">
@@ -2988,10 +3027,17 @@ document.addEventListener('click', async e => {
     state.whatsapp.key = t.dataset.key || ''; state.whatsapp.cid = student ? student.cid : '';
     state.whatsapp.type = t.dataset.type || 'absence'; state.whatsapp.text = '';
     state.whatsapp.date = 'all'; state.whatsapp.actionId = ''; state.whatsapp.refId = '';
+    state.whatsapp.invite = {day:'', date:'', time:'', recipient:'counselor'};
     state.view = 'whatsapp'; render(); window.scrollTo(0,0); return;
   }
   if(act === 'waReset'){
     const s = messagingStudent(); if(s){ state.whatsapp.text = ''; render(); } return;
+  }
+  if(act === 'waPrint'){
+    const s = messagingStudent(), textField = $('#waText');
+    if(!s || !textField || !textField.value.trim()){ toast('تعذّر تجهيز الخطاب للطباعة. تحقق من الطالب ونص الرسالة.','err'); return; }
+    printHTML(guardianLetterHTML(s, state.whatsapp.type || 'absence', textField.value.trim()));
+    return;
   }
   if(act === 'waSend'){
     const s = messagingStudent(), phoneField = $('#waPhone'), textField = $('#waText');
@@ -3124,6 +3170,16 @@ document.querySelector('.overlay').addEventListener('click', () => $('#shell').c
 document.addEventListener('input', e => {
   const inp = e.target;
   if(inp.id === 'waText'){ state.whatsapp.text = inp.value; return; }
+  if(['waInviteDay','waInviteDate','waInviteTime'].includes(inp.id)){
+    const field = {waInviteDay:'day',waInviteDate:'date',waInviteTime:'time'}[inp.id];
+    state.whatsapp.invite[field] = inp.value;
+    const student = messagingStudent(), text = $('#waText');
+    if(student && text && state.whatsapp.type === 'actions'){
+      state.whatsapp.text = whatsappText(student, 'actions', state.whatsapp.actionId);
+      text.value = state.whatsapp.text;
+    }
+    return;
+  }
   if(inp.id === 'entrySearch'){ state.entryQ = inp.value; applyEntryFilters(); return; }
   if(inp.id === 'refQ'){ state.refQ = inp.value; const q = normAr(inp.value); document.querySelectorAll('.acard[data-rid]').forEach(el => { el.style.display = !q || normAr(el.querySelector('.acard-h b').textContent).includes(q) ? '' : 'none'; }); return; }
   if(inp.id === 'rq'){ state.rq = inp.value; applyRq(); return; }
@@ -3143,7 +3199,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', async e => {
   const el = e.target;
-  if(el.id === 'waClass' || el.id === 'waStudent' || el.id === 'waType' || el.id === 'waAbsenceDate' || el.id === 'waActionDetail' || el.id === 'waGuidanceDetail'){
+  if(el.id === 'waClass' || el.id === 'waStudent' || el.id === 'waType' || el.id === 'waAbsenceDate' || el.id === 'waActionDetail' || el.id === 'waGuidanceDetail' || el.id === 'waInviteRecipient'){
     if(el.id === 'waClass'){
       state.whatsapp.cid = el.value;
       const available = whatsappStudents().filter(s => el.value === 'all' || s.cid === el.value);
@@ -3156,6 +3212,7 @@ document.addEventListener('change', async e => {
     else if(el.id === 'waAbsenceDate') state.whatsapp.date = el.value;
     else if(el.id === 'waActionDetail') state.whatsapp.actionId = el.value;
     else if(el.id === 'waGuidanceDetail') state.whatsapp.refId = el.value;
+    else if(el.id === 'waInviteRecipient') state.whatsapp.invite.recipient = el.value;
     state.whatsapp.text = ''; render(); return;
   }
   if(el.id === 'entryDate'){
