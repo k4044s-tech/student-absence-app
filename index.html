@@ -741,7 +741,7 @@ async function sbLoadProfile(user){
 }
 const profOK = p => !!p && (p.is_admin || (p.active && (!p.expires_at || new Date(p.expires_at) > new Date())));
 const authEmail = u => { u = String(u || '').trim().toLowerCase(); return u.includes('@') ? u : 'k4044s+' + u + '@gmail.com'; };
-const uName = p => (p && (p.username || p.email)) || '';
+const uName = p => { if(!p) return ''; if(p.username) return p.username; const m = /^k4044s\+(.+)@gmail\.com$/i.exec(p.email || ''); return m ? m[1] : (p.email || ''); };
 const isAdm = () => !!(sb.profile && sb.profile.is_admin);
 function authRender(){
   const el = $('#auth'); if(!el) return;
@@ -1139,9 +1139,8 @@ const KI = {
 };
 const lastBackup = () => { try{ return localStorage.getItem('absence:lastBackup'); }catch(e){ return null; } };
 function railNote(){
-  const lb = lastBackup();
-  const where = sb.user ? 'البيانات محفوظة على الجهاز ومتزامنة مع السحابة.' : 'البيانات محفوظة على هذا الجهاز. اربطها بالسحابة من الإعدادات لمزامنتها بين أجهزتك.';
-  return `${where}${installHTML(true).replace('btn primary','btn primary" style="margin-top:6px;width:100%')}`;
+  if(!sb.user) return '';
+  return `مسجّل باسم <b dir="ltr">${esc(uName(sb.profile) || '')}</b><button class="btn" style="margin-top:8px;width:100%" data-act="sbOut">تسجيل الخروج</button>`;
 }
 function bannerHTML(){
   return '';
@@ -2613,12 +2612,7 @@ function settingsView(){
     <p class="hint">ثبّته على الكمبيوتر أو الجوال ليعمل كتطبيق مستقل بأيقونة خاصة، حتى بدون إنترنت.</p>
     <div class="row-actions" style="margin-top:0">${installHTML(false)}</div>
   </section>
-  ${sbPanel()}
-  ${state.downloads ? `<section class="panel">
-    <h3>تصدير البيانات</h3>
-    <p class="hint">بياناتك محفوظة في السحابة تلقائيًا. يمكنك تصدير كل أيام الغياب (${AR(Object.keys(state.days).length)} يومًا حاليًا) في ملف Excel.</p>
-    <div class="row-actions"><button class="btn" data-act="xlsxAll">تصدير Excel لكل البيانات</button></div>
-  </section>` : ''}`;
+`;
 }
 function rosterPanel(){
   const list = classes(), withR = list.filter(c => rosterOf(c.id).length), without = list.filter(c => !rosterOf(c.id).length);
