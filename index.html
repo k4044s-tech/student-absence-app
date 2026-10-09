@@ -247,6 +247,14 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 .acard.due{ border-color:var(--bad-line); background:linear-gradient(180deg,var(--bad-soft),var(--card) 70%); }
 .acard-h{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
 .acard-h b{ font-size:14.5px; }
+.stu-n{ all:unset; cursor:pointer; font-weight:700; color:inherit; border-bottom:1px dashed currentColor; }
+.stu-n:hover{ color:var(--accent, #0b6b55); }
+.stu-k{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+.stu-k div{ background:var(--soft, #f3f5f4); border-radius:10px; padding:8px; text-align:center; display:flex; flex-direction:column; }
+.stu-k b{ font-size:20px; } .stu-k span{ font-size:12px; color:var(--muted); }
+.stu-a{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.stu-t{ min-width:0 !important; } .stu-t td, .stu-t th{ padding:6px 8px; }
+
 .acard-n{ display:flex; gap:12px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); }
 .acard-n b{ color:var(--ink); font-size:15px; }
 .acard-t{ display:flex; gap:6px; flex-wrap:wrap; }
@@ -438,6 +446,10 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 @media (max-width:860px){ .nav button{ position:relative; } .nav .nbadge{ position:absolute; top:2px; inset-inline-end:calc(50% - 22px); margin:0; font-size:10.5px; min-width:18px; padding:0 5px; } }
 .banner.ok-b{ background:var(--good-soft); border-color:var(--good-line); color:var(--ink); }
 .phead{ display:flex; align-items:flex-start; gap:12px; } .phead > div:first-child{ flex:1; min-width:0; }
+.role-q{ width:auto; min-height:42px; padding:0 10px; font-size:13px; margin-inline-end:6px; flex:none; max-width:180px; }
+.topbar .role-q{ min-height:36px; max-width:120px; font-size:12px; padding:0 6px; }
+@media screen and (max-width:860px){ .phead .role-q{ display:none; } }
+@media screen and (min-width:861px){ .topbar .role-q{ display:none; } }
 .ib-btn{ position:relative; display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--ink); flex:none; }
 .ib-btn.has{ border-color:var(--bad-line); } .ib-n:empty{ display:none; } .ib-n{ position:absolute; top:-7px; inset-inline-start:-7px; min-width:20px; height:20px; padding:0 6px; border-radius:99px; background:var(--bad); color:#fff; font-size:11.5px; font-weight:700; line-height:20px; text-align:center; }
 .topbar .ib-btn{ width:36px; height:36px; }
@@ -1027,7 +1039,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v54';
+const APP_VER = 'absence-v59';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -1209,6 +1221,25 @@ function bannerHTML(){
   const txt = lb ? `مرّ ${AR(days)} يومًا على آخر نسخة احتياطية منزّلة. نزّل نسخة جديدة احتياطًا.` : 'لم تنزّل نسخة احتياطية بعد. احتفظ بنسخة من بيانات الغياب على جهازك.';
   return `<div class="banner no-print"><span aria-hidden="true">⚠️</span><span><strong>النسخة الاحتياطية</strong> ${txt}</span><button type="button" data-act="backup">حفظ نسخة الآن</button><button type="button" class="later" data-act="snooze">تذكيري لاحقًا</button></div>`;
 }
+/* ---------- الواجهة حسب الدور (لكل جهاز) ---------- */
+function ROLES(){ const g = G(); return {
+  all:{t:'كل الصلاحيات', v:null, ib:null},
+  dep:{t:g.deputy, v:['entry','follow','actions','counsel','reports','settings'], ib:['dep','act','noc']},
+  coun:{t:g.f ? 'الموجهة' : 'الموجه', v:['counsel','follow'], ib:['coun']},
+  rec:{t:g.officer, v:['entry','reports'], ib:['noc']}
+}; }
+const roleGet = () => { const r = lsGet('role'); return ROLES()[r] ? r : 'all'; };
+const roleOK = v => { const R = ROLES()[roleGet()]; return !R.v || R.v.includes(v); };
+function roleApply(){
+  const adm = isAdm(), R = ROLES()[roleGet()];
+  if(!adm && !roleOK(state.view)) state.view = R.v[0];
+  document.querySelectorAll('.nav button').forEach(b => { if(adm || b.dataset.view === 'admin') return; b.hidden = !roleOK(b.dataset.view); b.classList.toggle('on', b.dataset.view === state.view); });
+  document.querySelectorAll('.ib-btn').forEach(b => {
+    let s = b.previousElementSibling; if(!s || !s.classList.contains('role-q')){ s = document.createElement('select'); s.className = 'role-q input no-print'; s.title = 'أعمل بصفتي'; b.before(s); }
+    const cur = roleGet(); s.innerHTML = Object.entries(ROLES()).map(([k, o]) => `<option value="${k}" ${k === cur ? 'selected' : ''}>${o.t}</option>`).join(''); s.hidden = adm;
+  });
+}
+document.addEventListener('change', e => { if(e.target.classList && e.target.classList.contains('role-q')){ lsSet('role', e.target.value); const ip = $('#ibPanel'); if(ip) ip.remove(); render(); window.scrollTo(0, 0); } });
 function render(){
   if(!state.cfg) return;
   const adm = isAdm(); if(adm) state.view = 'admin'; else if(state.view === 'admin') state.view = 'entry';
@@ -1218,7 +1249,7 @@ function render(){
   const sy = $('#sync'); sy.textContent = sb.user ? sbSyncLabel() : (isStandalone() ? 'تطبيق مثبّت · حفظ على الجهاز' : 'حفظ على الجهاز'); sy.className = 'sync' + (state.mode === 'db' ? '' : ' local');
   $('#railNote').innerHTML = adm ? `مسجّل باسم <b dir="ltr">${esc(uName(sb.profile) || sb.user.email || '')}</b><button class="btn" style="margin-top:8px;width:100%" data-act="sbOut">تسجيل الخروج</button>` : railNote();
   $('#banner').innerHTML = adm ? '' : (bannerHTML());
-  navBadges(); inboxRender();
+  roleApply(); navBadges(); inboxRender();
   const d = parse(state.entryDate);
   const head = {
     entry: ['رصد الغياب اليومي', `${dayName(d)} ${AR(dmy(d))} · ${AR(classes().length)} فصلًا · ${arN(totalStudents())} ${G().nStudents}`],
@@ -1846,7 +1877,7 @@ function actionsView(){
     const lvl = s.top ? `<span class="tag ${s.top.pct >= 20 ? 'bad' : 'warn'}">${s.top.pct ? `بلغ ${s.top.pct}%` : 'تحويل للمرشد'}</span>` : `<span class="tag mute">قريب من الحد</span>`;
     const st = !s.reached.length ? '' : s.due.length ? `<span class="tag bad">مستحق: ${s.due.map(L => L.short).join('، ')}</span>` : `<span class="tag ok">الإجراءات منفّذة</span>`;
     return `<div class="acard ${s.due.length ? 'due' : ''}" data-key="${esc(s.key)}">
-      <div class="acard-h"><b>${esc(s.name)}</b><span class="tile-sub">${s.cls ? esc(clsLabel(s.cls)) : 'فصل محذوف'}</span></div>
+      <div class="acard-h"><b><button class="stu-n" data-stu="${esc(s.key)}">${esc(s.name)}</button></b><span class="tile-sub">${s.cls ? esc(clsLabel(s.cls)) : 'فصل محذوف'}</span></div>
       <div class="acard-n"><span><b>${s.unexc}</b> بدون عذر</span><span><b>${s.exc}</b> بعذر</span><span><b>${s.maxStreak}</b> أطول غياب متصل</span></div>
       <div class="acard-t">${lvl}${st}</div>
       <div class="acard-f">${s.reached.length && waPhone(s.phone || phoneFor(s.cid, s.name)) ? `<a class="btn sm wa" href="${esc(waUrl(s.phone || phoneFor(s.cid, s.name), waActText(s)))}" target="_blank" rel="noopener">واتساب</a>` : ''}${s.reached.length ? `<button class="btn sm" data-act="actRec">تسجيل الإجراء</button><button class="btn sm" data-act="actView">معاينة النموذج</button><button class="btn sm" data-act="actRefer">إحالة للإرشاد</button><button class="btn sm" data-act="actPrint">${ICON.print} طباعة</button>` : `<span style="color:var(--muted);font-size:12.5px">أول إجراء عند 3 أيام متصلة أو 5 منفصلة</span>`}</div>
@@ -1974,7 +2005,8 @@ function inboxItems(){
     const noc = flDailyAll().filter(x => x.date === today && x.type !== 'بعذر' && !flContactOf(flRid(x))).length;
     if(noc) L.push({k:'noc', ic:'📞', t:`${AR(noc)} غياب اليوم بدون تواصل مع ولي الأمر`, s:'سجل الغياب اليومي', act:'data-act="ibNoc"'});
   }catch(e){}
-  return L;
+  const R = ROLES()[roleGet()];
+  return R.ib ? L.filter(i => R.ib.includes(i.k)) : L;
 }
 function inboxRender(){
   const n = isAdm() ? 0 : inboxItems().length;
@@ -2031,8 +2063,12 @@ function flRange(){
 }
 function periodBar(extra){
   const [a, b] = flRange(), P = pPresets(), cur = pCurTerm(), on = P.find(p => p[2] === a && p[3] === b);
+  if(!state.pbOpen){
+    const lbl = on ? on[1] : (a === b ? 'يوم ' + AR(dmy(parse(a))) : 'فترة مخصصة');
+    return `<div class="bar pbar pbar-min"><div class="pbar-r"><button class="chip on" data-act="pbToggle">📅 ${lbl}${on ? '' : ''} <span class="sub" style="margin-inline-start:6px">${AR(dmy(parse(a)))} – ${AR(dmy(parse(b)))}</span> ▾</button><span class="grow"></span>${extra || ''}</div></div>`;
+  }
   return `<div class="bar pbar">
-    <div class="pbar-r"><label class="f">من تاريخ<input class="input" type="date" id="pFrom" value="${a}"></label><label class="f">إلى تاريخ<input class="input" type="date" id="pTo" value="${b}"></label><span class="grow"></span>${extra || ''}</div>
+    <div class="pbar-r"><button class="chip" data-act="pbToggle" title="إخفاء">▴ إخفاء</button><label class="f">من تاريخ<input class="input" type="date" id="pFrom" value="${a}"></label><label class="f">إلى تاريخ<input class="input" type="date" id="pTo" value="${b}"></label><span class="grow"></span>${extra || ''}</div>
     <div class="chips pbar-c"><span class="sub">فترات جاهزة:</span>${P.map(p => `<button class="chip ${on && on[0] === p[0] ? 'on' : ''}" data-pp="${p[0]}">${p[1]}${cur === p[0] ? ' <span class="pcur">الحالي</span>' : ''}</button>`).join('')}</div>
   </div>`;
 }
@@ -2150,7 +2186,7 @@ function flDailyView(){
     const rid = flRid(x), c = flContactOf(rid), w = flWarnOf(rid), d = parse(x.date), un = x.type !== 'بعذر';
     return `<tr class="${un && !c ? 'fl-pend' : ''}" data-rid="${esc(rid)}">
       <td><b>${dayName(d)}</b><div class="sub">${AR(dmy(d))}</div><div class="sub">${hijriNum(x.date)} هـ</div></td>
-      <td class="nm"><b>${esc(x.name)}</b><div class="sub">${esc(flCls(x.cid))} · الغياب رقم ${AR(x.n)}</div></td>
+      <td class="nm"><button class="stu-n" data-stu="${esc(x.cid + '|' + x.name)}">${esc(x.name)}</button><div class="sub">${esc(flCls(x.cid))} · الغياب رقم ${AR(x.n)}</div></td>
       <td><div class="seg"><button data-act="flType" data-v="بعذر" class="${!un ? 'on' : ''}">بعذر</button><button data-act="flType" data-v="بدون" class="${un ? 'on' : ''}">بدون عذر</button></div></td>
       <td>${un ? '<span class="sub">—</span>' + exTag(x.r.exStatus) : `<select class="input fl-in" data-flf="reason"><option value="">— بدون سبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>${proofOf(x.reason) ? `<div class="sub" style="margin-top:4px">الإثبات: ${esc(proofOf(x.reason))}${x.r.proof ? ' ✓' : ''}</div>` : ''}${exTag(x.r.exStatus)}`}</td>
       <td><input class="input fl-in" data-flf="note" value="${esc(x.note)}" placeholder="ملاحظة…"></td>
@@ -2304,6 +2340,33 @@ function caseInfo(s){
   const status = c.status || (cons.length || refs.length ? 'قيد المتابعة' : 'مفتوحة');
   return {s, c, auto, done, n: done.filter(Boolean).length, status, rows, cons, refs};
 }
+/* ---------- ملف الطالب ---------- */
+function stuDlg(key){
+  const f = state.fl, sv = [f.from, f.to]; f.from = '0000-01-01'; f.to = '9999-12-31';
+  let s; try{ s = studentStats().find(o => o.key === key); } finally { f.from = sv[0]; f.to = sv[1]; }
+  const i = key.indexOf('|'), cid = key.slice(0, i), name = key.slice(i + 1);
+  if(!s){ const c = state.cfg.classes.find(x => x.id === cid); s = {key, cid, name, unexc:0, exc:0, maxStreak:0, dates:[], phone:'', cls:c, reached:[], due:[]}; }
+  const x = caseInfo(s), ph = s.phone || phoneFor(cid, name), wa = waPhone(ph);
+  const acts = state.actions[key] || {};
+  const rows = x.rows.slice().sort((a, b) => b.date.localeCompare(a.date)).map(r => {
+    const rid = flRid(r), c = flContactOf(rid), un = r.type !== 'بعذر';
+    return `<tr data-rid="${esc(rid)}"><td><b>${dayName(parse(r.date))}</b><div class="sub">${AR(dmy(parse(r.date)))}</div></td>
+      <td>${un ? '<span class="tag bad">بدون عذر</span>' : '<span class="tag ok">بعذر</span>'}${r.reason ? `<div class="sub">${esc(r.reason)}</div>` : ''}${exTag(r.r.exStatus)}</td>
+      <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)}</button>` : `<button class="btn sm" data-act="flCont">تواصل</button>`}</td>
+      <td>${un ? (flWarnOf(rid) ? '<span class="tag ok">✓ إنذار</span>' : `<button class="btn sm danger-o" data-act="flWarn">إنذار</button>`) : '—'}</td></tr>`;
+  }).join('');
+  const lv = s.reached.map(L => `<span class="tag ${acts[L.id] ? 'ok' : 'bad'}">${acts[L.id] ? '✓ ' : 'مستحق: '}${esc(L.short)}</span>`).join('');
+  const rf = x.refs.map(r => `<span class="tag ${refStatus(r).c}">تحويل ${hijriNum(r.date)}: ${esc(refStatus(r).t)}</span>`).join('');
+  openDlg(`<div class="reged-h"><b>ملف ${G().student}: ${esc(name)}</b><span class="tag mute">${s.cls ? esc(clsLabel(s.cls)) : ''}</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b" data-key="${esc(key)}" data-ckey="${esc(key)}">
+      <div class="stu-k"><div><b>${AR(s.unexc)}</b><span>بدون عذر</span></div><div><b>${AR(s.exc)}</b><span>بعذر</span></div><div><b>${AR(x.cons.length)}</b><span>تواصل</span></div><div><b>${AR(s.maxStreak)}</b><span>أطول متصل</span></div></div>
+      <div class="stu-a">${wa ? `<a class="btn wa" href="${esc(waUrl(ph, s.unexc ? waActText(s) : waAbsentText(cid, name, 'بدون')))}" target="_blank" rel="noopener">واتساب ولي الأمر</a><a class="btn" href="tel:${esc(ph)}">اتصال ${esc(ph)}</a>` : '<span class="tag mute">لا يوجد رقم جوال — استورد كشف الطلاب من نور</span>'}
+        ${s.reached.length ? `<button class="btn" data-act="actRec">تسجيل الإجراء</button><button class="btn" data-act="actPrint">${ICON.print} طباعة النموذج</button>` : ''}
+        <button class="btn" data-act="actRefer">تحويل للموجه</button><button class="btn" data-act="stuCase">الحالة (${AR(x.n)}/${AR(CASE_STEPS.length)})</button></div>
+      ${lv || rf ? `<div class="acard-t" style="margin:4px 0 10px"><span class="tag ${x.status === 'مغلقة' ? 'ok' : x.status === 'قيد المتابعة' ? 'warn' : 'bad'}">${x.status}</span>${lv}${rf}</div>` : ''}
+      <div style="overflow-x:auto"><table class="regt stu-t"><thead><tr><th>اليوم</th><th>الغياب</th><th>التواصل</th><th>المساءلة</th></tr></thead><tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">لا يوجد غياب مسجّل</td></tr>'}</tbody></table></div>
+    </div>`);
+}
 function caseList(){
   const q = normAr(state.fl.q || '');
   return studentStats().filter(s => s.unexc + s.exc > 0 && (!q || normAr(s.name).includes(q))).map(caseInfo);
@@ -2322,12 +2385,12 @@ function casesView(){
   const cards = L.map(x => {
     const s = x.s, pct = Math.round(x.n * 10);
     return `<div class="acard ${x.status === 'مفتوحة' ? 'due' : ''}" data-ckey="${esc(s.key)}">
-      <div class="acard-h"><b>${esc(s.name)}</b><span class="tile-sub">${s.cls ? esc(clsLabel(s.cls)) : ''}</span></div>
+      <div class="acard-h"><b><button class="stu-n" data-stu="${esc(s.key)}">${esc(s.name)}</button></b><span class="tile-sub">${s.cls ? esc(clsLabel(s.cls)) : ''}</span></div>
       <div class="acard-n"><span><b>${AR(s.unexc)}</b> بدون عذر</span><span><b>${AR(s.exc)}</b> بعذر</span><span><b>${AR(x.cons.length)}</b> تواصل</span></div>
       <div class="sub" style="margin:6px 0 0"><b>الإجراء المناسب:</b> ${esc((CASE_ACT.find(a => a[0] === caseAct(s)) || [])[2] || '')}</div>
       <div class="cprog"><div class="cprog-b"><i style="width:${pct}%"></i></div><span>${AR(x.n)} من ${AR(CASE_STEPS.length)}</span></div>
       <div class="acard-t">${stTag(x.status)}${s.due.length ? `<span class="tag bad">إجراء مستحق: ${esc(s.due.map(L => L.short).join('، '))}</span>` : ''}${x.c.review ? `<span class="tag mute">مراجعة ${AR(dmy(parse(x.c.review)))}</span>` : ''}</div>
-      <div class="acard-f"><button class="btn sm primary" data-act="caseOpen">فتح الحالة</button></div>
+      <div class="acard-f"><button class="btn sm primary" data-act="caseOpen">ملف الطالب</button></div>
     </div>`;
   }).join('');
   return `<div class="kpis">
@@ -2434,7 +2497,7 @@ function counselView(){
     const st = refStatus(r), c = state.cfg.classes.find(x => x.id === r.cid);
     const rs = (r.reasons || []).map(x => `<span class="tag mute">${esc(x === 'أخرى' && r.other ? r.other : x)}</span>`).join('');
     return `<div class="acard ${st.k === 'new' || st.k === 'coun' ? 'due' : ''}" data-rid="${esc(r.id)}">
-      <div class="acard-h"><b>${esc(r.name)}</b><span class="tile-sub">${c ? esc(clsLabel(c)) : ''}</span></div>
+      <div class="acard-h"><b><button class="stu-n" data-stu="${esc(r.cid + '|' + (r.name || '').trim())}">${esc(r.name)}</button></b><span class="tile-sub">${c ? esc(clsLabel(c)) : ''}</span></div>
       <div class="acard-n"><span>${dayName(parse(r.date))} ${hijriNum(r.date)}</span>${r.subject ? `<span>المادة: <b>${esc(r.subject)}</b></span>` : ''}${r.period ? `<span>الحصة ${esc(r.period)}</span>` : ''}</div>
       <div class="acard-t">${rs}</div>
       <div class="acard-t"><span class="tag ${st.c}">${esc(st.t)}</span>${st.k === 'closed' && !r.depSeen ? '<span class="tag ok">إفادة جديدة للوكيل</span>' : ''}${r.teacher ? `<span class="tag mute">${esc(r.teacher)}</span>` : ''}</div>
@@ -3195,11 +3258,12 @@ document.addEventListener('click', async e => {
     if(isDirty() && t.dataset.view !== state.view){ toast('لديك تعديلات غير محفوظة. احفظها أولًا أو اضغط «تراجع».','err'); return; }
     state.view = t.dataset.view; render(); window.scrollTo(0,0); return;
   }
+  if(t.dataset.stu){ stuDlg(t.dataset.stu); return; }
   if(t.dataset.go){ state.view = t.dataset.go; render(); return; }
   if(t.dataset.open){ if(isDirty()){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; } state.entryDate = t.dataset.open; loadDraft(); render(); window.scrollTo(0,0); return; }
   if(t.dataset.rtype){ state.rpt.type = t.dataset.rtype; render(); return; }
   if(t.dataset.fcty){ t.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); flContSync(); return; }
-  if(t.dataset.pp){ const p = pPresets().find(x => x[0] === t.dataset.pp); if(p){ state.fl.from = p[2]; state.fl.to = p[3]; render(); } return; }
+  if(t.dataset.pp){ const p = pPresets().find(x => x[0] === t.dataset.pp); if(p){ state.fl.from = p[2]; state.fl.to = p[3]; state.pbOpen = false; render(); } return; }
   if(t.dataset.flcact){ state.fl.cact = t.dataset.flcact; render(); return; }
   if(t.dataset.flcst){ state.fl.cst = t.dataset.flcst; render(); return; }
   if(t.dataset.flflt){ state.fl.flt = t.dataset.flflt; render(); return; }
@@ -3255,18 +3319,18 @@ document.addEventListener('click', async e => {
     const id = (state.refEdit || {}).id; closeDlg(); if(id && await deleteRef(id)){ toast('تم حذف التحويل'); render(); } return;
   }
   if(act === 'actRefer'){
-    const s = studentStats().find(x => x.key === t.closest('.acard').dataset.key); if(!s) return;
+    const s = studentStats().find(x => x.key === t.closest('[data-key]').dataset.key); if(!s) return;
     openRef({cid:s.cid, name:s.name, reasons:['أخرى'], other:'تكرر الغياب بدون عذر', teacher: state.cfg.preparer || '',
       problem: `غاب${G().f ? 'ت' : ''} ${s.unexc} ${s.unexc > 10 ? 'يومًا' : 'أيام'} بدون عذر مقبول${s.maxStreak >= 3 ? `، منها ${s.maxStreak} أيام متصلة` : ''}.\nآخر أيام الغياب: ${s.dates.slice(-5).map(k => hijriNum(k)).join('، ')}`,
       dep:{text:'تم التحويل بسبب تكرر الغياب وفق قواعد السلوك والمواظبة.', refer:true, by: state.cfg.deputy || '', date: today}});
     return;
   }
   if(t.dataset.actstage){ state.actStage = t.dataset.actstage; render(); return; }
-  if(act === 'actRec'){ openActRec(t.closest('.acard').dataset.key); return; }
+  if(act === 'actRec'){ openActRec(t.closest('[data-key]').dataset.key); return; }
   if(act === 'actSave'){ await saveActRec(); return; }
-  if(act === 'actPrint'){ const s = studentStats().find(x => x.key === t.closest('.acard').dataset.key); if(s){ state.viewLv = null; printForms([s]); } return; }
+  if(act === 'actPrint'){ const s = studentStats().find(x => x.key === t.closest('[data-key]').dataset.key); if(s){ state.viewLv = null; printForms([s]); } return; }
   if(t.dataset.lvsel){ const s = studentStats().find(x => x.key === state.viewList[0]); if(s) viewForms([s], 'نموذج: ' + s.name, t.dataset.lvsel); return; }
-  if(act === 'actView'){ const s = studentStats().find(x => x.key === t.closest('.acard').dataset.key); if(s) viewForms([s], 'نموذج: ' + s.name); return; }
+  if(act === 'actView'){ const s = studentStats().find(x => x.key === t.closest('[data-key]').dataset.key); if(s) viewForms([s], 'نموذج: ' + s.name); return; }
   if(act === 'actViewDue'){ viewForms(studentStats().filter(x => x.due.length).sort((a,b) => b.unexc - a.unexc), 'النماذج المستحقة'); return; }
   if(act === 'actPrintView'){ const keys = state.viewList || []; const all = studentStats(); printForms(keys.map(k => all.find(x => x.key === k)).filter(Boolean)); return; }
   if(act === 'actPrintDue'){ state.viewLv = null;  printForms(studentStats().filter(x => x.due.length).sort((a,b) => b.unexc - a.unexc)); return; }
@@ -3332,7 +3396,9 @@ document.addEventListener('click', async e => {
     if(act === 'flWarn'){ await flWarnPrint(rid); return; }
     if(await flRowUpdate(x, {type: t.dataset.v === 'بعذر' ? 'بعذر' : 'بدون'})){ toast('تم تحديث التصنيف'); render(); } return;
   }
-  if(act === 'caseOpen'){ caseDlg(t.closest('.acard').dataset.ckey); return; }
+  if(act === 'stuCase'){ caseDlg(t.closest('[data-ckey]').dataset.ckey); return; }
+  if(act === 'caseOpen'){ stuDlg(t.closest('.acard').dataset.ckey); return; }
+  if(act === 'pbToggle'){ state.pbOpen = !state.pbOpen; render(); return; }
   if(act === 'csGo'){ e.preventDefault(); caseGo(+t.dataset.i); return; }
   if(act === 'caseSave'){ t.disabled = true; await caseSave(); return; }
   if(act === 'fcSave'){ t.disabled = true; await flContSave(); return; }
