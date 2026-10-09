@@ -412,10 +412,21 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   .sheet{ box-shadow:none !important; width:auto !important; padding:0 !important; }
   *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 }
+.auth{ position:fixed; inset:0; z-index:300; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:16px; overflow:auto; }
+.auth[hidden]{ display:none; }
+.auth-card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px 24px; width:100%; max-width:380px; box-shadow:var(--shadow); }
+.auth-card h2{ margin:10px 0 4px; font-size:20px; } .auth-card .sub{ color:var(--muted); font-size:13px; margin-bottom:18px; }
+.auth-card .f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:var(--muted); margin-bottom:12px; }
+.auth-card .btn{ width:100%; min-height:40px; } .auth-card .alt{ margin-top:14px; text-align:center; font-size:13px; color:var(--muted); }
+.auth-card .alt button{ background:none; border:0; color:var(--ink); font-weight:600; text-decoration:underline; cursor:pointer; padding:0 4px; font:inherit; }
+.auth-card .msg{ font-size:13px; padding:10px 12px; border-radius:8px; background:var(--bg); border:1px solid var(--border); margin-bottom:14px; }
+.adm td,.adm th{ padding:8px 10px; border-bottom:1px solid var(--border); text-align:right; font-size:13px; } .adm{ width:100%; border-collapse:collapse; }
+@media print{ .auth{ display:none !important; } }
 </style>
 <style id="report-css"></style>
 </head>
 <body>
+<div class="auth" id="auth"><div class="auth-card"><div class="sub">جارٍ التحقق…</div></div></div>
 <div class="topbar no-print">
   <button class="hamburger" data-act="menu" aria-label="فتح القائمة"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
   <div class="tb-title" id="tbTitle">متابعة الغياب</div>
@@ -433,6 +444,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
       <button type="button" data-view="actions"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>إجراءات الغياب</span></button>
       <button type="button" data-view="counsel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6M19 8v6"/></svg><span>الإرشاد الطلابي</span></button>
       <button type="button" data-view="settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الفصول والإعدادات</span></button>
+      <button type="button" data-view="admin" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>إدارة الحسابات</span></button>
     </nav>
     <div class="rail-foot">
       <div class="note-card" id="railNote"></div>
@@ -656,8 +668,9 @@ function lsSet(k, v){ try{ localStorage.setItem('absence:' + k, JSON.stringify(v
 
 /* ---------- المزامنة السحابية (Supabase) ---------- */
 const SB_KINDS = ['cfg', 'days', 'roster', 'actions', 'refs', 'noorm'], SB_MULTI = {days:1, refs:1};
-const sb = { client:null, user:null, ch:null, snap:{}, dirty:{}, applying:false, timer:null, status:'off', err:'', last:'' };
-const sbCfg = () => { try{ return JSON.parse(localStorage.getItem('absence:sbcfg') || '{}'); }catch(e){ return {}; } };
+const sb = { client:null, user:null, ch:null, snap:{}, dirty:{}, applying:false, timer:null, status:'off', err:'', last:'', profile:null, booting:true, mode:'in', msg:'', admin:null };
+const SB_DEF = {url:'https://zgadvzvlvyhavugeguks.supabase.co', key:'sb_publishable_82JRQTuJ7XZ_HPznx_LsMQ_FjavCD88'};
+const sbCfg = () => { let c = {}; try{ c = JSON.parse(localStorage.getItem('absence:sbcfg') || '{}'); }catch(e){} return c.url && c.key ? c : SB_DEF; };
 const sbRowsOf = (k, v) => SB_MULTI[k] ? Object.entries(v || {}) : [['main', v]];
 function sbSetStatus(st, err){ sb.status = st; sb.err = err || ''; const el = document.getElementById('sbStatus'); if(el) el.innerHTML = sbStatusHTML(); const sy = document.getElementById('sync'); if(sy && state.cfg) sy.textContent = sbSyncLabel(); }
 function sbSyncLabel(){ return {on:'متزامن مع السحابة', sync:'جارٍ المزامنة…', offline:'غير متصل · سيُرفع لاحقًا', error:'خطأ في المزامنة'}[sb.status] || 'حفظ على الجهاز'; }
@@ -670,7 +683,7 @@ function sbTrack(k, v){
   if(sb.user){ clearTimeout(sb.timer); sb.timer = setTimeout(sbPush, 500); }
 }
 async function sbPush(){
-  if(!sb.user || !sb.client) return;
+  if(!sb.user || !sb.client || !(sb.profile && sb.profile.active)) return;
   const ids = Object.keys(sb.dirty); if(!ids.length){ sbSetStatus('on'); return; }
   if(!navigator.onLine){ sbSetStatus('offline'); return; }
   sbSetStatus('sync');
@@ -708,12 +721,54 @@ function sbLoadLib(){ if(!sbLib){ sbLib = loadScript('https://cdn.jsdelivr.net/n
 async function sbStart(){
   const c = sbCfg(); if(!c.url || !c.key) return;
   try{ const lib = await sbLoadLib(); sb.client = lib.createClient(c.url, c.key, {auth:{persistSession:true, storageKey:'absence-sb-auth'}}); }
-  catch(e){ sbSetStatus('error', 'تعذّر تحميل مكتبة Supabase. تحقق من الاتصال.'); return; }
+  catch(e){ sbSetStatus('offline'); sbOfflineGate(); return; }
   const {data} = await sb.client.auth.getSession();
-  if(data && data.session) await sbOnLogin(data.session.user); else sbSetStatus('off');
+  if(data && data.session) await sbOnLogin(data.session.user); else { sbSetStatus('off'); sb.booting = false; authRender(); }
+}
+function sbOfflineGate(){
+  // بدون إنترنت: يُسمح بالدخول إذا كان الجهاز مسجّلًا ومفعّلًا سابقًا
+  const p = lsGet('sbprof', null); let has = false; try{ has = !!localStorage.getItem('absence-sb-auth'); }catch(e){}
+  if(has && p && p.active){ sb.profile = p; sb.user = {id: p.id, email: p.email}; }
+  sb.booting = false; authRender();
+}
+function wipeLocal(){
+  try{ Object.keys(localStorage).filter(k => k.startsWith('absence:') && k !== 'absence:sbcfg').forEach(k => localStorage.removeItem(k)); }catch(e){}
+}
+async function sbLoadProfile(user){
+  const {data, error} = await sb.client.from('profiles').select('*').eq('id', user.id).maybeSingle();
+  if(error || !data){ const c = lsGet('sbprof', null); return c && c.id === user.id ? c : (error ? null : {id:user.id, email:user.email, active:false}); }
+  lsSetRaw('sbprof', JSON.stringify(data)); return data;
+}
+function authRender(){
+  const el = $('#auth'); if(!el) return;
+  const ab = document.querySelector('.nav [data-view="admin"]'); if(ab) ab.hidden = !(sb.profile && sb.profile.is_admin);
+  if(sb.booting){ el.hidden = false; el.innerHTML = `<div class="auth-card"><div class="sub" style="margin:0">جارٍ التحقق…</div></div>`; return; }
+  if(sb.user && sb.profile && sb.profile.active){ el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  const brand = `<div class="brand-ic">${document.querySelector('.brand-ic') ? document.querySelector('.brand-ic').innerHTML : ''}</div>`;
+  const msg = sb.msg ? `<div class="msg">${esc(sb.msg)}</div>` : '';
+  if(sb.user){
+    el.innerHTML = `<div class="auth-card">${brand}<h2>الحساب بانتظار التفعيل</h2><div class="sub">أُنشئ حسابك <b dir="ltr">${esc(sb.user.email || '')}</b>، وسيعمل بعد أن يفعّله مدير النظام.</div>
+      <button class="btn primary" data-act="auRecheck">تحقق مجددًا</button><div class="alt"><button data-act="sbOut">تسجيل الخروج</button></div></div>`;
+    return;
+  }
+  const up = sb.mode === 'up';
+  el.innerHTML = `<div class="auth-card">${brand}<h2>${up ? 'إنشاء حساب' : 'تسجيل الدخول'}</h2><div class="sub">متابعة غياب الطلاب</div>${msg}
+    <form id="auForm" onsubmit="this.querySelector('.btn.primary').click();return false">
+    ${up ? `<label class="f">اسم المدرسة<input class="input" id="auSchool" autocomplete="organization"></label>` : ''}
+    <label class="f">البريد الإلكتروني<input class="input" id="auEmail" type="email" dir="ltr" autocomplete="username"></label>
+    <label class="f">كلمة المرور<input class="input" id="auPass" type="password" dir="ltr" autocomplete="${up ? 'new-password' : 'current-password'}"></label>
+    <button class="btn primary" data-act="${up ? 'sbUp' : 'sbIn'}">${up ? 'إنشاء الحساب' : 'دخول'}</button></form>
+    <div class="alt">${up ? 'لديك حساب؟' : 'ليس لديك حساب؟'}<button data-act="auMode">${up ? 'تسجيل الدخول' : 'إنشاء حساب'}</button></div></div>`;
 }
 async function sbOnLogin(user){
-  sb.user = user;
+  const prev = lsGet('sbuid', null);
+  if(prev && prev !== user.id){ wipeLocal(); lsSetRaw('sbuid', JSON.stringify(user.id)); location.reload(); return; }
+  lsSetRaw('sbuid', JSON.stringify(user.id));
+  sb.user = user; sb.profile = await sbLoadProfile(user); sb.booting = false; sb.msg = '';
+  authRender();
+  if(!sb.profile || !sb.profile.active){ sbSetStatus('off'); return; }
+  if(state.cfg) render();
   try{ sb.dirty = JSON.parse(localStorage.getItem('absence:sbdirty') || '{}'); }catch(e){ sb.dirty = {}; }
   // اللقطة الأولى = البيانات المحلية الحالية
   SB_KINDS.forEach(k => { const v = {cfg: state.cfg, days: state.days, refs: state.refs, roster: state.roster, actions: state.actions, noorm: state.noorM}[k]; sbRowsOf(k, v).forEach(([key, d]) => { sb.snap[k + '|' + key] = JSON.stringify(d); }); });
@@ -735,28 +790,46 @@ async function sbPull(first){
   const remote = new Set();
   (data || []).forEach(r => { remote.add(r.kind + '|' + r.key); sbApply(r.kind, r.key, r.data, false); });
   // ما هو موجود محليًا وغير موجود في السحابة يُرفع (أول ربط لجهاز عليه بيانات)
+  if(first && !remote.has('cfg|main') && sb.profile && sb.profile.school && state.cfg){ state.cfg.school = sb.profile.school; lsSet('cfg', state.cfg); }
   if(first) Object.keys(sb.snap).forEach(id => { if(!remote.has(id) && !sb.dirty[id]) sb.dirty[id] = 1; });
   if(state.cfg) onData();
   sbSetStatus(Object.keys(sb.dirty).length ? 'sync' : 'on');
 }
 async function sbLogin(signup){
-  const url = ($('#sbUrl').value || '').trim().replace(/\/+$/, ''), key = ($('#sbKey').value || '').trim(), email = ($('#sbEmail').value || '').trim(), pass = $('#sbPass').value || '';
-  if(!/^https:\/\/.+\.supabase\.co$/.test(url) || key.length < 30){ toast('تحقق من رابط المشروع والمفتاح.','err'); return; }
-  if(!email || pass.length < 6){ toast('اكتب البريد وكلمة مرور من ٦ أحرف فأكثر.','err'); return; }
-  try{ localStorage.setItem('absence:sbcfg', JSON.stringify({url, key})); }catch(e){}
-  sb.client = null; sbSetStatus('sync');
-  try{ const lib = await sbLoadLib(); sb.client = lib.createClient(url, key, {auth:{persistSession:true, storageKey:'absence-sb-auth'}}); }
-  catch(e){ sbSetStatus('error', 'تعذّر تحميل مكتبة Supabase.'); return; }
-  const fn = signup ? sb.client.auth.signUp({email, password:pass}) : sb.client.auth.signInWithPassword({email, password:pass});
-  const {data, error} = await fn;
-  if(error){ sbSetStatus('error', error.message); toast('تعذّر الدخول: ' + error.message, 'err'); return; }
-  if(!data.session){ sbSetStatus('off'); toast('أُنشئ الحساب. افتح رابط التأكيد في بريدك ثم اضغط «دخول».'); return; }
-  toast('تم الربط بالسحابة'); await sbOnLogin(data.session.user); render();
+  const email = ($('#auEmail').value || '').trim(), pass = $('#auPass').value || '', school = signup ? ($('#auSchool').value || '').trim() : '';
+  if(signup && !school){ toast('اكتب اسم المدرسة.','err'); return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('اكتب بريدًا إلكترونيًا صحيحًا.','err'); return; }
+  if(pass.length < 6){ toast('كلمة المرور ٦ أحرف فأكثر.','err'); return; }
+  if(!sb.client){ try{ const c = sbCfg(), lib = await sbLoadLib(); sb.client = lib.createClient(c.url, c.key, {auth:{persistSession:true, storageKey:'absence-sb-auth'}}); }catch(e){ toast('لا يوجد اتصال بالإنترنت.','err'); return; } }
+  const {data, error} = signup ? await sb.client.auth.signUp({email, password:pass, options:{data:{school}, emailRedirectTo: location.origin + location.pathname}}) : await sb.client.auth.signInWithPassword({email, password:pass});
+  if(error){
+    const m = /Invalid login/i.test(error.message) ? 'البريد أو كلمة المرور غير صحيحة.' : /not confirmed/i.test(error.message) ? 'أكّد بريدك أولًا من الرسالة التي وصلتك.' : /already registered/i.test(error.message) ? 'هذا البريد مسجّل مسبقًا، سجّل الدخول.' : error.message;
+    toast(m, 'err'); return;
+  }
+  if(!data.session){ sb.mode = 'in'; sb.msg = 'أُنشئ الحساب. افتح رابط التأكيد في بريدك، ثم سجّل الدخول. يعمل الحساب بعد تفعيله من مدير النظام.'; authRender(); return; }
+  await sbOnLogin(data.session.user);
 }
 async function sbLogout(){
+  if(sb.user && Object.keys(sb.dirty).length && navigator.onLine) await sbPush();
   if(sb.client) await sb.client.auth.signOut().catch(() => {});
-  if(sb.ch && sb.client) sb.client.removeChannel(sb.ch);
-  sb.user = null; sb.ch = null; sbSetStatus('off'); render();
+  try{ localStorage.removeItem('absence-sb-auth'); }catch(e){}
+  wipeLocal(); location.reload();
+}
+async function adminLoad(){
+  const {data, error} = await sb.client.from('profiles').select('*').order('created_at', {ascending:false});
+  sb.admin = error ? {err: error.message} : (data || []);
+  if(state.view === 'admin') render();
+}
+function adminView(){
+  if(!sb.profile || !sb.profile.is_admin) return '';
+  if(!sb.admin){ adminLoad(); return `<div class="loading">جارٍ تحميل الحسابات…</div>`; }
+  if(sb.admin.err) return `<div class="panel">تعذّر التحميل: ${esc(sb.admin.err)}</div>`;
+  const n = sb.admin.filter(p => p.active).length;
+  const rows = sb.admin.map(p => `<tr><td>${esc(p.school || '—')}</td><td dir="ltr" style="text-align:right">${esc(p.email || '')}</td><td>${p.created_at ? AR(dmy(new Date(p.created_at))) : ''}</td>
+    <td>${p.is_admin ? '<span class="tag ok">مدير النظام</span>' : p.active ? '<span class="tag ok">مفعّل</span>' : '<span class="tag warn">بانتظار التفعيل</span>'}</td>
+    <td>${p.id === sb.user.id ? '' : `<button class="btn ${p.active ? 'danger' : 'primary'}" data-act="adToggle" data-id="${p.id}">${p.active ? 'تعطيل' : 'تفعيل'}</button>`}</td></tr>`).join('');
+  return `<section class="panel"><div class="row-actions" style="margin-top:0"><h3 style="margin:0">الحسابات (${AR(sb.admin.length)} · المفعّل ${AR(n)})</h3><span class="grow"></span><button class="btn" data-act="adReload">تحديث</button></div>
+    <div style="overflow-x:auto;margin-top:12px"><table class="adm"><thead><tr><th>المدرسة</th><th>البريد</th><th>التسجيل</th><th>الحالة</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="5">لا توجد حسابات</td></tr>'}</tbody></table></div></section>`;
 }
 function sbStatusHTML(){
   const m = {on:['ok', 'متصل ومتزامن' + (sb.last ? ' · آخر رفع ' + sb.last : '')], sync:['warn', 'جارٍ المزامنة…'], offline:['warn', 'لا يوجد إنترنت · الرصد محفوظ على الجهاز وسيُرفع عند الاتصال'], error:['bad', 'خطأ: ' + esc(sb.err)], off:['mute', 'غير مربوط']}[sb.status] || ['mute', 'غير مربوط'];
@@ -767,15 +840,7 @@ function sbPanel(){
   if(sb.user) return `<section class="panel"><h3>المزامنة السحابية</h3>
     <p class="hint">مربوط بحساب <b>${esc(sb.user.email || '')}</b>. كل رصد يُحفظ على الجهاز فورًا ويُرفع للسحابة، ويظهر على أجهزتك الأخرى خلال ثانية.</p>
     <div class="row-actions" style="margin-top:0"><span id="sbStatus">${sbStatusHTML()}</span><span class="grow"></span><button class="btn" data-act="sbSync">مزامنة الآن</button><button class="btn danger" data-act="sbOut">تسجيل الخروج</button></div></section>`;
-  return `<section class="panel"><h3>المزامنة السحابية (Supabase)</h3>
-    <p class="hint">لحفظ البيانات في السحابة ومزامنتها بين الجوال والكمبيوتر. أنشئ مشروعًا في Supabase وشغّل ملف <b>supabase.sql</b> مرة واحدة، ثم الصق بيانات المشروع هنا. التفاصيل في ملف <b>README</b>.</p>
-    <div class="fields">
-      <label class="f">رابط المشروع (Project URL)<input class="input" id="sbUrl" dir="ltr" placeholder="https://xxxx.supabase.co" value="${esc(c.url || '')}"></label>
-      <label class="f">المفتاح العام (anon key)<input class="input" id="sbKey" dir="ltr" value="${esc(c.key || '')}"></label>
-      <label class="f">البريد الإلكتروني<input class="input" id="sbEmail" type="email" dir="ltr" autocomplete="username"></label>
-      <label class="f">كلمة المرور<input class="input" id="sbPass" type="password" dir="ltr" autocomplete="current-password"></label>
-    </div>
-    <div class="row-actions"><span id="sbStatus">${sbStatusHTML()}</span><span class="grow"></span><button class="btn" data-act="sbUp">إنشاء حساب</button><button class="btn primary" data-act="sbIn">دخول</button></div></section>`;
+  return '';
 }
 window.addEventListener('online', () => { if(sb.user){ sbPush(); sbPull(false); } });
 window.addEventListener('offline', () => { if(sb.user) sbSetStatus('offline'); });
@@ -1035,9 +1100,10 @@ const lastBackup = () => { try{ return localStorage.getItem('absence:lastBackup'
 function railNote(){
   const lb = lastBackup();
   const where = sb.user ? 'البيانات محفوظة على الجهاز ومتزامنة مع السحابة.' : 'البيانات محفوظة على هذا الجهاز. اربطها بالسحابة من الإعدادات لمزامنتها بين أجهزتك.';
-  return `${where}${lb ? `<div>آخر نسخة احتياطية: ${lb.replace(/-/g,'/')}</div>` : ''}${state.downloads ? `<button type="button" class="btn" data-act="backup">${ICON.down} نسخة احتياطية</button>` : ''}${installHTML(true).replace('btn primary','btn primary" style="margin-top:6px;width:100%')}`;
+  return `${where}${installHTML(true).replace('btn primary','btn primary" style="margin-top:6px;width:100%')}`;
 }
 function bannerHTML(){
+  return '';
   if(!state.downloads || !Object.keys(state.days).length || state.view !== 'entry') return '';
   let sn = null; try{ sn = localStorage.getItem('absence:snooze'); }catch(e){}
   if(sn && sn >= today) return '';
@@ -1061,12 +1127,13 @@ function render(){
     reports: ['التقارير', 'الإحصائية وسجل الغياب اليومي، جاهزة للطباعة'],
     counsel: ['الإرشاد الطلابي', 'تحويل ' + G().students + ' لوكيل شؤون ' + G().students + ' والموجه الطلابي (نموذج 31)'],
     actions: ['إجراءات الغياب', 'متابعة المواظبة وتطبيق إجراءات الغياب بدون عذر'],
-    settings: ['الفصول والإعدادات', 'تُضبط مرة واحدة وتُستخدم في الرصد والتقارير']
+    settings: ['الفصول والإعدادات', 'تُضبط مرة واحدة وتُستخدم في الرصد والتقارير'],
+    admin: ['إدارة الحسابات', 'تفعيل حسابات المدارس أو تعطيلها']
   }[state.view];
   $('#pTitle').textContent = head[0]; $('#pSub').textContent = head[1]; $('#tbTitle').textContent = head[0];
   $('#shell').classList.remove('open');
   const m = $('#main');
-  m.innerHTML = `<div class="view">${({entry:entryView, reports:reportsView, actions:actionsView, counsel:counselView, settings:settingsView})[state.view]()}</div>`;
+  m.innerHTML = `<div class="view">${({entry:entryView, reports:reportsView, actions:actionsView, counsel:counselView, settings:settingsView, admin:adminView})[state.view]()}</div>`;
   if(state.view === 'entry') updateTally();
 }
 
@@ -2505,16 +2572,11 @@ function settingsView(){
     <div class="row-actions" style="margin-top:0">${installHTML(false)}</div>
   </section>
   ${sbPanel()}
-  <section class="panel">
-    <h3>النسخ الاحتياطي</h3>
-    <p class="hint">لنقل البيانات بين الكمبيوتر والجوال: نزّل نسخة من جهاز واستوردها في الآخر. الملف فيه بيانات المدرسة والفصول وكل أيام الغياب (${AR(Object.keys(state.days).length)} يومًا حاليًا). عند الاستيراد تُستبدل الفصول والبيانات، وتُضاف أيام الملف أو تُحدَّث، ولا يُحذف أي يوم غير موجود في الملف.</p>
-    <div class="row-actions">
-      ${state.downloads ? `<button class="btn" data-act="xlsxAll">تصدير Excel لكل البيانات</button>` : ''}
-      ${state.downloads ? `<button class="btn primary" data-act="backup">${ICON.down} تنزيل نسخة احتياطية</button>` : `<span class="tag mute">التنزيل غير متاح في هذا العرض</span>`}
-      <button class="btn" data-act="pickrestore" id="restoreBtn">${ICON.up} استيراد نسخة احتياطية</button>
-      <input type="file" id="restoreFile" accept=".json,application/json" hidden>
-    </div>
-  </section>`;
+  ${state.downloads ? `<section class="panel">
+    <h3>تصدير البيانات</h3>
+    <p class="hint">بياناتك محفوظة في السحابة تلقائيًا. يمكنك تصدير كل أيام الغياب (${AR(Object.keys(state.days).length)} يومًا حاليًا) في ملف Excel.</p>
+    <div class="row-actions"><button class="btn" data-act="xlsxAll">تصدير Excel لكل البيانات</button></div>
+  </section>` : ''}`;
 }
 function rosterPanel(){
   const list = classes(), withR = list.filter(c => rosterOf(c.id).length), without = list.filter(c => !rosterOf(c.id).length);
@@ -2664,6 +2726,16 @@ document.addEventListener('click', async e => {
   }
   if(act === 'install'){ if(installEvt){ installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if(r && r.outcome === 'accepted') toast('جارٍ التثبيت…'); render(); } return; }
   if(act === 'sbIn' || act === 'sbUp'){ t.disabled = true; await sbLogin(act === 'sbUp'); if(t.isConnected) t.disabled = false; return; }
+  if(act === 'auMode'){ sb.mode = sb.mode === 'up' ? 'in' : 'up'; sb.msg = ''; authRender(); return; }
+  if(act === 'auRecheck'){ t.disabled = true; sb.profile = await sbLoadProfile(sb.user); if(sb.profile && sb.profile.active){ await sbOnLogin(sb.user); } else { toast('لم يُفعَّل الحساب بعد.','err'); if(t.isConnected) t.disabled = false; } return; }
+  if(act === 'adReload'){ sb.admin = null; render(); return; }
+  if(act === 'adToggle'){
+    const p = (sb.admin || []).find(x => x.id === t.dataset.id); if(!p) return;
+    t.disabled = true;
+    const {error} = await sb.client.from('profiles').update({active: !p.active}).eq('id', p.id);
+    if(error){ toast('تعذّر التحديث: ' + error.message, 'err'); t.disabled = false; return; }
+    p.active = !p.active; toast(p.active ? 'تم تفعيل الحساب' : 'تم تعطيل الحساب'); render(); return;
+  }
   if(act === 'sbOut'){ await sbLogout(); return; }
   if(act === 'sbSync'){ await sbPush(); await sbPull(false); toast('تمت المزامنة'); return; }
   if(act === 'snooze'){ lsSetRaw('snooze', iso(addDays(new Date(), 7))); $('#banner').innerHTML = ''; toast('سنذكّرك بعد أسبوع'); return; }
