@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f6f7f9; --card:#ffffff; --ink:#111827; --muted:#4b5563; --accent:#18181b; --accent-fg:#fafafa;
@@ -631,6 +631,25 @@ const ACT_CSS = `
 @media print{.actf{width:auto;padding:0;break-after:page}.actf:last-child{break-after:auto}}
 `;
 const REF_CSS = `
+.actf.warnf .wbx{display:inline-block;width:14px;height:14px;border:1.5px solid #222;vertical-align:middle;text-align:center;line-height:12px;font-size:12px;font-family:Arial,sans-serif;font-weight:700;margin-inline-end:4px}.actf.warnf .wf-ck i{font-style:normal;margin-inline-start:16px;white-space:nowrap}
+.refm.callf{font-family:'Al-Mohanad','AL-Mohanad','Al Mohanad','Noto Naskh Arabic',serif;font-size:17px;line-height:2}
+.callf .cf-no{font-size:13px;margin-top:6px}.callf .cf-t{text-align:center;font-size:24px;margin:4px 0 14px;font-weight:700}
+.callf .cf-tb{width:100%;border-collapse:collapse;margin-bottom:18px;text-align:center}.callf .cf-tb th{background:#eef1f3;font-weight:700}.callf .cf-tb th,.callf .cf-tb td{border:1px solid #9aa5ad;padding:6px}
+.callf p{margin:8px 0}.callf .cf-p{text-align:justify;text-indent:28px}.callf .cf-c{text-align:center;margin-top:16px}
+.callf .cf-sig{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}.callf .cf-sig b{display:block;background:#eef1f3;padding:2px 10px;margin-bottom:6px}
+.callf .cf-n{margin-top:60px;font-size:14px}.callf .cf-n b{color:#c0392b}
+.warnf .wbx{display:inline-block;width:15px;height:15px;border:1.5px solid #222;vertical-align:middle;text-align:center;line-height:13px;font-size:13px;font-family:Arial,sans-serif;font-weight:700}
+.warnf .wf-dl{margin:10px 0 14px;font-size:16px}.warnf .wf-dl table{width:100%;border-collapse:collapse;margin-top:4px}.warnf .wf-dl table{table-layout:fixed}.warnf .wf-dl td{border:1px solid #555;padding:4px 3px;white-space:nowrap;font-size:13px;font-weight:700;color:#000;text-align:center;overflow:hidden}
+.warnf .wf-sig{margin-top:34px}
+.refm.callf.warnf{font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;font-size:15.5px;line-height:2.1;padding:30px 44px}
+.warnf .cf-p{text-align:justify;margin:4px 0}.warnf .wf-h{margin:16px 0 12px}.warnf .wf-st{font-size:14.5px}.warnf .wf-st td,.warnf .wf-st th{padding:7px 8px}
+.warnf .wf-r{align-items:baseline;margin:12px 0}.warnf .wf-ck i{font-style:normal;margin-inline-start:16px;white-space:nowrap}.warnf .wbx{margin-inline-end:4px}
+.warnf .wf-dl td{font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif}.warnf .wf-sig{margin-top:40px;line-height:2.4}
+.warnf .wf-st{font-size:15px;margin:4px 0 14px}
+.warnf .wf-h{text-align:center;margin:18px 0 8px}.warnf .wf-h span{display:inline-block;border:1.5px solid #333;border-radius:6px;padding:2px 46px;font-weight:700;font-size:18px}
+.warnf .wf-r{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 20px;margin:6px 0}.warnf p{margin:6px 0}.warnf .cf-p{text-indent:0}
+.warnf .wf-h:not(:first-of-type){border-top:1px solid #555;padding-top:12px}
+.wrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border)}
 .refm{width:794px;background:#fff;color:#1a1a1a;padding:26px 34px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;line-height:1.7;font-size:13px}
 .refm .ahead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding-bottom:10px;border-bottom:2px solid #1d5f8a;margin-bottom:14px}
 .refm .ahead .r{font-weight:700;font-size:12px;line-height:1.9}.refm .ahead .r .sch{font-size:14px}
@@ -1039,7 +1058,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v59';
+const APP_VER = 'absence-v67';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -1810,7 +1829,7 @@ function buildRegSheet(dateKey){
 async function downloadRegister(){
   const dl = state.downloads; if(!dl) return;
   const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>سجل غياب ${G().students} ${state.rpt.date}</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>${REG_CSS}body{margin:0;background:#eef1f4;padding:24px 0}
 .pbtn{display:block;margin:0 auto 16px;font:600 15px 'IBM Plex Sans Arabic',Tahoma,sans-serif;background:#18181b;color:#fff;border:0;border-radius:8px;padding:10px 26px;cursor:pointer}
 @media print{@page{size:A4;margin:10mm}body{background:#fff;padding:0}.pbtn{display:none}}</style></head>
@@ -1880,7 +1899,7 @@ function actionsView(){
       <div class="acard-h"><b><button class="stu-n" data-stu="${esc(s.key)}">${esc(s.name)}</button></b><span class="tile-sub">${s.cls ? esc(clsLabel(s.cls)) : 'فصل محذوف'}</span></div>
       <div class="acard-n"><span><b>${s.unexc}</b> بدون عذر</span><span><b>${s.exc}</b> بعذر</span><span><b>${s.maxStreak}</b> أطول غياب متصل</span></div>
       <div class="acard-t">${lvl}${st}</div>
-      <div class="acard-f">${s.reached.length && waPhone(s.phone || phoneFor(s.cid, s.name)) ? `<a class="btn sm wa" href="${esc(waUrl(s.phone || phoneFor(s.cid, s.name), waActText(s)))}" target="_blank" rel="noopener">واتساب</a>` : ''}${s.reached.length ? `<button class="btn sm" data-act="actRec">تسجيل الإجراء</button><button class="btn sm" data-act="actView">معاينة النموذج</button><button class="btn sm" data-act="actRefer">إحالة للإرشاد</button><button class="btn sm" data-act="actPrint">${ICON.print} طباعة</button>` : `<span style="color:var(--muted);font-size:12.5px">أول إجراء عند 3 أيام متصلة أو 5 منفصلة</span>`}</div>
+      <div class="acard-f">${s.reached.length && waPhone(s.phone || phoneFor(s.cid, s.name)) ? `<a class="btn sm wa" href="${esc(waUrl(s.phone || phoneFor(s.cid, s.name), waActText(s)))}" target="_blank" rel="noopener">واتساب</a>` : ''}${s.reached.length ? `${s.unexc >= 3 ? `<button class="btn sm ${warnDue(s).length ? 'danger-o' : ''}" data-act="warnOpen">الإنذارات${warnDue(s).length ? ' (مستحق)' : ''}</button>` : ''}<button class="btn sm" data-act="actRec">تسجيل الإجراء</button><button class="btn sm" data-act="actView">معاينة النموذج</button><button class="btn sm" data-act="actRefer">إحالة للإرشاد</button><button class="btn sm" data-act="actPrint">${ICON.print} طباعة</button>` : `<span style="color:var(--muted);font-size:12.5px">أول إجراء عند 3 أيام متصلة أو 5 منفصلة</span>`}</div>
     </div>`;
   }).join('');
   return `${periodBar()}<div class="bar">
@@ -2001,6 +2020,7 @@ function inboxItems(){
   refsNewForDep().forEach(r => L.push({k:'dep', ic:'✅', t:`أفاد ${g.counselor} — للاطلاع`, s:r.name, act:`data-act="depView" data-rid="${esc(r.id)}"`}));
   try{
     const due = studentStats().filter(s => s.due.length).length;
+    const wd = warnDueAll().length; if(wd) L.push({k:'act', ic:'📄', t:`${AR(wd)} ${g.students} لهم إنذار غياب مستحق`, s:'إجراءات الغياب', act:'data-go="actions"'});
     if(due) L.push({k:'act', ic:'⚠️', t:`${AR(due)} ${g.students} بحاجة إلى إجراء غياب`, s:'إجراءات الغياب', act:'data-go="actions"'});
     const noc = flDailyAll().filter(x => x.date === today && x.type !== 'بعذر' && !flContactOf(flRid(x))).length;
     if(noc) L.push({k:'noc', ic:'📞', t:`${AR(noc)} غياب اليوم بدون تواصل مع ولي الأمر`, s:'سجل الغياب اليومي', act:'data-act="ibNoc"'});
@@ -2021,6 +2041,8 @@ function inboxOpen(btn){
   const r = btn.getBoundingClientRect(); p.style.top = (r.bottom + 8) + 'px'; p.style.left = Math.max(8, r.left) + 'px';
 }
 function refStatus(r){
+  const cl = (r.coun && r.coun.call) || {};
+  if(cl.on && !cl.done) return {k:'coun', t:'استدعاء ولي الأمر — قيد المعالجة', c:'warn'};
   if(r.coun && r.coun.text) return {k:'closed', t:'مغلقة', c:'ok'};
   if(r.dep && r.dep.refer) return {k:'coun', t:'لدى ' + G().counselor, c:'bad'};
   if(r.dep && r.dep.text) return {k:'dep', t:'عولجت لدى الوكيل', c:'ok'};
@@ -2312,6 +2334,74 @@ async function flWarnPrint(rid){
   window.addEventListener('afterprint', done);
   try{ window.print(); }catch(e){ done(); }
 }
+/* ---------- الإنذارات الثلاثة ---------- */
+const keyOf = t => (t.closest('[data-key]') || t.closest('.modal').querySelector('[data-key]')).dataset.key;
+const WARN_LV = [{n:1, d:3, t:'الإنذار الأول'}, {n:2, d:5, t:'الإنذار الثاني'}, {n:3, d:10, t:'الإنذار الثالث'}];
+const W_METH = ['رسالة نصية', 'خطاب', 'أخرى'];
+const warnRec = key => ((state.contacts.warn3 || {})[key]) || {};
+const warnDue = s => WARN_LV.filter(L => s.unexc >= L.d && !warnRec(s.key)['w' + L.n]);
+const warnKeyStats = key => statsAll().find(o => o.key === key);
+const statsAll = () => { const f = state.fl, sv = [f.from, f.to]; f.from = '0000-01-01'; f.to = '9999-12-31'; try{ return studentStats(); } finally { f.from = sv[0]; f.to = sv[1]; } };
+const warnDueAll = () => statsAll().filter(s => warnDue(s).length);
+function warnWaText(s){
+  const g = G(), f = g.f;
+  return `السلام عليكم ورحمة الله وبركاته\nولي أمر ${f ? 'الطالبة' : 'الطالب'} / ${s.name} حفظه الله\nنود إحاطتكم بأن مجموع غياب ${f ? 'ابنتكم' : 'ابنكم'} قد بلغ (${s.unexc}) أيام بدون عذر تقبله المدرسة، لذا نرجو منكم الاهتمام بمتابعة ${f ? 'ابنتكم' : 'ابنكم'} وحث${g.his} على الانتظام في حضور المدرسة، وسيتم الحسم من درجات المواظبة عن كل يوم دراسي بدون عذر.\n(الإنذار الثاني)\n${state.cfg.school || ''}`;
+}
+function warnFormHTML(s, n){
+  const cfg = state.cfg, g = G(), f = g.f, w = warnRec(s.key), logo = logoSrc();
+  const st = f ? 'الطالبة' : 'الطالب', son = f ? 'ابنتكم' : 'ابنكم', hf = f ? 'حفظها الله' : 'حفظه الله';
+  const v = w['w' + n], d = v && (v.date || v), dt = d || today, dd = parse(dt);
+  const lim = WARN_LV[n - 1].d, dates = s.dates.slice().sort().slice(0, lim);
+  const box = m => `<span class="wbx">${w.w2 && w.w2.method === m ? '✓' : ''}</span>`;
+  const days = `<b>(${lim}) ${lim > 10 ? 'يومًا' : 'أيام'}</b>`;
+  const dbox = `<div class="adays"><div class="adays-h">أيام الغياب بدون عذر</div><div class="adays-g">${dates.map(k => `<span>${dayName(parse(k))} ${hijriNum(k)}</span>`).join('')}</div></div>`;
+  const toG = `<p>المكرّم ولي أمر ${st} / <b>${esc(s.name)}</b><span style="margin-inline-start:24px">${hf}</span></p><p>السلام عليكم ورحمة الله وبركاته، وبعد:</p>`;
+  const B = {
+    1: `<p>${f ? 'الطالبة المكرّمة' : 'الطالب المكرّم'} / <b>${esc(s.name)}</b><span style="margin-inline-start:24px">${f ? 'وفقها' : 'وفقه'} الله</span></p><p>السلام عليكم ورحمة الله وبركاته، وبعد:</p>
+      <p>نود تنبيه${f ? 'كِ' : 'ك'} بأن مجموع أيام غياب${f ? 'كِ' : 'ك'} قد بلغ ${days} بدون عذر تقبله المدرسة.</p>${dbox}
+      <p>لذا نرجو ${f ? 'منكِ' : 'منك'} الاهتمام بالانتظام في الحضور إلى المدرسة، حيث أن غياب${f ? 'كِ' : 'ك'} يؤثر على تحصيل${f ? 'كِ' : 'ك'} الدراسي وتدني مستوا${f ? 'كِ' : 'ك'} بين أقران${f ? 'كِ' : 'ك'}، لذا نرجو ${f ? 'منكِ' : 'منك'} الحرص على عدم الغياب والانضباط في الحضور للمدرسة.</p>`,
+    2: `${toG}<p>نود إحاطتكم بأن مجموع غياب ${son} قد بلغ ${days} بدون عذر تقبله المدرسة.</p>${dbox}
+      <p>لذا نرجو منكم الاهتمام بمتابعة ${son} وحث${g.his} على الانتظام في حضور المدرسة، وسيتم الحسم من درجات المواظبة عن كل يوم دراسي بدون عذر، حيث أن غياب${g.his} يؤثر على تحصيل${g.his} الدراسي وتدني مستوا${g.his} بين أقران${g.his}، لذا نرجو منكم الحرص على توجيه ${st} وانضباط${g.his} في الحضور للمدرسة.</p>
+      <p class="wf-ck">تم إشعار ولي الأمر: <i>${box('رسالة نصية')} برسالة نصية</i><i>${box('خطاب')} خطاب</i><i>${box('أخرى')} أخرى: ${w.w2 && w.w2.other ? esc(w.w2.other) : '..........'}</i></p>`,
+    3: `${toG}<p>نود إحاطتكم بأن مجموع غياب ${son} قد بلغ ${days} بدون عذر تقبله المدرسة.</p>${dbox}
+      <p>لذا نرجو منكم مراجعة المدرسة لاتخاذ الإجراء المناسب ومعرفة مسببات الغياب، حيث في حال تجاوز <b>(15) يومًا</b> سيتم الرفع لإدارة التعليم ونقل ${st} من المدرسة مع الحسم من درجات المواظبة، وسيتم تطبيق نظام حماية الطفل.</p>`
+  };
+  const sig = n === 1
+    ? `<div><div class="st">${st}</div><div>الاسم: ${esc(s.name)}</div><div>التوقيع: ....................</div></div>`
+    : `<div><div class="st">ولي الأمر</div><div>الاسم: ${esc(guardianOf(s)) || '....................'}</div><div>التوقيع: ....................</div><div>الجوال: <span dir="ltr">${esc(s.phone || phoneFor(s.cid, s.name) || '....................')}</span></div></div>`;
+  return `<article class="actf warnf">
+    <div class="ahead"><div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
+      <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
+      <div class="d"><div>اليوم: <b>${dayName(dd)}</b></div><div>التاريخ: <b>${hijriNum(dt)}</b></div><div>الموافق: <b>${dmy(dd).replace(/ /g,'')}</b></div></div></div>
+    <h1>${WARN_LV[n - 1].t} — غياب بدون عذر</h1>
+    <table class="at1"><tr><th>اسم ${g.studentDef}</th><th>الصف</th><th>العام الدراسي</th><th>الغياب بدون عذر</th></tr>
+      <tr><td>${esc(s.name)}</td><td>${s.cls ? esc(clsLabel(s.cls)) : ''}</td><td>${esc(cfg.year || '')} هـ</td><td>${lim} ${lim > 10 ? 'يومًا' : 'أيام'}</td></tr></table>
+    <div class="abody">${B[n]}</div>
+    <div class="asig3" style="grid-template-columns:1fr 1fr">${sig}
+      <div><div class="st">${g.affairs}</div><div>الاسم: ${esc(cfg.deputy || '') || '....................'}</div><div>التوقيع: ....................</div></div></div>
+    <div class="alead"><div>${f ? 'قائدة' : 'قائد'} المدرسة: <b>${esc(cfg.principal || '')}</b><br>التوقيع: ....................</div><div class="stamp">الختم</div></div>
+  </article>`;
+}
+function warnDlg(key){
+  const s = warnKeyStats(key); if(!s){ toast('لا يوجد غياب مسجّل لهذا الاسم.', 'err'); return; }
+  const w = warnRec(key), ph = s.phone || phoneFor(s.cid, s.name);
+  const rows = WARN_LV.map(L => {
+    const v = w['w' + L.n], d = v && (v.date || v), reached = s.unexc >= L.d;
+    const st = d ? `<span class="tag ok">✓ صدر ${hijriNum(d)}</span>` : reached ? '<span class="tag bad">مستحق</span>' : `<span class="tag mute">عند ${AR(L.d)} أيام</span>`;
+    const meth = L.n === 2 && reached ? `<select class="input" id="w2m" style="width:auto;min-height:34px">${W_METH.map(m => `<option ${v && v.method === m ? 'selected' : ''}>${m}</option>`).join('')}</select>${waPhone(ph) ? `<a class="btn sm wa" href="${esc(waUrl(ph, warnWaText(s)))}" target="_blank" rel="noopener">واتساب</a>` : ''}` : '';
+    return `<div class="wrow"><b>${L.t}</b>${st}<span class="grow"></span>${meth}${reached ? `<button class="btn sm" data-act="warnPv" data-n="${L.n}">معاينة</button><button class="btn sm" data-act="warnPrint" data-n="${L.n}">${ICON.print} طباعة</button>` : ''}${reached ? (d ? `<button class="btn sm" data-act="warnUndo" data-n="${L.n}">إلغاء</button>` : `<button class="btn sm primary" data-act="warnIssue" data-n="${L.n}">تم الإصدار</button>`) : ''}</div>`;
+  }).join('');
+  openDlg(`<div class="reged-h"><b>إنذارات الغياب: ${esc(s.name)}</b><span class="tag bad">بدون عذر ${AR(s.unexc)}</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b" data-key="${esc(key)}">${rows}
+      ${s.unexc >= 10 ? '<p class="hint" style="margin:10px 0 0">مع الإنذار الثالث: استدعِ ولي الأمر وحوّل الحالة للموجه.</p>' : ''}</div>
+    <div class="reged-f">${s.unexc >= 10 ? '<button class="btn" data-act="actRefer">تحويل للموجه</button>' : ''}<span class="grow"></span><button class="btn" data-act="dlgclose">إغلاق</button></div>`);
+}
+async function warnSet(key, n, val){
+  const all = Object.assign({}, state.contacts.warn3 || {}), r = Object.assign({}, all[key] || {});
+  if(val) r['w' + n] = val; else delete r['w' + n];
+  all[key] = r; state.contacts = Object.assign({}, state.contacts, {warn3: all});
+  await flSaveContacts(); warnDlg(key); render();
+}
 /* ---------- حالات الغياب: الحالة + قائمة التحقق ---------- */
 const CASE_STEPS = ['رصد الغياب وتحديد التاريخ', 'إشعار ولي الأمر وتسجيل وقت الإشعار', 'تسجيل رد ولي الأمر وسبب الغياب', 'استلام العذر ومراجعته',
   'اعتماد العذر أو تسجيل نتيجة المراجعة', 'مراجعة تكرار الغياب وعدد الأيام', 'إحالة الحالة للموجه الطلابي عند استيفاء الشروط', 'إعداد خطة علاجية عند الحاجة',
@@ -2362,7 +2452,7 @@ function stuDlg(key){
       <div class="stu-k"><div><b>${AR(s.unexc)}</b><span>بدون عذر</span></div><div><b>${AR(s.exc)}</b><span>بعذر</span></div><div><b>${AR(x.cons.length)}</b><span>تواصل</span></div><div><b>${AR(s.maxStreak)}</b><span>أطول متصل</span></div></div>
       <div class="stu-a">${wa ? `<a class="btn wa" href="${esc(waUrl(ph, s.unexc ? waActText(s) : waAbsentText(cid, name, 'بدون')))}" target="_blank" rel="noopener">واتساب ولي الأمر</a><a class="btn" href="tel:${esc(ph)}">اتصال ${esc(ph)}</a>` : '<span class="tag mute">لا يوجد رقم جوال — استورد كشف الطلاب من نور</span>'}
         ${s.reached.length ? `<button class="btn" data-act="actRec">تسجيل الإجراء</button><button class="btn" data-act="actPrint">${ICON.print} طباعة النموذج</button>` : ''}
-        <button class="btn" data-act="actRefer">تحويل للموجه</button><button class="btn" data-act="stuCase">الحالة (${AR(x.n)}/${AR(CASE_STEPS.length)})</button></div>
+        ${s.unexc >= 3 ? `<button class="btn ${warnDue(s).length ? 'danger-o' : ''}" data-act="warnOpen">الإنذارات${warnDue(s).length ? ' — ' + esc(warnDue(s).map(L => L.t).join('، ')) + ' مستحق' : ''}</button>` : ''}<button class="btn" data-act="actRefer">تحويل للموجه</button><button class="btn" data-act="stuCase">الحالة (${AR(x.n)}/${AR(CASE_STEPS.length)})</button></div>
       ${lv || rf ? `<div class="acard-t" style="margin:4px 0 10px"><span class="tag ${x.status === 'مغلقة' ? 'ok' : x.status === 'قيد المتابعة' ? 'warn' : 'bad'}">${x.status}</span>${lv}${rf}</div>` : ''}
       <div style="overflow-x:auto"><table class="regt stu-t"><thead><tr><th>اليوم</th><th>الغياب</th><th>التواصل</th><th>المساءلة</th></tr></thead><tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">لا يوجد غياب مسجّل</td></tr>'}</tbody></table></div>
     </div>`);
@@ -2501,7 +2591,7 @@ function counselView(){
       <div class="acard-n"><span>${dayName(parse(r.date))} ${hijriNum(r.date)}</span>${r.subject ? `<span>المادة: <b>${esc(r.subject)}</b></span>` : ''}${r.period ? `<span>الحصة ${esc(r.period)}</span>` : ''}</div>
       <div class="acard-t">${rs}</div>
       <div class="acard-t"><span class="tag ${st.c}">${esc(st.t)}</span>${st.k === 'closed' && !r.depSeen ? '<span class="tag ok">إفادة جديدة للوكيل</span>' : ''}${r.teacher ? `<span class="tag mute">${esc(r.teacher)}</span>` : ''}</div>
-      <div class="acard-f"><button class="btn sm" data-act="refOpen">فتح وتحديث</button><button class="btn sm" data-act="refView">معاينة النموذج</button><button class="btn sm" data-act="refPrint">${ICON.print} طباعة</button>${waPhone(phoneFor(r.cid, r.name)) ? `<a class="btn sm wa" href="${esc(waUrl(phoneFor(r.cid, r.name), waRefText(r)))}" target="_blank" rel="noopener">واتساب</a>` : `<span class="tag mute">بلا جوال</span>`}</div>
+      <div class="acard-f"><button class="btn sm" data-act="refOpen">فتح وتحديث</button>${r.coun && r.coun.call && r.coun.call.on ? `<button class="btn sm" data-act="refCall">${ICON.print} الاستدعاء</button>` : ''}<button class="btn sm" data-act="refView">معاينة النموذج</button><button class="btn sm" data-act="refPrint">${ICON.print} طباعة</button>${waPhone(phoneFor(r.cid, r.name)) ? `<a class="btn sm wa" href="${esc(waUrl(phoneFor(r.cid, r.name), waRefText(r)))}" target="_blank" rel="noopener">واتساب</a>` : `<span class="tag mute">بلا جوال</span>`}</div>
     </div>`;
   }).join('');
   return `${periodBar()}<div class="bar">
@@ -2523,7 +2613,7 @@ function openRef(r){
   const g = G(), list = classes(); if(!list.length){ toast('أضف الفصول أولًا.','err'); return; }
   const isNew = !r || !r.id || !state.refs[r.id];
   r = Object.assign({id:'', date:today, cid:list[0].id, name:'', subject:'', period:'', reasons:[], other:'', problem:'', teacher:'', dep:{text:'', refer:false, by:state.cfg.deputy || '', date:today}, coun:{text:'', by:state.cfg.counselor || '', date:''}}, clone(r || {}));
-  state.refEdit = r;
+  state.refEdit = r; const cl = r.coun.call || {};
   openDlg(`<div class="reged-h"><b>${isNew ? 'تحويل جديد' : 'تحويل: ' + esc(r.name)}</b><span class="tag mute">نموذج 31</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
     <div class="dlg-b rform">
       <div class="rsec"><div class="rsec-h">بيانات التحويل <small>يعبّئها ${g.teacherT} بعد انتهاء الحصة</small></div>
@@ -2549,9 +2639,17 @@ function openRef(r){
       <div class="rsec"><div class="rsec-h">ما تم حيال ${g.studentDef} <small>خاص بـ${g.counselor}</small></div>
         <label class="f"><textarea class="input" id="rfCounText" rows="3">${esc(r.coun.text)}</textarea></label>
         <div class="fields" style="margin-top:10px"><label class="f">اسم ${g.counselor}<input class="input" id="rfCounBy" value="${esc(r.coun.by)}"></label><label class="f">التاريخ<input class="input" id="rfCounDate" type="date" value="${esc(r.coun.date || '')}"></label></div>
+        <label class="chk" style="margin:12px 0 6px"><input type="checkbox" id="rfCall" ${cl.on ? 'checked' : ''}> استدعاء ولي الأمر</label>
+        <div class="fields" id="rfCallBox" ${cl.on ? '' : 'hidden'}>
+          <label class="f">موعد الحضور<input class="input" id="rfCallDate" type="date" value="${esc(cl.date || '')}"></label>
+          <label class="f">الساعة<input class="input" id="rfCallTime" type="time" value="${esc(cl.time || '09:00')}"></label>
+          <label class="f">هاتف المدرسة<input class="input" id="rfCallPhone" dir="ltr" value="${esc(cl.phone || state.cfg.schoolPhone || '')}"></label>
+          <label class="chk" style="align-self:end;min-height:38px"><input type="checkbox" id="rfCallDone" ${cl.done ? 'checked' : ''}> حضر ولي الأمر وعولجت المشكلة</label>
+        </div>
+        <p class="hint" id="rfCallHint" style="margin:6px 0 0" ${cl.on && !cl.done ? '' : 'hidden'}>يبقى التحويل «قيد المعالجة» حتى يحضر ولي الأمر وتُعالج المشكلة.</p>
       </div>
     </div>
-    <div class="reged-f">${isNew ? '' : `<button class="btn danger" data-act="refDel">حذف</button>`}<span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn" data-act="refPreview">معاينة</button><button class="btn primary" data-act="refSave">حفظ</button></div>`);
+    <div class="reged-f">${isNew ? '' : `<button class="btn danger" data-act="refDel">حذف</button>`}<span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn" data-act="refCallPv" id="rfCallBtn" ${cl.on ? '' : 'hidden'}>${ICON.print} طباعة الاستدعاء</button><button class="btn" data-act="refPreview">معاينة</button><button class="btn primary" data-act="refSave">حفظ</button></div>`);
   $('#dlgBg .modal').classList.add('dlg-wide');
 }
 function readRef(){
@@ -2560,7 +2658,10 @@ function readRef(){
   r.reasons = [...document.querySelectorAll('#dlgBg [data-rsn]')].filter(x => x.checked).map(x => x.dataset.rsn);
   if(r.other && !r.reasons.includes('أخرى')) r.reasons.push('أخرى');
   r.dep = {text:v('rfDepText').trim(), refer:$('#rfRefer').checked, by:v('rfDepBy').trim(), date:v('rfDepDate')};
-  r.coun = {text:v('rfCounText').trim(), by:v('rfCounBy').trim(), date:v('rfCounDate') || (v('rfCounText').trim() ? today : '')};
+  const oc = ((state.refEdit || {}).coun || {}).call || {};
+  r.coun = {text:v('rfCounText').trim(), by:v('rfCounBy').trim(), date:v('rfCounDate') || (v('rfCounText').trim() ? today : ''),
+    call: $('#rfCall') && $('#rfCall').checked ? {on:true, date:v('rfCallDate'), time:v('rfCallTime'), phone:v('rfCallPhone').trim(), done:$('#rfCallDone').checked, at: oc.at || today} : null};
+  if(r.coun.call && r.coun.call.phone && r.coun.call.phone !== state.cfg.schoolPhone) state.cfg.schoolPhone = r.coun.call.phone;
   if(!r.id) r.id = 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   if(!r.createdAt) r.createdAt = new Date().toISOString();
   return r;
@@ -2596,6 +2697,28 @@ function refFormHTML(r){
       <div class="rsl"><span><b>${g.counselor}:</b> ${esc((r.coun && r.coun.by) || '')}</span><span><b>التوقيع:</b> ............</span><span><b>التاريخ:</b> ${hd(r.coun && r.coun.text ? r.coun.date : '')}</span></div>
       <div class="rnotes"><b>ملاحظات:</b><ol>${notes.map(n => `<li>${n}</li>`).join('')}</ol></div>
     </div>
+  </article>`;
+}
+function callFormHTML(r){
+  const cfg = state.cfg, g = G(), f = g.f, c = cfg.classes.find(x => x.id === r.cid), logo = logoSrc(), cl = (r.coun && r.coun.call) || {};
+  const issue = cl.at || today, cd = cl.date ? parse(cl.date) : null;
+  const tm = (cl.time || '09:00').split(':'), hh = +tm[0], t12 = `${String(hh % 12 || 12).padStart(2, '0')}:${tm[1] || '00'}`, ap = hh < 12 ? 'صباحًا' : 'مساءً';
+  const son = f ? 'ابنتكم' : 'ابنكم', st = f ? 'الطالبة' : 'الطالب';
+  return `<article class="refm callf">
+    <div class="ahead"><div class="r">المملكة العربية السعودية<br>وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
+      <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
+      <div class="d"><div>الرقم: ........</div><div>التاريخ: <b>${hijriNum(issue)}</b></div><div>المشفوعات: استدعاء ولي أمر</div></div></div>
+    <div class="cf-no">نموذج رقم (4)</div>
+    <h1 class="cf-t">خطاب استدعاء ولي الأمر</h1>
+    <table class="cf-tb"><tr><th>المدرسة</th><td>${esc(cfg.school)}</td><th>اليوم</th><td>${dayName(parse(issue))}</td><th>التاريخ</th><td>${hijriNum(issue)}</td></tr></table>
+    <p class="cf-to"><b>المكرم ولي أمر ${st}:</b> ${esc(r.name)} <span style="margin-inline-start:30px"><b>بالصف:</b> ${c ? esc(clsLabel(c)) : ''}</span></p>
+    <p>السلام عليكم ورحمة الله وبركاته .. وبعد</p>
+    <p class="cf-p">سعيًا من المدرسة للأخذ بيد ${st} لبر الأمان ومساعدت${g.his} للتغلب على مشاكل${g.his} والصعوبات التي تواجه${g.his}، ونظرًا لأهمية التعاون والتنسيق بين المدرسة والمنزل، ولاطلاع ولي أمر ${st} على ما يستجد في جانب السلوك والمواظبة ل${son} وفيما يخدم مصلحت${g.his} ويحقق ل${g.his} النجاح.</p>
+    <p class="cf-p"><b>يرجى</b> منكم التكرم بالحضور إلى المدرسة في يوم: <b>${cd ? dayName(cd) : '..........'}</b> الموافق <b>${cd ? hijriNum(cl.date)  : '....../....../١٤٤هـ'}</b> في تمام الساعة (<b>${t12}</b>) ${ap} لمقابلة ${g.counselor} لأمر هام يتعلق ب${son}، وفي حالة الاعتذار عن الحضور نأمل إبلاغنا بذلك بالاتصال على الهاتف (<b dir="ltr">${esc(cl.phone || '..........')}</b>).</p>
+    <p class="cf-c">شاكرين لكم حسن تعاونكم وتجاوبكم معنا لتحقيق مصلحة ${st}</p>
+    <div class="cf-sig"><div><b>${g.counselor}</b><div>الاسم: ${esc((r.coun && r.coun.by) || cfg.counselor || '')}</div><div>التوقيع: ..................</div><div>التاريخ: ${hijriNum(issue)}</div></div>
+      <div><b>${f ? 'مديرة' : 'مدير'} المدرسة</b><div>الاسم: ${esc(cfg.principal || '')}</div><div>التوقيع: ..................</div><div>التاريخ: ${hijriNum(issue)}</div></div></div>
+    <p class="cf-n"><b>ملحوظة:</b> يسلم الأصل لولي الأمر ويحتفظ بصورة منه في المدرسة بعد التوقيع.</p>
   </article>`;
 }
 function previewHTML(title, html){
@@ -3095,7 +3218,7 @@ async function downloadReport(){
   const r = state.rpt, key = r.type === 'monthly' ? r.month : r.date;
   const name = {daily:'daily', weekly:'weekly', monthly:'monthly'}[r.type];
   const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>تقرير غياب ${G().students} ${key}</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>${REPORT_CSS}body{margin:0;background:#eef1f4;padding:24px 0}.sheet{margin:0 auto}
 .pbtn{display:block;margin:0 auto 16px;font:600 15px 'IBM Plex Sans Arabic',Tahoma,sans-serif;background:#1A9BEF;color:#fff;border:0;border-radius:10px;padding:10px 26px;cursor:pointer}
 @media print{@page{size:A4;margin:10mm}body{background:#fff;padding:0}.pbtn{display:none}.sheet{box-shadow:none;width:auto;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head>
@@ -3311,6 +3434,8 @@ document.addEventListener('click', async e => {
   if(act === 'refOpen'){ openRef(state.refs[t.closest('.acard').dataset.rid]); return; }
   if(act === 'refView'){ const r = state.refs[t.closest('.acard').dataset.rid]; if(r) previewHTML('نموذج 31: ' + r.name, refFormHTML(r)); return; }
   if(act === 'refPrint'){ const r = state.refs[t.closest('.acard').dataset.rid]; if(r) printHTML(refFormHTML(r)); return; }
+  if(act === 'refCallPv'){ const r = readRef(); previewHTML('استدعاء ولي أمر: ' + (r.name || ''), callFormHTML(r)); return; }
+  if(act === 'refCall'){ const r = state.refs[t.closest('[data-rid]').dataset.rid]; if(r) previewHTML('استدعاء ولي أمر: ' + r.name, callFormHTML(r)); return; }
   if(act === 'refPreview'){ const r = readRef(); state.refEdit = r; const html = refFormHTML(r); const keep = r; previewHTML('معاينة: ' + (r.name || 'تحويل'), html); state.refBack = keep; return; }
   if(act === 'pvPrint'){ printHTML(state.pvHTML || ''); return; }
   if(act === 'refSave'){ const r = readRef(); if(!r.name){ toast('اكتب اسم ' + G().studentDef + '.','err'); return; } closeDlg(); if(await saveRef(r)){ toast('تم حفظ التحويل'); render(); } return; }
@@ -3319,18 +3444,18 @@ document.addEventListener('click', async e => {
     const id = (state.refEdit || {}).id; closeDlg(); if(id && await deleteRef(id)){ toast('تم حذف التحويل'); render(); } return;
   }
   if(act === 'actRefer'){
-    const s = studentStats().find(x => x.key === t.closest('[data-key]').dataset.key); if(!s) return;
+    const s = studentStats().find(x => x.key === keyOf(t)); if(!s) return;
     openRef({cid:s.cid, name:s.name, reasons:['أخرى'], other:'تكرر الغياب بدون عذر', teacher: state.cfg.preparer || '',
       problem: `غاب${G().f ? 'ت' : ''} ${s.unexc} ${s.unexc > 10 ? 'يومًا' : 'أيام'} بدون عذر مقبول${s.maxStreak >= 3 ? `، منها ${s.maxStreak} أيام متصلة` : ''}.\nآخر أيام الغياب: ${s.dates.slice(-5).map(k => hijriNum(k)).join('، ')}`,
       dep:{text:'تم التحويل بسبب تكرر الغياب وفق قواعد السلوك والمواظبة.', refer:true, by: state.cfg.deputy || '', date: today}});
     return;
   }
   if(t.dataset.actstage){ state.actStage = t.dataset.actstage; render(); return; }
-  if(act === 'actRec'){ openActRec(t.closest('[data-key]').dataset.key); return; }
+  if(act === 'actRec'){ openActRec(keyOf(t)); return; }
   if(act === 'actSave'){ await saveActRec(); return; }
-  if(act === 'actPrint'){ const s = studentStats().find(x => x.key === t.closest('[data-key]').dataset.key); if(s){ state.viewLv = null; printForms([s]); } return; }
+  if(act === 'actPrint'){ const s = studentStats().find(x => x.key === keyOf(t)); if(s){ state.viewLv = null; printForms([s]); } return; }
   if(t.dataset.lvsel){ const s = studentStats().find(x => x.key === state.viewList[0]); if(s) viewForms([s], 'نموذج: ' + s.name, t.dataset.lvsel); return; }
-  if(act === 'actView'){ const s = studentStats().find(x => x.key === t.closest('[data-key]').dataset.key); if(s) viewForms([s], 'نموذج: ' + s.name); return; }
+  if(act === 'actView'){ const s = studentStats().find(x => x.key === keyOf(t)); if(s) viewForms([s], 'نموذج: ' + s.name); return; }
   if(act === 'actViewDue'){ viewForms(studentStats().filter(x => x.due.length).sort((a,b) => b.unexc - a.unexc), 'النماذج المستحقة'); return; }
   if(act === 'actPrintView'){ const keys = state.viewList || []; const all = studentStats(); printForms(keys.map(k => all.find(x => x.key === k)).filter(Boolean)); return; }
   if(act === 'actPrintDue'){ state.viewLv = null;  printForms(studentStats().filter(x => x.due.length).sort((a,b) => b.unexc - a.unexc)); return; }
@@ -3393,10 +3518,13 @@ document.addEventListener('click', async e => {
   if(act === 'flType' || act === 'flCont' || act === 'flWarn'){
     const rid = t.closest('tr').dataset.rid, x = flFindRow(rid); if(!x) return;
     if(act === 'flCont'){ flContDlg(rid); return; }
-    if(act === 'flWarn'){ await flWarnPrint(rid); return; }
+    if(act === 'flWarn'){ warnDlg(x.cid + '|' + x.name); return; }
     if(await flRowUpdate(x, {type: t.dataset.v === 'بعذر' ? 'بعذر' : 'بدون'})){ toast('تم تحديث التصنيف'); render(); } return;
   }
   if(act === 'stuCase'){ caseDlg(t.closest('[data-ckey]').dataset.ckey); return; }
+  if(act === 'warnOpen'){ warnDlg(keyOf(t)); return; }
+  if(act === 'warnIssue' || act === 'warnUndo'){ const key = keyOf(t), n = +t.dataset.n; await warnSet(key, n, act === 'warnUndo' ? null : (n === 2 ? {date: today, method: ($('#w2m') || {}).value || 'رسالة نصية'} : {date: today})); toast(act === 'warnUndo' ? 'تم الإلغاء' : 'تم تسجيل الإنذار'); return; }
+  if(act === 'warnPv' || act === 'warnPrint'){ const s = warnKeyStats(keyOf(t)); if(!s) return; const n = +t.dataset.n || 1; if(act === 'warnPv') previewHTML(WARN_LV[n - 1].t + ': ' + s.name, warnFormHTML(s, n)); else printHTML(warnFormHTML(s, n)); return; }
   if(act === 'caseOpen'){ stuDlg(t.closest('.acard').dataset.ckey); return; }
   if(act === 'pbToggle'){ state.pbOpen = !state.pbOpen; render(); return; }
   if(act === 'csGo'){ e.preventDefault(); caseGo(+t.dataset.i); return; }
@@ -3501,6 +3629,7 @@ document.addEventListener('change', async e => {
 });
 document.addEventListener('input', e => {
   const inp = e.target;
+  if(inp.id === 'rfCall' || inp.id === 'rfCallDone'){ const on = $('#rfCall').checked, dn = $('#rfCallDone').checked; $('#rfCallBox').hidden = !on; $('#rfCallBtn').hidden = !on; $('#rfCallHint').hidden = !on || dn; return; }
   if(inp.id === 'fcR'){ delete inp.dataset.auto; return; }
   if(inp.id === 'fcE'){ const v = inp.value === 'مقبول' ? 'بعذر' : inp.value === 'مرفوض' ? 'بدون' : ''; if(v) document.querySelectorAll('#fcTy button').forEach(b => b.classList.toggle('on', b.dataset.fcty === v)); flContSync(); return; }
   if(inp.id === 'fcP' || inp.id === 'fcM' || inp.id === 'fcS'){ flContSync(); return; }
