@@ -413,7 +413,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 }
 .auth{ position:fixed; inset:0; z-index:300; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:16px; overflow:auto; }
-.auth[hidden]{ display:none; }
+.auth[hidden], .nav button[hidden]{ display:none !important; }
 .auth-card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px 24px; width:100%; max-width:380px; box-shadow:var(--shadow); }
 .auth-card h2{ margin:10px 0 4px; font-size:20px; } .auth-card .sub{ color:var(--muted); font-size:13px; margin-bottom:18px; }
 .auth-card .f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:var(--muted); margin-bottom:12px; }
@@ -728,7 +728,7 @@ async function sbStart(){
 function sbOfflineGate(){
   // بدون إنترنت: يُسمح بالدخول إذا كان الجهاز مسجّلًا ومفعّلًا سابقًا
   const p = lsGet('sbprof', null); let has = false; try{ has = !!localStorage.getItem('absence-sb-auth'); }catch(e){}
-  if(has && p && p.active){ sb.profile = p; sb.user = {id: p.id, email: p.email}; }
+  if(has && profOK(p)){ sb.profile = p; sb.user = {id: p.id, email: p.email}; }
   sb.booting = false; authRender();
 }
 function wipeLocal(){
@@ -739,16 +739,19 @@ async function sbLoadProfile(user){
   if(error || !data){ const c = lsGet('sbprof', null); return c && c.id === user.id ? c : (error ? null : {id:user.id, email:user.email, active:false}); }
   lsSetRaw('sbprof', JSON.stringify(data)); return data;
 }
+const profOK = p => !!p && (p.is_admin || (p.active && (!p.expires_at || new Date(p.expires_at) > new Date())));
+const authEmail = u => { u = String(u || '').trim().toLowerCase(); return u.includes('@') ? u : 'k4044s+' + u + '@gmail.com'; };
+const uName = p => (p && (p.username || p.email)) || '';
+const isAdm = () => !!(sb.profile && sb.profile.is_admin);
 function authRender(){
   const el = $('#auth'); if(!el) return;
-  const ab = document.querySelector('.nav [data-view="admin"]'); if(ab) ab.hidden = !(sb.profile && sb.profile.is_admin);
   if(sb.booting){ el.hidden = false; el.innerHTML = `<div class="auth-card"><div class="sub" style="margin:0">جارٍ التحقق…</div></div>`; return; }
-  if(sb.user && sb.profile && sb.profile.active){ el.hidden = true; el.innerHTML = ''; return; }
+  if(sb.user && profOK(sb.profile)){ el.hidden = true; el.innerHTML = ''; return; }
   el.hidden = false;
   const brand = `<div class="brand-ic">${document.querySelector('.brand-ic') ? document.querySelector('.brand-ic').innerHTML : ''}</div>`;
   const msg = sb.msg ? `<div class="msg">${esc(sb.msg)}</div>` : '';
   if(sb.user){
-    el.innerHTML = `<div class="auth-card">${brand}<h2>الحساب بانتظار التفعيل</h2><div class="sub">أُنشئ حسابك <b dir="ltr">${esc(sb.user.email || '')}</b>، وسيعمل بعد أن يفعّله مدير النظام.</div>
+    el.innerHTML = `<div class="auth-card">${brand}${sb.profile && sb.profile.active && sb.profile.expires_at ? `<h2>انتهى الاشتراك</h2><div class="sub">انتهى اشتراك حسابك <b dir="ltr">${esc(uName(sb.profile) || sb.user.email || '')}</b> بتاريخ ${AR(dmy(new Date(sb.profile.expires_at)))}. تواصل مع مدير النظام لتجديده. بياناتك محفوظة.</div>` : `<h2>الحساب بانتظار التفعيل</h2><div class="sub">أُنشئ حسابك <b dir="ltr">${esc(uName(sb.profile) || sb.user.email || '')}</b>، وسيعمل بعد أن يفعّله مدير النظام.</div>`}
       <button class="btn primary" data-act="auRecheck">تحقق مجددًا</button><div class="alt"><button data-act="sbOut">تسجيل الخروج</button></div></div>`;
     return;
   }
@@ -756,7 +759,7 @@ function authRender(){
   el.innerHTML = `<div class="auth-card">${brand}<h2>${up ? 'إنشاء حساب' : 'تسجيل الدخول'}</h2><div class="sub">متابعة غياب الطلاب</div>${msg}
     <form id="auForm" onsubmit="this.querySelector('.btn.primary').click();return false">
     ${up ? `<label class="f">اسم المدرسة<input class="input" id="auSchool" autocomplete="organization"></label>` : ''}
-    <label class="f">البريد الإلكتروني<input class="input" id="auEmail" type="email" dir="ltr" autocomplete="username"></label>
+    <label class="f">اسم المستخدم<input class="input" id="auEmail" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="${up ? 'أحرف إنجليزية وأرقام' : ''}"></label>
     <label class="f">كلمة المرور<input class="input" id="auPass" type="password" dir="ltr" autocomplete="${up ? 'new-password' : 'current-password'}"></label>
     <button class="btn primary" data-act="${up ? 'sbUp' : 'sbIn'}">${up ? 'إنشاء الحساب' : 'دخول'}</button></form>
     <div class="alt">${up ? 'لديك حساب؟' : 'ليس لديك حساب؟'}<button data-act="auMode">${up ? 'تسجيل الدخول' : 'إنشاء حساب'}</button></div></div>`;
@@ -767,7 +770,8 @@ async function sbOnLogin(user){
   lsSetRaw('sbuid', JSON.stringify(user.id));
   sb.user = user; sb.profile = await sbLoadProfile(user); sb.booting = false; sb.msg = '';
   authRender();
-  if(!sb.profile || !sb.profile.active){ sbSetStatus('off'); return; }
+  if(!profOK(sb.profile)){ sbSetStatus('off'); return; }
+  if(isAdm()){ state.view = 'admin'; sbSetStatus('on'); if(state.cfg) render(); return; }
   if(state.cfg) render();
   try{ sb.dirty = JSON.parse(localStorage.getItem('absence:sbdirty') || '{}'); }catch(e){ sb.dirty = {}; }
   // اللقطة الأولى = البيانات المحلية الحالية
@@ -796,17 +800,18 @@ async function sbPull(first){
   sbSetStatus(Object.keys(sb.dirty).length ? 'sync' : 'on');
 }
 async function sbLogin(signup){
-  const email = ($('#auEmail').value || '').trim(), pass = $('#auPass').value || '', school = signup ? ($('#auSchool').value || '').trim() : '';
+  const uname = ($('#auEmail').value || '').trim().toLowerCase(), email = authEmail(uname), pass = $('#auPass').value || '', school = signup ? ($('#auSchool').value || '').trim() : '';
   if(signup && !school){ toast('اكتب اسم المدرسة.','err'); return; }
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('اكتب بريدًا إلكترونيًا صحيحًا.','err'); return; }
+  if(!uname){ toast('اكتب اسم المستخدم.','err'); return; }
+  if(signup && !/^[a-z0-9][a-z0-9._-]{2,29}$/.test(uname)){ toast('اسم المستخدم: ٣ أحرف فأكثر، بالإنجليزية والأرقام فقط (ويسمح بـ . _ -).','err'); return; }
   if(pass.length < 6){ toast('كلمة المرور ٦ أحرف فأكثر.','err'); return; }
   if(!sb.client){ try{ const c = sbCfg(), lib = await sbLoadLib(); sb.client = lib.createClient(c.url, c.key, {auth:{persistSession:true, storageKey:'absence-sb-auth'}}); }catch(e){ toast('لا يوجد اتصال بالإنترنت.','err'); return; } }
-  const {data, error} = signup ? await sb.client.auth.signUp({email, password:pass, options:{data:{school}, emailRedirectTo: location.origin + location.pathname}}) : await sb.client.auth.signInWithPassword({email, password:pass});
+  const {data, error} = signup ? await sb.client.auth.signUp({email, password:pass, options:{data:{school, username: uname}, emailRedirectTo: location.origin + location.pathname}}) : await sb.client.auth.signInWithPassword({email, password:pass});
   if(error){
-    const m = /Invalid login/i.test(error.message) ? 'البريد أو كلمة المرور غير صحيحة.' : /not confirmed/i.test(error.message) ? 'أكّد بريدك أولًا من الرسالة التي وصلتك.' : /already registered/i.test(error.message) ? 'هذا البريد مسجّل مسبقًا، سجّل الدخول.' : error.message;
+    const m = /Invalid login/i.test(error.message) ? 'اسم المستخدم أو كلمة المرور غير صحيحة.' : /not confirmed/i.test(error.message) ? 'أكّد بريدك أولًا من الرسالة التي وصلتك.' : /already registered|already exists/i.test(error.message) ? 'اسم المستخدم مستخدم مسبقًا، اختر اسمًا آخر.' : error.message;
     toast(m, 'err'); return;
   }
-  if(!data.session){ sb.mode = 'in'; sb.msg = 'أُنشئ الحساب. افتح رابط التأكيد في بريدك، ثم سجّل الدخول. يعمل الحساب بعد تفعيله من مدير النظام.'; authRender(); return; }
+  if(!data.session){ sb.mode = 'in'; sb.msg = 'أُنشئ الحساب. يعمل بعد تفعيله من مدير النظام.'; authRender(); return; }
   await sbOnLogin(data.session.user);
 }
 async function sbLogout(){
@@ -820,16 +825,52 @@ async function adminLoad(){
   sb.admin = error ? {err: error.message} : (data || []);
   if(state.view === 'admin') render();
 }
+function subTag(p){
+  if(p.is_admin) return '<span class="tag ok">مدير النظام</span>';
+  if(!p.active) return '<span class="tag warn">غير مفعّل</span>';
+  if(p.expires_at && new Date(p.expires_at) <= new Date()) return '<span class="tag bad">انتهى الاشتراك</span>';
+  return '<span class="tag ok">مفعّل</span>';
+}
+function subEnd(p){
+  if(!p.expires_at) return 'بدون حد';
+  const d = new Date(p.expires_at), left = Math.ceil((d - new Date()) / 86400000);
+  return `${AR(dmy(d))}<div class="hint" style="margin:0">${left > 0 ? 'متبقٍ ' + AR(left) + ' يومًا' : 'منتهٍ'}</div>`;
+}
 function adminView(){
-  if(!sb.profile || !sb.profile.is_admin) return '';
+  if(!isAdm()) return '';
   if(!sb.admin){ adminLoad(); return `<div class="loading">جارٍ تحميل الحسابات…</div>`; }
   if(sb.admin.err) return `<div class="panel">تعذّر التحميل: ${esc(sb.admin.err)}</div>`;
-  const n = sb.admin.filter(p => p.active).length;
-  const rows = sb.admin.map(p => `<tr><td>${esc(p.school || '—')}</td><td dir="ltr" style="text-align:right">${esc(p.email || '')}</td><td>${p.created_at ? AR(dmy(new Date(p.created_at))) : ''}</td>
-    <td>${p.is_admin ? '<span class="tag ok">مدير النظام</span>' : p.active ? '<span class="tag ok">مفعّل</span>' : '<span class="tag warn">بانتظار التفعيل</span>'}</td>
-    <td>${p.id === sb.user.id ? '' : `<button class="btn ${p.active ? 'danger' : 'primary'}" data-act="adToggle" data-id="${p.id}">${p.active ? 'تعطيل' : 'تفعيل'}</button>`}</td></tr>`).join('');
-  return `<section class="panel"><div class="row-actions" style="margin-top:0"><h3 style="margin:0">الحسابات (${AR(sb.admin.length)} · المفعّل ${AR(n)})</h3><span class="grow"></span><button class="btn" data-act="adReload">تحديث</button></div>
-    <div style="overflow-x:auto;margin-top:12px"><table class="adm"><thead><tr><th>المدرسة</th><th>البريد</th><th>التسجيل</th><th>الحالة</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="5">لا توجد حسابات</td></tr>'}</tbody></table></div></section>`;
+  const list = sb.admin.filter(p => !p.is_admin), q = (sb.adQ || '').trim();
+  const shown = q ? list.filter(p => (p.school || '').includes(q) || uName(p).includes(q.toLowerCase())) : list;
+  const n = list.filter(p => profOK(p)).length, wait = list.filter(p => !p.active).length;
+  const rows = shown.map(p => `<tr><td><b>${esc(p.school || '—')}</b><div class="hint" dir="ltr" style="margin:0;text-align:right">${esc(uName(p))}</div></td>
+    <td>${p.created_at ? AR(dmy(new Date(p.created_at))) : ''}</td><td>${subEnd(p)}</td><td>${subTag(p)}</td>
+    <td><div class="row-actions" style="margin:0;gap:6px;flex-wrap:wrap">
+      <button class="btn ${p.active ? '' : 'primary'}" data-act="adToggle" data-id="${p.id}">${p.active ? 'تعطيل' : 'تفعيل'}</button>
+      <button class="btn" data-act="adSub" data-id="${p.id}">الاشتراك</button>
+      <button class="btn" data-act="adPass" data-id="${p.id}">كلمة المرور</button>
+      <button class="btn danger" data-act="adDel" data-id="${p.id}">حذف</button></div></td></tr>`).join('');
+  return `<section class="panel"><div class="row-actions" style="margin-top:0;flex-wrap:wrap"><h3 style="margin:0">حسابات المدارس</h3>
+    <span class="tag mute">${AR(list.length)} حسابًا</span><span class="tag ok">فعّال ${AR(n)}</span>${wait ? `<span class="tag warn">بانتظار التفعيل ${AR(wait)}</span>` : ''}
+    <span class="grow"></span><input class="input" id="adQ" placeholder="بحث بالمدرسة أو اسم المستخدم" value="${esc(q)}" style="max-width:220px"><button class="btn" data-act="adReload">تحديث</button></div>
+    <div style="overflow-x:auto;margin-top:12px"><table class="adm"><thead><tr><th>المدرسة</th><th>التسجيل</th><th>نهاية الاشتراك</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:var(--muted)">لا توجد حسابات مدارس بعد</td></tr>'}</tbody></table></div></section>`;
+}
+function adFind(id){ return (sb.admin || []).find(x => x.id === id); }
+function adSubDlg(p){
+  const cur = p.expires_at ? iso(new Date(p.expires_at)) : '';
+  const b = (m, l) => `<button class="btn" data-act="adSubSet" data-id="${p.id}" data-m="${m}">${l}</button>`;
+  openDlg(`<div class="reged-h"><b>اشتراك ${esc(p.school || uName(p))}</b><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b"><p class="hint" style="margin-top:0">نهاية الاشتراك الحالية: ${p.expires_at ? AR(dmy(new Date(p.expires_at))) : 'بدون حد'}. تُضاف المدة من اليوم، أو من نهاية الاشتراك إن كان ما زال ساريًا. ويُفعَّل الحساب تلقائيًا.</p>
+      <div class="row-actions" style="margin:0;flex-wrap:wrap;gap:6px">${b(1,'شهر')}${b(3,'٣ أشهر')}${b(6,'٦ أشهر')}${b(12,'سنة')}${b(0,'بدون حد')}</div>
+      <label class="f" style="margin-top:14px">أو حدّد تاريخ النهاية<input class="input" type="date" id="adDate" value="${cur}"></label></div>
+    <div class="reged-f"><span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn primary" data-act="adSubSet" data-id="${p.id}" data-m="date">حفظ التاريخ</button></div>`);
+}
+function adPassDlg(p){
+  openDlg(`<div class="reged-h"><b>إعادة تعيين كلمة المرور</b><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b"><p class="hint" style="margin-top:0">حساب <b dir="ltr">${esc(uName(p))}</b>. اكتب كلمة مرور جديدة (٦ أحرف فأكثر) ثم أرسلها لصاحب الحساب.</p>
+      <label class="f">كلمة المرور الجديدة<input class="input" id="adPw" dir="ltr" autocomplete="new-password"></label></div>
+    <div class="reged-f"><span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn primary" data-act="adPassSave" data-id="${p.id}">حفظ</button></div>`);
 }
 function sbStatusHTML(){
   const m = {on:['ok', 'متصل ومتزامن' + (sb.last ? ' · آخر رفع ' + sb.last : '')], sync:['warn', 'جارٍ المزامنة…'], offline:['warn', 'لا يوجد إنترنت · الرصد محفوظ على الجهاز وسيُرفع عند الاتصال'], error:['bad', 'خطأ: ' + esc(sb.err)], off:['mute', 'غير مربوط']}[sb.status] || ['mute', 'غير مربوط'];
@@ -972,7 +1013,7 @@ function loadDraft(){
 function onData(){
   if(!state.ready.cfg || !state.ready.days) return;
   if(!isDirty()) loadDraft();
-  $('#schoolName').textContent = state.cfg.school || '';
+  $('#schoolName').textContent = isAdm() ? 'لوحة مدير النظام' : (state.cfg.school || '');
   const ae = document.activeElement;
   if(state.view === 'entry' && ae && ae.closest && ae.closest('.tile')) { updateTally(); return; }
   if(state.view === 'settings' && ae && ae.closest && ae.closest('.panel') && ae.tagName === 'INPUT') return;
@@ -1115,12 +1156,13 @@ function bannerHTML(){
 }
 function render(){
   if(!state.cfg) return;
-  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.view === state.view));
-  $('#schoolName').textContent = state.cfg.school || '';
+  const adm = isAdm(); if(adm) state.view = 'admin'; else if(state.view === 'admin') state.view = 'entry';
+  document.querySelectorAll('.nav button').forEach(b => { b.classList.toggle('on', b.dataset.view === state.view); b.hidden = adm ? b.dataset.view !== 'admin' : b.dataset.view === 'admin'; });
+  $('#schoolName').textContent = adm ? 'لوحة مدير النظام' : (state.cfg.school || '');
   $('#appName').textContent = document.title = 'متابعة غياب ' + G().students;
   const sy = $('#sync'); sy.textContent = sb.user ? sbSyncLabel() : (isStandalone() ? 'تطبيق مثبّت · حفظ على الجهاز' : 'حفظ على الجهاز'); sy.className = 'sync' + (state.mode === 'db' ? '' : ' local');
-  $('#railNote').innerHTML = railNote();
-  $('#banner').innerHTML = bannerHTML();
+  $('#railNote').innerHTML = adm ? `مسجّل باسم <b dir="ltr">${esc(uName(sb.profile) || sb.user.email || '')}</b><button class="btn" style="margin-top:8px;width:100%" data-act="sbOut">تسجيل الخروج</button>` : railNote();
+  $('#banner').innerHTML = adm ? '' : bannerHTML();
   const d = parse(state.entryDate);
   const head = {
     entry: ['رصد الغياب اليومي', `${dayName(d)} ${AR(dmy(d))} · ${AR(classes().length)} فصلًا · ${arN(totalStudents())} ${G().nStudents}`],
@@ -2727,8 +2769,35 @@ document.addEventListener('click', async e => {
   if(act === 'install'){ if(installEvt){ installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if(r && r.outcome === 'accepted') toast('جارٍ التثبيت…'); render(); } return; }
   if(act === 'sbIn' || act === 'sbUp'){ t.disabled = true; await sbLogin(act === 'sbUp'); if(t.isConnected) t.disabled = false; return; }
   if(act === 'auMode'){ sb.mode = sb.mode === 'up' ? 'in' : 'up'; sb.msg = ''; authRender(); return; }
-  if(act === 'auRecheck'){ t.disabled = true; sb.profile = await sbLoadProfile(sb.user); if(sb.profile && sb.profile.active){ await sbOnLogin(sb.user); } else { toast('لم يُفعَّل الحساب بعد.','err'); if(t.isConnected) t.disabled = false; } return; }
+  if(act === 'auRecheck'){ t.disabled = true; sb.profile = await sbLoadProfile(sb.user); if(profOK(sb.profile)){ await sbOnLogin(sb.user); } else { toast('لم يُفعَّل الحساب بعد.','err'); if(t.isConnected) t.disabled = false; } return; }
   if(act === 'adReload'){ sb.admin = null; render(); return; }
+  if(act === 'adSub'){ const p = adFind(t.dataset.id); if(p) adSubDlg(p); return; }
+  if(act === 'adPass'){ const p = adFind(t.dataset.id); if(p) adPassDlg(p); return; }
+  if(act === 'adSubSet'){
+    const p = adFind(t.dataset.id); if(!p) return; const m = t.dataset.m; let exp = null;
+    if(m === 'date'){ const v = $('#adDate').value; if(!v){ toast('اختر التاريخ.','err'); return; } exp = new Date(v + 'T23:59:59').toISOString(); }
+    else if(+m){ const base = p.expires_at && new Date(p.expires_at) > new Date() ? new Date(p.expires_at) : new Date(); base.setMonth(base.getMonth() + +m); exp = base.toISOString(); }
+    t.disabled = true;
+    const upd = {expires_at: exp, active: true};
+    const {error} = await sb.client.from('profiles').update(upd).eq('id', p.id);
+    if(error){ toast('تعذّر الحفظ: ' + error.message, 'err'); t.disabled = false; return; }
+    Object.assign(p, upd); closeDlg(); toast(exp ? 'ينتهي الاشتراك في ' + AR(dmy(new Date(exp))) : 'اشتراك بدون حد'); render(); return;
+  }
+  if(act === 'adPassSave'){
+    const pw = ($('#adPw').value || '').trim(); if(pw.length < 6){ toast('كلمة المرور ٦ أحرف فأكثر.','err'); return; }
+    t.disabled = true;
+    const {error} = await sb.client.rpc('admin_set_password', {uid: t.dataset.id, pw});
+    if(error){ toast('تعذّر التغيير: ' + error.message, 'err'); t.disabled = false; return; }
+    closeDlg(); toast('تم تغيير كلمة المرور'); return;
+  }
+  if(act === 'adDel'){
+    const p = adFind(t.dataset.id); if(!p) return;
+    if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد الحذف'; setTimeout(() => { if(t.isConnected){ t.classList.remove('armed'); t.textContent = 'حذف'; } }, 4000); return; }
+    t.disabled = true;
+    const {error} = await sb.client.rpc('admin_delete_user', {uid: p.id});
+    if(error){ toast('تعذّر الحذف: ' + error.message, 'err'); t.disabled = false; return; }
+    sb.admin = sb.admin.filter(x => x.id !== p.id); toast('تم حذف الحساب وبياناته'); render(); return;
+  }
   if(act === 'adToggle'){
     const p = (sb.admin || []).find(x => x.id === t.dataset.id); if(!p) return;
     t.disabled = true;
@@ -2779,6 +2848,7 @@ document.addEventListener('mousedown', e => { if(e.target && e.target.id === 'mo
 document.querySelector('.overlay').addEventListener('click', () => $('#shell').classList.remove('open'));
 document.addEventListener('input', e => {
   const inp = e.target;
+  if(inp.id === 'adQ'){ sb.adQ = inp.value; const pos = inp.selectionStart; render(); const n = $('#adQ'); if(n){ n.focus(); n.setSelectionRange(pos, pos); } return; }
   if(inp.id === 'refQ'){ state.refQ = inp.value; const q = normAr(inp.value); document.querySelectorAll('.acard[data-rid]').forEach(el => { el.style.display = !q || normAr(el.querySelector('.acard-h b').textContent).includes(q) ? '' : 'none'; }); return; }
   if(inp.id === 'rq'){ state.rq = inp.value; applyRq(); return; }
   if(inp.id === 'actQ'){ state.actQ = inp.value; const q = normAr(inp.value); document.querySelectorAll('.acard').forEach(el => { el.style.display = !q || normAr(el.querySelector('.acard-h b').textContent).includes(q) ? '' : 'none'; }); return; }
