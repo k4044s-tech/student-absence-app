@@ -423,6 +423,31 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 .adm td,.adm th{ padding:8px 10px; border-bottom:1px solid var(--border); text-align:right; font-size:13px; } .adm{ width:100%; border-collapse:collapse; }
 @media print{ .auth{ display:none !important; } }
 .topbar .tb-out{ display:none; background:none; border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:13px; color:var(--muted); }
+.fl-t{ min-width:720px; } .fl-t th,.fl-t td{ padding:9px 10px; text-align:center; border-bottom:1px solid var(--border); } .fl-t th{ background:var(--accent-soft); font-weight:600; position:sticky; top:0; }
+.fl-t td.nm{ text-align:right; font-weight:500; } .fl-t .sub{ font-size:12px; color:var(--muted); font-weight:400; }
+.fl-d td{ vertical-align:middle; } .fl-d .input{ min-height:36px; min-width:130px; } .fl-d tr.fl-pend td{ background:var(--warn-soft); }
+.fl-d .seg button{ padding:6px 10px; } .btn.danger-o{ color:var(--bad); border-color:var(--bad-line); } .btn.fl-ok{ color:var(--good); border-color:var(--good-line); background:var(--good-soft); }
+.fc-seg{ display:flex; min-height:38px; } .fc-seg button{ flex:1; font-size:13.5px; }
+.fc-proof{ font-size:13px; background:var(--accent-soft); border-radius:8px; padding:8px 12px; color:var(--ink); }
+.cprog{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--muted); margin:8px 0; } .cprog-b{ flex:1; height:7px; background:var(--accent-soft); border-radius:9px; overflow:hidden; } .cprog-b i{ display:block; height:100%; background:var(--good); border-radius:9px; }
+.csteps{ display:grid; gap:6px; } .cstep{ display:flex; align-items:center; gap:10px; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; cursor:pointer; }
+.cstep.on{ background:var(--good-soft); border-color:var(--good-line); } .cstep small{ margin-inline-start:auto; font-size:11.5px; color:var(--muted); background:var(--accent-soft); padding:2px 8px; border-radius:99px; } .cstep input{ width:18px; height:18px; } .cs-go{ margin-inline-start:8px; } .cstep small + .cs-go{ margin-inline-start:8px; } .cstep:not(:has(small)) .cs-go{ margin-inline-start:auto; }
+.pbar{ flex-direction:column; align-items:stretch; gap:12px; } .pbar-r{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px; } .pbar-r .f{ display:flex; flex-direction:column; gap:4px; font-size:12.5px; color:var(--muted); }
+.pbar-c{ border-top:1px dashed var(--border); padding-top:12px; align-items:center; } .pcur{ font-size:11px; background:rgba(255,255,255,.25); border-radius:99px; padding:1px 7px; margin-inline-start:4px; } .chip:not(.on) .pcur{ background:var(--accent-soft); }
+.nbadge{ margin-inline-start:auto; min-width:20px; padding:1px 6px; border-radius:99px; font-size:11.5px; font-weight:700; text-align:center; color:#fff; background:var(--bad); line-height:18px; } .nbadge.ok{ background:var(--good); }
+@media (max-width:860px){ .nav button{ position:relative; } .nav .nbadge{ position:absolute; top:2px; inset-inline-end:calc(50% - 22px); margin:0; font-size:10.5px; min-width:18px; padding:0 5px; } }
+.banner.ok-b{ background:var(--good-soft); border-color:var(--good-line); color:var(--ink); }
+.phead{ display:flex; align-items:flex-start; gap:12px; } .phead > div:first-child{ flex:1; min-width:0; }
+.ib-btn{ position:relative; display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--ink); flex:none; }
+.ib-btn.has{ border-color:var(--bad-line); } .ib-n:empty{ display:none; } .ib-n{ position:absolute; top:-7px; inset-inline-start:-7px; min-width:20px; height:20px; padding:0 6px; border-radius:99px; background:var(--bad); color:#fff; font-size:11.5px; font-weight:700; line-height:20px; text-align:center; }
+.topbar .ib-btn{ width:36px; height:36px; }
+.ib-panel{ position:fixed; z-index:90; width:min(360px, calc(100vw - 16px)); max-height:70vh; overflow:auto; background:var(--card); border:1px solid var(--border); border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,.16); padding:6px; }
+.ib-h{ display:flex; align-items:center; gap:8px; padding:8px 10px; } .ib-it{ display:flex; gap:10px; width:100%; text-align:right; background:none; border:0; border-top:1px solid var(--border); padding:10px; border-radius:8px; }
+.ib-it:hover{ background:var(--accent-soft); } .ib-it small{ display:block; color:var(--muted); font-size:12.5px; } .ib-ic{ font-size:18px; } .ib-empty{ padding:18px; text-align:center; color:var(--muted); }
+@media screen and (max-width:860px){ .phead .ib-btn{ display:none; } }
+@media screen and (min-width:861px){ .topbar .ib-btn{ display:none; } }
+.tg-ok{ color:var(--good); font-weight:600; } .tg-bad{ color:var(--bad); font-weight:600; }
+.fl-tabs button{ white-space:nowrap; }
 /* الجوال: القائمة الجانبية تصبح شريط تنقّل سفلي */
 @media screen and (max-width:860px){
   .topbar .hamburger, .overlay{ display:none !important; }
@@ -453,6 +478,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 <div class="topbar no-print">
   <button class="hamburger" data-act="menu" aria-label="فتح القائمة"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
   <div class="tb-title" id="tbTitle">متابعة الغياب</div>
+  <button type="button" class="ib-btn" data-act="ibOpen" aria-label="صندوق الرسائل"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><span class="ib-n"></span></button>
   <button class="tb-out" data-act="sbOut">خروج</button>
 </div>
 <div class="shell" id="shell">
@@ -466,6 +492,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
       <button type="button" data-view="entry" class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>رصد الغياب</span></button>
       <button type="button" data-view="reports"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5M8 13h8M8 17h5"/></svg><span>التقارير</span></button>
       <button type="button" data-view="actions"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>إجراءات الغياب</span></button>
+      <button type="button" data-view="follow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg><span>سجل المتابعة</span></button>
       <button type="button" data-view="counsel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6M19 8v6"/></svg><span>الإرشاد الطلابي</span></button>
       <button type="button" data-view="settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الفصول والإعدادات</span></button>
       <button type="button" data-view="admin" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>إدارة الحسابات</span></button>
@@ -477,7 +504,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   </aside>
   <main class="main"><div class="inner">
     <header class="phead">
-      <div><div class="school" id="schoolName"></div><h1 id="pTitle">رصد الغياب اليومي</h1><div class="sub" id="pSub"></div></div>
+      <div><div class="school" id="schoolName"></div><h1 id="pTitle">رصد الغياب اليومي</h1><div class="sub" id="pSub"></div></div><button type="button" class="ib-btn" data-act="ibOpen" aria-label="صندوق الرسائل"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><span class="ib-n"></span></button>
     </header>
     <div id="banner"></div>
     <div id="main"><div class="loading">جارٍ تحميل البيانات…</div></div>
@@ -682,7 +709,7 @@ const DEFAULT_CFG = { schoolDays:180, actFrom:'', gender:'بنين', school:'م�
 const today = iso(new Date());
 const state = {
   cfg: null, days: {}, mode: 'local', db: null, downloads: null, ready: {cfg:false, days:false},
-  view: 'entry', entryDate: today, roster: {}, actions: {}, actStage: 'all', actQ: '', refs: {}, refSt: 'all', refQ: '', cmp: {type:'daily', red:5, min:3, unOnly:false}, noorM: {files:[], days:'', red:5, min:3, unOnly:false}, rsOpen: new Set(), rq: '', bulkType: 'بدون', draft: {}, dirty: false,
+  view: 'entry', fl: {tab:'daily', from:'', to:'', q:''}, contacts: {items:[]}, entryDate: today, roster: {}, actions: {}, actStage: 'all', actQ: '', refs: {}, refSt: 'all', refQ: '', cmp: {type:'daily', red:5, min:3, unOnly:false}, noorM: {files:[], days:'', red:5, min:3, unOnly:false}, rsOpen: new Set(), rq: '', bulkType: 'بدون', draft: {}, dirty: false,
   rpt: { type:'daily', date: today, month: today.slice(0,7) }
 };
 
@@ -691,7 +718,7 @@ function lsSetRaw(k, v){ try{ localStorage.setItem('absence:' + k, v); }catch(e)
 function lsSet(k, v){ try{ localStorage.setItem('absence:' + k, JSON.stringify(v)); }catch(e){} sbTrack(k, v); }
 
 /* ---------- المزامنة السحابية (Supabase) ---------- */
-const SB_KINDS = ['cfg', 'days', 'roster', 'actions', 'refs', 'noorm'], SB_MULTI = {days:1, refs:1};
+const SB_KINDS = ['cfg', 'days', 'roster', 'actions', 'refs', 'noorm', 'contacts'], SB_MULTI = {days:1, refs:1};
 const sb = { client:null, user:null, ch:null, snap:{}, dirty:{}, applying:false, timer:null, status:'off', err:'', last:'', profile:null, booting:true, mode:'in', msg:'', admin:null };
 const SB_DEF = {url:'https://zgadvzvlvyhavugeguks.supabase.co', key:'sb_publishable_82JRQTuJ7XZ_HPznx_LsMQ_FjavCD88'};
 const sbCfg = () => { let c = {}; try{ c = JSON.parse(localStorage.getItem('absence:sbcfg') || '{}'); }catch(e){} return c.url && c.key ? c : SB_DEF; };
@@ -734,9 +761,10 @@ function sbApply(kind, key, data, del){
   else if(kind === 'refs'){ if(del) delete state.refs[key]; else state.refs[key] = data; }
   else if(kind === 'roster'){ state.roster = del ? {} : (data || {}); }
   else if(kind === 'actions'){ state.actions = del ? {} : (data || {}); }
+  else if(kind === 'contacts'){ state.contacts = del ? {items:[]} : (data || {items:[]}); }
   else if(kind === 'noorm'){ state.noorM = Object.assign({files:[], days:'', red:5, min:3, unOnly:false}, del ? {} : data); }
   sb.applying = true;
-  const map = {cfg: state.cfg, days: state.days, refs: state.refs, roster: state.roster, actions: state.actions, noorm: state.noorM};
+  const map = {cfg: state.cfg, days: state.days, refs: state.refs, roster: state.roster, actions: state.actions, noorm: state.noorM, contacts: state.contacts};
   lsSet(kind, map[kind]);
   sb.applying = false;
 }
@@ -799,7 +827,7 @@ async function sbOnLogin(user){
   if(state.cfg) render();
   try{ sb.dirty = JSON.parse(localStorage.getItem('absence:sbdirty') || '{}'); }catch(e){ sb.dirty = {}; }
   // اللقطة الأولى = البيانات المحلية الحالية
-  SB_KINDS.forEach(k => { const v = {cfg: state.cfg, days: state.days, refs: state.refs, roster: state.roster, actions: state.actions, noorm: state.noorM}[k]; sbRowsOf(k, v).forEach(([key, d]) => { sb.snap[k + '|' + key] = JSON.stringify(d); }); });
+  SB_KINDS.forEach(k => { const v = {cfg: state.cfg, days: state.days, refs: state.refs, roster: state.roster, actions: state.actions, noorm: state.noorM, contacts: state.contacts}[k]; sbRowsOf(k, v).forEach(([key, d]) => { sb.snap[k + '|' + key] = JSON.stringify(d); }); });
   await sbPull(true);
   if(sb.ch) sb.client.removeChannel(sb.ch);
   sb.ch = sb.client.channel('absence-' + user.id)
@@ -968,6 +996,7 @@ function useLocal(){
   state.actions = lsGet('actions', {});
   state.refs = lsGet('refs', {});
   state.noorM = Object.assign({files:[], days:'', red:5, min:3, unOnly:false}, lsGet('noorm', {}));
+  state.contacts = lsGet('contacts', {items:[]});
   state.ready = {cfg:true, days:true};
   onData();
   sbStart();
@@ -998,7 +1027,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v37';
+const APP_VER = 'absence-v54';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -1188,7 +1217,8 @@ function render(){
   $('#appName').textContent = document.title = 'متابعة غياب ' + G().students;
   const sy = $('#sync'); sy.textContent = sb.user ? sbSyncLabel() : (isStandalone() ? 'تطبيق مثبّت · حفظ على الجهاز' : 'حفظ على الجهاز'); sy.className = 'sync' + (state.mode === 'db' ? '' : ' local');
   $('#railNote').innerHTML = adm ? `مسجّل باسم <b dir="ltr">${esc(uName(sb.profile) || sb.user.email || '')}</b><button class="btn" style="margin-top:8px;width:100%" data-act="sbOut">تسجيل الخروج</button>` : railNote();
-  $('#banner').innerHTML = adm ? '' : bannerHTML();
+  $('#banner').innerHTML = adm ? '' : (bannerHTML());
+  navBadges(); inboxRender();
   const d = parse(state.entryDate);
   const head = {
     entry: ['رصد الغياب اليومي', `${dayName(d)} ${AR(dmy(d))} · ${AR(classes().length)} فصلًا · ${arN(totalStudents())} ${G().nStudents}`],
@@ -1196,12 +1226,13 @@ function render(){
     counsel: ['الإرشاد الطلابي', 'تحويل ' + G().students + ' لوكيل شؤون ' + G().students + ' والموجه الطلابي (نموذج 31)'],
     actions: ['إجراءات الغياب', 'متابعة المواظبة وتطبيق إجراءات الغياب بدون عذر'],
     settings: ['الفصول والإعدادات', 'تُضبط مرة واحدة وتُستخدم في الرصد والتقارير'],
+    follow: ['سجل متابعة الغياب', 'الغياب اليومي والتواصل مع أولياء الأمور والإجراءات والملخص الإحصائي'],
     admin: ['إدارة الحسابات', 'تفعيل حسابات المدارس أو تعطيلها']
   }[state.view];
   $('#pTitle').textContent = head[0]; $('#pSub').textContent = head[1]; $('#tbTitle').textContent = head[0];
   $('#shell').classList.remove('open');
   const m = $('#main');
-  m.innerHTML = `<div class="view">${({entry:entryView, reports:reportsView, actions:actionsView, counsel:counselView, settings:settingsView, admin:adminView})[state.view]()}</div>`;
+  m.innerHTML = `<div class="view">${({entry:entryView, reports:reportsView, actions:actionsView, counsel:counselView, settings:settingsView, admin:adminView, follow:followView})[state.view]()}</div>`;
   if(state.view === 'entry') updateTally();
 }
 
@@ -1334,6 +1365,49 @@ function noorNormGrade(t){
   const stage = /متوسط/.test(s) ? 'متوسط' : (/ابتدائ/.test(s) ? 'ابتدائي' : null);
   return g >= 0 && stage ? {grade: NOOR_GRADES[g], stage} : null;
 }
+/* كشف الطلاب (نور ← التقارير ← كشف الطلاب): الاسم ورقم جوال الطالب */
+function noorPhone(d){ d = String(d || '').replace(/\D/g, ''); if(d.startsWith('966')) d = '0' + d.slice(3); else if(d.length === 9 && d[0] === '5') d = '0' + d; return d; }
+function noorInfoParse(pages){
+  const map = new Map(); let female = null, found = false;
+  pages.forEach(items => {
+    const its = items.map(i => ({...i, w: i.w || 0, t: noorDecode(i.str)})).filter(i => i.t);
+    const hPh = its.find(i => /^رقم جوال$/.test(i.t)), hNm = its.find(i => /^اسم الطالب(ة)?$/.test(i.t));
+    if(!hPh || !hNm) return;
+    found = true;
+    if(/الطالبة/.test(hNm.t)) female = true; else if(female === null) female = false;
+    const hdrY = Math.min(hPh.y, hNm.y);
+    const hdrs = its.filter(i => Math.abs(i.y - hNm.y) < 12 && i !== hNm && i.x < hNm.x).sort((a, b) => b.x - a.x);
+    const nameLeft = hdrs.length ? hdrs[0].x + hdrs[0].w + 2 : hNm.x - 40;
+    const phHdrs = its.filter(i => Math.abs(i.y - hPh.y) < 12 && i.x > hPh.x + hPh.w).sort((a, b) => a.x - b.x);
+    const phRight = phHdrs.length ? phHdrs[0].x - 2 : hPh.x + hPh.w + 20;
+    let gr = null, sec = null;
+    const lines = [];
+    its.filter(i => i.y > hdrY + 20).forEach(i => { let L = lines.find(l => Math.abs(l.y - i.y) < 4); if(!L){ L = {y:i.y, items:[]}; lines.push(L); } L.items.push(i); });
+    lines.forEach(L => { L.items.sort((a, b) => b.x - a.x); const txt = L.items.map(i => i.t).join(' ');
+      if(!gr && /الصف/.test(txt)) gr = noorNormGrade(txt);
+      if(sec == null && /الفصل/.test(txt) && !/الدراسي/.test(txt)){ const m = txt.replace(/.*الفصل/, '').match(/\d+/); if(m) sec = +m[0]; } });
+    if(!gr || sec == null) return;
+    const key = gr.stage + '|' + gr.grade + '|' + sec;
+    if(!map.has(key)) map.set(key, {...gr, section: sec, rows: []});
+    const C = map.get(key);
+    const body = its.filter(i => i.y < hdrY - 4);
+    const ser = body.filter(i => /^\d{1,3}$/.test(i.t) && i.x > hNm.x + hNm.w).sort((a, b) => b.y - a.y);
+    if(!ser.length) return;
+    const gaps = ser.slice(1).map((n, k) => ser[k].y - n.y).filter(g => g > 2).sort((a, b) => a - b);
+    const h = gaps.length ? gaps[Math.floor(gaps.length / 2)] : 24;
+    ser.forEach((sn, k) => {
+      const top = k === 0 ? sn.y + h / 2 : (ser[k - 1].y + sn.y) / 2, bot = k === ser.length - 1 ? sn.y - h / 2 : (sn.y + ser[k + 1].y) / 2;
+      const band = body.filter(f => f.y <= top && f.y > bot).sort((a, b) => (b.y - a.y) > 2 ? 1 : (a.y - b.y) > 2 ? -1 : b.x - a.x);
+      const name = band.filter(f => f.x >= nameLeft && f.x < sn.x - 2 && /[؀-ۿ]/.test(f.t)).map(f => f.t).join(' ').replace(/\s+/g, ' ').trim();
+      const phone = noorPhone(band.filter(f => f.x + f.w <= phRight + 2 && /^\d+$/.test(f.t)).map(f => f.t).join(''));
+      const n = +sn.t;
+      if(name.split(' ').length >= 2 && !C.rows.some(r => r.n === n)) C.rows.push({n, name, phone});
+    });
+  });
+  if(!found) return null;
+  const classes = [...map.values()].map(c => { const r = c.rows.sort((a, b) => a.n - b.n); return {grade:c.grade, stage:c.stage, section:c.section, names: r.map(x => x.name), phones: r.map(x => x.phone)}; }).filter(c => c.names.length);
+  return {classes, female, phones: true};
+}
 /* pages: [[{str, x, y}]] → {classes:[{grade,stage,section,names:[]}], female:bool} */
 function noorParse(pages){
   const map = new Map(); let female = null;
@@ -1464,10 +1538,10 @@ async function noorImport(file){
     const pages = [];
     for(let i = 1; i <= doc.numPages; i++){
       const pg = await doc.getPage(i), tc = await pg.getTextContent();
-      pages.push(tc.items.filter(it => it.str && it.str.trim()).map(it => ({str: it.str, x: it.transform[4], y: it.transform[5]})));
+      pages.push(tc.items.filter(it => it.str && it.str.trim()).map(it => ({str: it.str, x: it.transform[4], y: it.transform[5], w: it.width})));
     }
-    const res = noorParse(pages);
-    if(!res.classes.length){ toast('لم أتعرّف على أسماء في هذا الملف. استخدم «كشف بأسماء الطلاب» أو «تقرير الغياب الشهري» من نور، أو «لصق أسماء فصل».','err'); return; }
+    const res = noorInfoParse(pages) || noorParse(pages);
+    if(!res.classes.length){ toast('لم أتعرّف على أسماء في هذا الملف. استخدم من نور: التقارير ← كشف الطلاب، أو «لصق أسماء فصل».','err'); return; }
     state.noorResult = res; showNoorPreview();
   }catch(e){ toast('تعذّر قراءة الملف.','err'); }
 }
@@ -1478,12 +1552,12 @@ function showNoorPreview(){
     const label = `${k.grade} ${k.stage} / ${m ? m.section : (SEC_L[k.section-1] || k.section)}`;
     return `<label class="nimp"><input type="checkbox" data-nk="${i}" checked>
       <span class="nimp-b"><b>${esc(label)}</b> <span class="tag ${m ? 'mute' : 'warn'}">${m ? `موجود · العدد الحالي ${m.count || 0}` : 'فصل جديد سيُنشأ'}</span>
-      <span class="tag ok">${k.names.length} اسمًا</span><br><small>${esc(k.names.slice(0,3).join('، '))}${k.names.length > 3 ? '…' : ''}</small></span></label>`;
+      <span class="tag ok">${k.names.length} اسمًا</span>${k.phones ? `<span class="tag mute">${k.phones.filter(Boolean).length} رقم جوال</span>` : ''}<br><small>${esc(k.names.slice(0,3).join('، '))}${k.names.length > 3 ? '…' : ''}</small></span></label>`;
   }).join('');
   const gNote = res.female !== null && res.female !== G().f ? `<label class="nimp"><input type="checkbox" id="nGender"><span class="nimp-b">الكشف بصيغة ${res.female ? 'الطالبات' : 'الطلاب'}: تحويل نوع المدرسة إلى «${res.female ? 'بنات' : 'بنين'}»</span></label>` : '';
   openDlg(`<div class="reged-h"><b>استيراد كشف نور</b><span class="tag mute">${res.classes.length} فصول</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
     <div class="dlg-b">
-      <p class="hint" style="margin:0 0 12px;color:var(--muted)">راجع الفصول المكتشفة ثم اضغط «استيراد». قائمة الفصل الموجودة مسبقًا تُستبدل بأسماء الكشف، ويبقى رقم الجوال المحفوظ لأي اسم مطابق.</p>
+      <p class="hint" style="margin:0 0 12px;color:var(--muted)">راجع الفصول المكتشفة ثم اضغط «استيراد». قائمة الفصل الموجودة مسبقًا تُستبدل بأسماء الكشف${res.phones ? '، وتُحفظ أرقام جوال ' + G().students + ' من الكشف' : '، ويبقى رقم الجوال المحفوظ لأي اسم مطابق'}.</p>
       ${rows}
       <label class="nimp"><input type="checkbox" id="nCount" checked><span class="nimp-b">تحديث عدد ${G().students} في كل فصل ليطابق الكشف</span></label>
       ${gNote}
@@ -1500,7 +1574,7 @@ async function noorApply(){
     let c = matchClass(k.stage, k.grade, k.section);
     if(!c){ c = {id:newId(), stage:k.stage, grade:k.grade, section: SEC_L[k.section-1] || String(k.section), count:k.names.length}; state.cfg.classes.push(c); }
     const old = rosterOf(c.id);
-    state.roster[c.id] = k.names.map(nm => { const o = old.find(x => normAr(x.name) === normAr(nm)); return {name:nm, phone:(o && o.phone) || ''}; });
+    state.roster[c.id] = k.names.map((nm, ki) => { const o = old.find(x => normAr(x.name) === normAr(nm)); return {name:nm, phone:((k.phones || [])[ki] || '') || (o && o.phone) || ''}; });
     if(upd) c.count = k.names.length;
     n++; names += k.names.length;
   });
@@ -1562,15 +1636,11 @@ function renderModal(keep){
   bg.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="غياب ${esc(clsLabel(c))}">
     <div class="card reged" data-cid="${esc(c.id)}">
       <div class="reged-h"><b>غياب ${esc(clsLabel(c))}</b><span class="tag mute">${dayName(d)} ${dmy(d)}</span><span class="tag mute">${G().enrolled} ${c.count || 0}</span><span class="tag warn">المرصود ${+state.draft[c.id] || 0}</span><button class="modal-x" data-act="mclose" aria-label="إغلاق">×</button></div>
-      <div class="reged-tw"><table class="regt"><thead><tr><th>#</th><th style="width:26%">اسم ${G().studentDef}</th><th>نوع الغياب</th><th>رقم الهاتف</th><th>الزمن</th><th>المجيب</th><th style="width:20%">سبب الغياب</th><th></th></tr></thead><tbody>
+      <div class="reged-tw"><table class="regt"><thead><tr><th>#</th><th style="width:26%">اسم ${G().studentDef}</th><th>نوع الغياب</th><th></th></tr></thead><tbody>
       ${rows.map((r,i) => `<tr data-i="${i}">
         <td class="n"><span class="n-l">${G().student} </span>${i+1}</td>
         <td class="f-name" data-l="اسم ${G().studentDef}"><input class="input" data-rf="name" list="nl-m" value="${esc(r.name)}" placeholder="الاسم الرباعي"></td>
         <td class="f-type" data-l="نوع الغياب"><div class="seg"><button data-act="rtype" data-v="بعذر" class="${r.type === 'بعذر' ? 'on' : ''}">بعذر</button><button data-act="rtype" data-v="بدون" class="${r.type !== 'بعذر' ? 'on' : ''}">بدون</button></div></td>
-        <td data-l="رقم الهاتف"><input class="input" data-rf="phone" type="tel" inputmode="tel" dir="ltr" value="${esc(r.phone)}" placeholder="05xxxxxxxx"></td>
-        <td data-l="الزمن"><input class="input" data-rf="time" type="time" value="${esc(r.time)}"></td>
-        <td data-l="المجيب"><input class="input" data-rf="answer" list="al-m" value="${esc(r.answer)}"></td>
-        <td data-l="سبب الغياب"><input class="input" data-rf="reason" value="${esc(r.reason)}"></td>
         <td class="f-del"><button class="btn danger" data-act="rdel" aria-label="حذف">حذف</button>${(r.name || '').trim() ? waBtn(c.id, r.name.trim(), r.phone) : ''}</td></tr>`).join('')}
       </tbody></table></div>
       <datalist id="nl-m">${[...hist.keys()].map(n => `<option value="${esc(n)}">`).join('')}</datalist>
@@ -1600,12 +1670,7 @@ function rosterModalHTML(c, rows, hist, d){
     return `<div class="rs ${on ? 'on' : ''}" data-name="${esc(st.name)}" data-q="${esc(normAr(st.name))}" ${on ? `data-i="${i}"` : ''}>
       <label class="rs-h"><input type="checkbox" data-rchk ${on ? 'checked' : ''}><span class="rs-n">${k+1}</span><span class="rs-name">${esc(st.name)}</span></label>
       ${on ? `<div class="seg"><button data-act="rtype" data-v="بعذر" class="${r.type === 'بعذر' ? 'on' : ''}">بعذر</button><button data-act="rtype" data-v="بدون" class="${r.type !== 'بعذر' ? 'on' : ''}">بدون</button></div>
-        <button class="btn sm" data-act="rdet">${open ? 'إخفاء' : 'تفاصيل'}${r.phone || r.reason ? ' •' : ''}</button>${waBtn(c.id, st.name, r.phone || phoneFor(c.id, st.name))}` : ''}
-      ${open ? `<div class="rs-d">
-        <label class="f">رقم الهاتف<input class="input" data-rf="phone" type="tel" inputmode="tel" dir="ltr" value="${esc(r.phone)}" placeholder="05xxxxxxxx"></label>
-        <label class="f">الزمن<input class="input" data-rf="time" type="time" value="${esc(r.time)}"></label>
-        <label class="f">المجيب<input class="input" data-rf="answer" list="al-m" value="${esc(r.answer)}"></label>
-        <label class="f">سبب الغياب<input class="input" data-rf="reason" value="${esc(r.reason)}"></label></div>` : ''}
+        ${waBtn(c.id, st.name, r.phone || phoneFor(c.id, st.name))}` : ''}
     </div>`;
   }).join('');
   return `<div class="modal" role="dialog" aria-modal="true" aria-label="غياب ${esc(clsLabel(c))}">
@@ -1622,7 +1687,7 @@ function rosterModalHTML(c, rows, hist, d){
       <div class="rsearch"><input class="input" id="rq" type="search" placeholder="ابحث بالاسم…" value="${esc(state.rq)}" autocomplete="off"></div>
       <div class="rlist2">${list}</div>
       ${others.length ? `<div class="sec-h" style="margin:14px 16px 6px"><h3>أسماء أخرى</h3><small>غير موجودة في قائمة الفصل</small></div>
-      <div class="reged-tw"><table class="regt"><thead><tr><th>#</th><th style="width:26%">اسم ${G().studentDef}</th><th>نوع الغياب</th><th>رقم الهاتف</th><th>الزمن</th><th>المجيب</th><th style="width:20%">سبب الغياب</th><th></th></tr></thead><tbody>
+      <div class="reged-tw"><table class="regt"><thead><tr><th>#</th><th style="width:26%">اسم ${G().studentDef}</th><th>نوع الغياب</th><th></th></tr></thead><tbody>
       ${others.map(([r, i]) => rowHTML(r, i)).join('')}</tbody></table></div>` : ''}
       <datalist id="nl-m">${[...hist.keys()].filter(n => !inR.has(n)).map(n => `<option value="${esc(n)}">`).join('')}</datalist>
       <datalist id="al-m">${ANSWERS.map(a => `<option value="${a}">`).join('')}</datalist>
@@ -1744,8 +1809,7 @@ const actDays = () => Math.max(1, +state.cfg.schoolDays || 180);
 const pctDays = pct => Math.round(pct * actDays() / 100);
 function critLabel(L){ return L.pct ? `نسبة (${L.pct}%) دون عذر مقبول متصلة أو متقطعة خلال العام الدراسي — ${pctDays(L.pct)} يومًا` : L.crit; }
 function studentStats(){
-  const from = state.cfg.actFrom || '';
-  const keys = Object.keys(state.days).filter(k => !from || k >= from).sort();
+  const keys = Object.keys(state.days).filter(inRange).sort();
   const map = new Map();
   keys.forEach((k, di) => {
     const S = state.days[k].students || {};
@@ -1788,9 +1852,8 @@ function actionsView(){
       <div class="acard-f">${s.reached.length && waPhone(s.phone || phoneFor(s.cid, s.name)) ? `<a class="btn sm wa" href="${esc(waUrl(s.phone || phoneFor(s.cid, s.name), waActText(s)))}" target="_blank" rel="noopener">واتساب</a>` : ''}${s.reached.length ? `<button class="btn sm" data-act="actRec">تسجيل الإجراء</button><button class="btn sm" data-act="actView">معاينة النموذج</button><button class="btn sm" data-act="actRefer">إحالة للإرشاد</button><button class="btn sm" data-act="actPrint">${ICON.print} طباعة</button>` : `<span style="color:var(--muted);font-size:12.5px">أول إجراء عند 3 أيام متصلة أو 5 منفصلة</span>`}</div>
     </div>`;
   }).join('');
-  return `<div class="bar">
+  return `${periodBar()}<div class="bar">
       <label class="f" style="flex-direction:row;align-items:center;gap:8px">أيام الدراسة الفعلية<input class="input" id="actDays" type="number" min="1" inputmode="numeric" value="${actDays()}" style="width:90px"></label>
-      <label class="f" style="flex-direction:row;align-items:center;gap:8px">احتساب الغياب من<input class="input" id="actFrom" type="date" value="${esc(state.cfg.actFrom || '')}"></label>
       <span class="grow"></span>
       ${dueN ? `<button class="btn" data-act="actViewDue">معاينة النماذج المستحقة</button><button class="btn primary" data-act="actPrintDue">${ICON.print} طباعة النماذج المستحقة (${dueN})</button>` : ''}
     </div>
@@ -1890,6 +1953,41 @@ function printForms(list){
 /* ---------- الإرشاد الطلابي (نموذج 31) ---------- */
 const RSN = ['عدم أداء الواجب','مشاغبة','تأخر عن الحصة','ضعف دراسي','أخرى'];
 const PERIODS = ['الأولى','الثانية','الثالثة','الرابعة','الخامسة','السادسة','السابعة'];
+const refsPendingCoun = () => Object.values(state.refs || {}).filter(r => refStatus(r).k === 'coun');
+const refsNewForDep = () => Object.values(state.refs || {}).filter(r => refStatus(r).k === 'closed' && !r.depSeen);
+function navBadges(){
+  const set = (v, n, cls) => { const b = document.querySelector(`.nav [data-view="${v}"]`); if(!b) return; let e = b.querySelector('.nbadge'); if(!n){ if(e) e.remove(); return; } if(!e){ e = document.createElement('b'); b.appendChild(e); } e.className = 'nbadge ' + cls; e.textContent = n; };
+  set('counsel', refsPendingCoun().length, 'bad'); set('follow', refsNewForDep().length, 'ok');
+}
+function depAlert(){
+  const L = refsNewForDep(); if(!L.length) return '';
+  return `<div class="banner ok-b no-print"><span aria-hidden="true">✅</span><span><strong>أفاد ${esc(G().counselor)}</strong> في ${AR(L.length)} ${L.length > 2 && L.length < 11 ? 'حالات' : 'حالة'}: ${L.slice(0, 4).map(r => esc(r.name)).join('، ')}${L.length > 4 ? '…' : ''}</span><button type="button" data-act="depView" data-rid="${esc(L[0].id)}">عرض الإفادة</button><button type="button" class="later" data-act="depSeen">تم الاطلاع</button></div>`;
+}
+/* ---------- صندوق الرسائل ---------- */
+function inboxItems(){
+  const L = [], g = G();
+  refsPendingCoun().forEach(r => L.push({k:'coun', ic:'🧑‍🏫', t:`تحويل بانتظار إفادة ${g.counselor}`, s:r.name, act:`data-act="ibRef" data-rid="${esc(r.id)}"`}));
+  refsNewForDep().forEach(r => L.push({k:'dep', ic:'✅', t:`أفاد ${g.counselor} — للاطلاع`, s:r.name, act:`data-act="depView" data-rid="${esc(r.id)}"`}));
+  try{
+    const due = studentStats().filter(s => s.due.length).length;
+    if(due) L.push({k:'act', ic:'⚠️', t:`${AR(due)} ${g.students} بحاجة إلى إجراء غياب`, s:'إجراءات الغياب', act:'data-go="actions"'});
+    const noc = flDailyAll().filter(x => x.date === today && x.type !== 'بعذر' && !flContactOf(flRid(x))).length;
+    if(noc) L.push({k:'noc', ic:'📞', t:`${AR(noc)} غياب اليوم بدون تواصل مع ولي الأمر`, s:'سجل الغياب اليومي', act:'data-act="ibNoc"'});
+  }catch(e){}
+  return L;
+}
+function inboxRender(){
+  const n = isAdm() ? 0 : inboxItems().length;
+  document.querySelectorAll('.ib-btn').forEach(b => { b.querySelector('.ib-n').textContent = n ? AR(n) : ''; b.classList.toggle('has', !!n); b.hidden = isAdm(); });
+}
+function inboxOpen(btn){
+  let p = $('#ibPanel'); if(p){ p.remove(); return; }
+  const L = inboxItems();
+  p = document.createElement('div'); p.id = 'ibPanel'; p.className = 'ib-panel no-print';
+  p.innerHTML = `<div class="ib-h"><b>صندوق الرسائل</b><span class="tag mute">${AR(L.length)}</span></div>` + (L.length ? L.map(i => `<button type="button" class="ib-it ib-${i.k}" ${i.act}><span class="ib-ic">${i.ic}</span><span><b>${esc(i.t)}</b><small>${esc(i.s)}</small></span></button>`).join('') : '<div class="ib-empty">لا توجد رسائل جديدة 👌</div>');
+  document.body.appendChild(p);
+  const r = btn.getBoundingClientRect(); p.style.top = (r.bottom + 8) + 'px'; p.style.left = Math.max(8, r.left) + 'px';
+}
 function refStatus(r){
   if(r.coun && r.coun.text) return {k:'closed', t:'مغلقة', c:'ok'};
   if(r.dep && r.dep.refer) return {k:'coun', t:'لدى ' + G().counselor, c:'bad'};
@@ -1905,8 +2003,429 @@ function waRefText(r){
   L.push('نأمل تعاونكم ومتابعتكم، ونرحب بزيارتكم للمدرسة.', state.cfg.school || '');
   return L.join('\n');
 }
+/* ---------- سجل متابعة الغياب ---------- */
+/* ---------- شريط الفترة المشترك ---------- */
+const CAL_KNOWN = {2026: {y1:'2026-08-23', t1:'2026-08-23', t2:'2027-01-17', ye:'2027-06-24'}};
+function calDefaults(){
+  const d = new Date(), Y = d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1;
+  return CAL_KNOWN[Y] || {y1: Y + '-08-23', t1: Y + '-08-23', t2: (Y + 1) + '-01-17', ye: (Y + 1) + '-06-24'};
+}
+function calDates(){ const c = state.cfg || {}, D = calDefaults(); return {y1: c.yearStart || D.y1, t1: c.term1Start || c.yearStart || D.t1, t2: c.term2Start || D.t2, ye: c.yearEnd || D.ye}; }
+function pPresets(){
+  const c = state.cfg || {}, d = new Date();
+  const wk = new Date(d); wk.setDate(d.getDate() - d.getDay());
+  const pm = new Date(d.getFullYear(), d.getMonth() - 1, 1), pme = new Date(d.getFullYear(), d.getMonth(), 0);
+  const before = k => { const x = parse(k); x.setDate(x.getDate() - 1); return iso(x); };
+  const {y1, t1, t2, ye} = calDates();
+  const L = [['day', 'اليوم', today, today], ['week', 'هذا الأسبوع', iso(wk), today], ['month', 'هذا الشهر', today.slice(0, 8) + '01', today], ['pmonth', 'الشهر الماضي', iso(pm), iso(pme)]];
+  if(t1) L.push(['t1', 'الفصل الدراسي الأول', t1, t2 ? before(t2) : (ye || today)]);
+  if(t2) L.push(['t2', 'الفصل الدراسي الثاني', t2, ye || today]);
+  if(y1) L.push(['year', 'العام الدراسي', y1, ye || today]);
+  return L;
+}
+const pCurTerm = () => { const p = pPresets().find(p => (p[0] === 't1' || p[0] === 't2') && today >= p[2] && today <= p[3]); return p ? p[0] : ''; };
+function flRange(){
+  const f = state.fl;
+  if(!f.from){ const cur = pPresets().find(p => p[0] === pCurTerm()); if(cur){ f.from = cur[2]; f.to = cur[3]; } else { f.from = today.slice(0, 8) + '01'; f.to = today; } }
+  return [f.from, f.to || today];
+}
+function periodBar(extra){
+  const [a, b] = flRange(), P = pPresets(), cur = pCurTerm(), on = P.find(p => p[2] === a && p[3] === b);
+  return `<div class="bar pbar">
+    <div class="pbar-r"><label class="f">من تاريخ<input class="input" type="date" id="pFrom" value="${a}"></label><label class="f">إلى تاريخ<input class="input" type="date" id="pTo" value="${b}"></label><span class="grow"></span>${extra || ''}</div>
+    <div class="chips pbar-c"><span class="sub">فترات جاهزة:</span>${P.map(p => `<button class="chip ${on && on[0] === p[0] ? 'on' : ''}" data-pp="${p[0]}">${p[1]}${cur === p[0] ? ' <span class="pcur">الحالي</span>' : ''}</button>`).join('')}</div>
+  </div>`;
+}
+const inRange = k => { const [a, b] = flRange(); return k >= a && k <= b; };
+const flCls = cid => { const c = (state.cfg.classes || []).find(x => x.id === cid); return c ? clsLabel(c) : '—'; };
+function flDaily(){
+  const [a, b] = flRange(), q = normAr(state.fl.q || '');
+  return flDailyAll().filter(x => x.date >= a && x.date <= b && (!q || normAr(x.name).includes(q)));
+}
+function flContacts(){
+  const [a, b] = flRange(), q = normAr(state.fl.q || '');
+  const auto = flDaily().filter(x => (x.r.answer || x.r.time) && !flContactOf(flRid(x))).map(x => ({auto:true, date:x.date, cid:x.cid, name:x.name, method:'اتصال',
+    reply: [x.r.answer ? 'المجيب: ' + x.r.answer : '', x.r.reason].filter(Boolean).join(' — '), action: x.type === 'بعذر' ? 'قُبل العذر' : 'تسجيل الغياب بدون عذر'}));
+  const man = (state.contacts.items || []).filter(c => c.date >= a && c.date <= b && (!q || normAr(c.name).includes(q)));
+  return [...auto, ...man].sort((x, y) => y.date.localeCompare(x.date));
+}
+function flActions(){
+  const q = normAr(state.fl.q || '');
+  return studentStats().filter(s => s.reached.length && (!q || normAr(s.name).includes(q))).map(s => {
+    const done = state.actions[s.key] || {}, ids = s.reached.filter(L => done[L.id]);
+    const act = ids.length ? ids.map(L => L.pct ? `إجراء ${L.pct}%` : 'تحويل للمرشد').join('، ') : 'لم يُتخذ إجراء بعد';
+    const dt = ids.map(L => done[L.id].date || '').sort().pop() || '';
+    return {s, total: s.unexc + s.exc, act, date: dt, open: s.due.length > 0, st: caseInfo(s).status, dueTxt: s.due.map(L => L.short).join('، ')};
+  }).sort((x, y) => y.open - x.open || y.total - x.total);
+}
+function flSummary(){
+  const d = flDaily(), c = flContacts(), a = flActions();
+  return {absent: new Set(d.map(x => x.cid + '|' + x.name)).size, exc: d.filter(x => x.type === 'بعذر').length, unexc: d.filter(x => x.type !== 'بعذر').length,
+    contacted: new Set(c.map(x => x.cid + '|' + x.name)).size, follow: a.filter(x => x.open).length};
+}
+const fd = k => k ? AR(dmy(parse(k))) : '';
+function flTables(tab, forPrint){
+  const T = (head, rows, empty) => `<table class="${forPrint ? 'pt' : 'regt fl-t'}"><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.join('') : `<tr><td colspan="${head.length}" style="text-align:center;color:#6b7280;padding:18px">${empty}</td></tr>`}</tbody></table>`;
+  const S = G().studentDef;
+  if(tab === 'daily'){
+    const L = flDaily();
+    return T(['م', 'اسم ' + S, 'الصف والفصل', 'تاريخ الغياب', 'عدد الأيام', 'نوع الغياب', 'العذر'],
+      L.map((x, i) => `<tr><td>${AR(i + 1)}</td><td class="nm">${esc(x.name)}</td><td>${esc(flCls(x.cid))}</td><td>${fd(x.date)}</td><td>${AR(x.n)}</td><td><span class="${x.type === 'بعذر' ? 'tg-ok' : 'tg-bad'}">${x.type}</span></td><td>${esc(x.reason)}</td></tr>`),
+      'لا يوجد غياب مسجّل بالأسماء في هذه الفترة. تُسجَّل الأسماء من «إدخال الغياب» في رصد الغياب.');
+  }
+  if(tab === 'contact'){
+    const L = flContacts();
+    return T(['م', 'اسم ' + S, 'تاريخ التواصل', 'وسيلة التواصل', 'رد ولي الأمر', 'الإجراء المتخذ', ...(forPrint ? [] : [''])],
+      L.map((x, i) => `<tr><td>${AR(i + 1)}</td><td class="nm">${esc(x.name)}<div class="sub">${esc(flCls(x.cid))}</div></td><td>${fd(x.date)}</td><td>${esc(x.method)}</td><td>${esc(x.reply)}</td><td>${esc(x.action)}</td>${forPrint ? '' : `<td>${x.auto ? '<span class="tag mute">من السجل اليومي</span>' : `<button class="btn sm" data-act="flEdit" data-id="${x.id}">تعديل</button> <button class="btn sm danger" data-act="flDel" data-id="${x.id}">حذف</button>`}</td>`}</tr>`),
+      'لا يوجد تواصل مسجّل في هذه الفترة.');
+  }
+  if(tab === 'acts'){
+    const L = flActions();
+    return T(['م', 'اسم ' + S, 'إجمالي أيام الغياب', 'الإجراء المتخذ', 'تاريخ الإجراء', 'حالة المتابعة'],
+      L.map((x, i) => `<tr><td>${AR(i + 1)}</td><td class="nm">${esc(x.s.name)}<div class="sub">${esc(flCls(x.s.cid))}</div></td><td>${AR(x.total)} <span class="sub">(${AR(x.s.unexc)} بدون عذر)</span></td><td>${esc(x.act)}${x.open ? `<div class="sub">مستحق: ${esc(x.dueTxt)}</div>` : ''}</td><td>${fd(x.date)}</td><td><span class="${x.st === 'مغلقة' ? 'tg-ok' : 'tg-bad'}">${x.st}</span></td></tr>`),
+      'لا يوجد ' + G().students + ' بلغوا حدود الإجراءات.');
+  }
+  const m = flSummary(), r = (l, v) => `<tr><td class="nm">${l}</td><td style="width:120px;font-weight:700;font-size:1.15em">${AR(v)}</td></tr>`;
+  return `<table class="${forPrint ? 'pt' : 'regt fl-t'}"><tbody>${r('إجمالي عدد ' + G().students + ' الغائبين', m.absent)}${r('عدد حالات الغياب بعذر', m.exc)}${r('عدد حالات الغياب دون عذر', m.unexc)}${r('عدد أولياء الأمور الذين تم التواصل معهم', m.contacted)}${r('عدد الحالات التي تحتاج إلى متابعة', m.follow)}</tbody></table>`;
+}
+const FL_TABS = [['daily', 'أولًا: سجل الغياب اليومي'], ['contact', 'ثانيًا: سجل التواصل مع ولي الأمر'], ['acts', 'ثالثًا: سجل الإجراءات والمتابعة'], ['sum', 'رابعًا: الملخص الإحصائي']];
+/* ---------- سجل الغياب اليومي: تصنيف، تواصل، إنذار ---------- */
+const ART32 = [
+  ['إجازة مرضية', 'تقرير إجازة مرضية من منصة صحتي'],
+  ['مراجعة مستشفى أو مركز صحي', 'إشعار مراجعة من منصة صحتي'],
+  ['حدوث كارثة (حريق ونحوه)', 'مشهد من الدفاع المدني'],
+  ['وفاة قريب حتى الدرجة الثالثة', 'شهادة الوفاة'],
+  ['مرافقة صحية لقريب من الدرجة الأولى', 'إشعار مرافقة'],
+  ['مرافقة صحية لقريب حتى الدرجة الثالثة', 'إشعار مرافقة (لإدارة المدرسة تقدير قبوله)'],
+  ['مراجعة الجهات الرسمية', 'إشعار مراجعة'],
+  ['مرافقة قريب من الدرجة الأولى لجهة رسمية', 'إشعار مراجعة'],
+  ['المشاركة في مسابقة محلية أو دولية', 'مشهد المشاركة'],
+  ['ظروف صحية أخرى', 'تقرير طبي (تقدّره إدارة المدرسة)'],
+  ['حالة تتعلق بحماية الطفل', 'وفق الأنظمة واللوائح'],
+  ['عدم توفر مواصلات', 'غير مدرج في المادة 32 (لإدارة المدرسة تقديره)'],
+  ['سبب آخر غير مدرج', 'لا يُعد عذرًا مقبولًا وفق المادة 32']
+];
+const FL_REASONS = ART32.map(a => a[0]);
+const proofOf = r => (ART32.find(a => a[0] === r) || [])[1] || '';
+const EX_ST = ['لم يُقدَّم', 'مقدَّم — قيد المراجعة', 'مقبول', 'مرفوض'];
+const exTag = st => st === 'مقبول' ? '<span class="tag ok">العذر مقبول</span>' : st === 'مرفوض' ? '<span class="tag bad">العذر مرفوض</span>' : st && st !== 'لم يُقدَّم' ? '<span class="tag warn">عذر قيد المراجعة</span>' : '';
+const FL_REPLY = {'إجازة مرضية':'أفاد بأن %s مريض%t', 'مراجعة مستشفى أو مركز صحي':'أفاد بأن لدى %s مراجعة طبية', 'حدوث كارثة (حريق ونحوه)':'أفاد بتعرّض الأسرة لحادث طارئ',
+  'وفاة قريب حتى الدرجة الثالثة':'أفاد بوفاة أحد الأقارب', 'مرافقة صحية لقريب من الدرجة الأولى':'أفاد بأن %s رافق%t أحد أفراد الأسرة لظرف صحي', 'مرافقة صحية لقريب حتى الدرجة الثالثة':'أفاد بأن %s رافق%t أحد الأقارب لظرف صحي',
+  'مراجعة الجهات الرسمية':'أفاد بمراجعة جهة رسمية', 'مرافقة قريب من الدرجة الأولى لجهة رسمية':'أفاد بأن %s رافق%t أحد أفراد الأسرة لمراجعة جهة رسمية', 'المشاركة في مسابقة محلية أو دولية':'أفاد بمشاركة %s في مسابقة',
+  'ظروف صحية أخرى':'أفاد بظرف صحي لدى %s', 'حالة تتعلق بحماية الطفل':'حالة تتعلق بحماية الطفل', 'عدم توفر مواصلات':'أفاد بعدم توفر مواصلات لـ%s', 'سبب آخر غير مدرج':'أبدى سببًا غير مدرج ضمن الأعذار المقبولة'};
+const flRid = x => x.date + '|' + x.cid + '|' + x.name;
+const flContactOf = rid => (state.contacts.items || []).find(c => c.rid === rid);
+const flWarnOf = rid => ((state.contacts.warns || {})[rid]) || '';
+async function flSaveContacts(){ lsSet('contacts', state.contacts); return true; }
+async function flRowUpdate(x, patch){
+  const day = state.days[x.date]; if(!day) return false;
+  const students = clone(day.students || {}), rows = students[x.cid] || [];
+  const r = rows.find(y => (y.name || '').trim() === x.name); if(!r) return false;
+  Object.assign(r, patch);
+  return saveDay(x.date, day.entries || {}, students);
+}
+function flFindRow(rid){ return flDailyAll().find(x => flRid(x) === rid); }
+function flDailyAll(){
+  const cnt = new Map(), out = [];
+  Object.keys(state.days).sort().forEach(k => {
+    const S = state.days[k].students || {};
+    Object.entries(S).forEach(([cid, rows]) => (rows || []).forEach(r => {
+      const nm = (r.name || '').trim(); if(!nm) return;
+      const key = cid + '|' + nm; cnt.set(key, (cnt.get(key) || 0) + 1);
+      out.push({date:k, cid, name:nm, n: cnt.get(key), type: r.type === 'بعذر' ? 'بعذر' : 'بدون عذر', reason: r.reason || '', note: r.note || '', r});
+    }));
+  });
+  return out;
+}
+function flDailyView(){
+  const all = flDaily(), f = state.fl.flt || 'all';
+  const L = all.filter(x => f === 'all' || (f === 'exc' && x.type === 'بعذر') || (f === 'unexc' && x.type !== 'بعذر') || (f === 'noc' && !flContactOf(flRid(x))))
+    .sort((a, b) => b.date.localeCompare(a.date) || a.name.localeCompare(b.name, 'ar'));
+  const nExc = all.filter(x => x.type === 'بعذر').length, nUn = all.length - nExc;
+  const nC = all.filter(x => flContactOf(flRid(x))).length, nW = all.filter(x => flWarnOf(flRid(x))).length;
+  const top = (() => { const m = new Map(); all.forEach(x => m.set(x.name, (m.get(x.name) || 0) + 1)); let b = null; m.forEach((v, k) => { if(!b || v > b[1]) b = [k, v]; }); return b; })();
+  const k = (cls, l, v, s) => `<div class="kpi ${cls}"><span class="l">${l}</span><span class="v">${v}</span><span class="s">${s}</span></div>`;
+  const chip = (v, t, n) => `<button class="chip ${f === v ? 'on' : ''}" data-flflt="${v}">${t} <b style="margin-inline-start:6px">${AR(n)}</b></button>`;
+  const rows = L.map(x => {
+    const rid = flRid(x), c = flContactOf(rid), w = flWarnOf(rid), d = parse(x.date), un = x.type !== 'بعذر';
+    return `<tr class="${un && !c ? 'fl-pend' : ''}" data-rid="${esc(rid)}">
+      <td><b>${dayName(d)}</b><div class="sub">${AR(dmy(d))}</div><div class="sub">${hijriNum(x.date)} هـ</div></td>
+      <td class="nm"><b>${esc(x.name)}</b><div class="sub">${esc(flCls(x.cid))} · الغياب رقم ${AR(x.n)}</div></td>
+      <td><div class="seg"><button data-act="flType" data-v="بعذر" class="${!un ? 'on' : ''}">بعذر</button><button data-act="flType" data-v="بدون" class="${un ? 'on' : ''}">بدون عذر</button></div></td>
+      <td>${un ? '<span class="sub">—</span>' + exTag(x.r.exStatus) : `<select class="input fl-in" data-flf="reason"><option value="">— بدون سبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>${proofOf(x.reason) ? `<div class="sub" style="margin-top:4px">الإثبات: ${esc(proofOf(x.reason))}${x.r.proof ? ' ✓' : ''}</div>` : ''}${exTag(x.r.exStatus)}`}</td>
+      <td><input class="input fl-in" data-flf="note" value="${esc(x.note)}" placeholder="ملاحظة…"></td>
+      <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)} ${AR(dmy(parse(c.date)).slice(0, 7))}</button><div class="sub">${esc(c.reply || '')}</div>` : `<button class="btn sm" data-act="flCont">تواصل</button>`}</td>
+      <td>${un ? (w ? `<span class="tag ok">✓ صدر ${AR(dmy(parse(w)).slice(0, 7))}</span> <button class="btn sm" data-act="flWarn">إعادة</button>` : `<button class="btn sm danger-o" data-act="flWarn">${ICON.print} إنذار غياب</button>`) : '<span class="sub">—</span>'}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="kpis">
+      ${k('', 'إجمالي أيام الغياب', AR(all.length), AR(new Set(all.map(x => x.cid + '|' + x.name)).size) + ' ' + G().students)}
+      ${k(nUn ? 'bad' : '', 'بدون عذر', AR(nUn), nUn - nW > 0 ? AR(nUn - nW) + ' بلا إنذار' : 'صدرت كل الإنذارات')}
+      ${k('good', 'بعذر', AR(nExc), 'عذر مقبول')}
+      ${k(all.length - nC ? 'warn' : 'good', 'تم التواصل', AR(nC), AR(all.length - nC) + ' بانتظار التواصل')}
+      ${k('', 'الأكثر غيابًا', top ? esc(top[0].split(' ').slice(0, 2).join(' ')) : '—', top ? AR(top[1]) + ' أيام' : 'لا يوجد غياب')}
+    </div>
+    <div class="bar"><div class="chips">${chip('all', 'الكل', all.length)}${chip('unexc', 'بدون عذر', nUn)}${chip('exc', 'بعذر', nExc)}${chip('noc', 'لم يُتواصل', all.length - nC)}</div></div>
+    <section class="panel" style="padding:0;overflow-x:auto"><table class="regt fl-t fl-d"><thead><tr><th>اليوم</th><th>${G().student}</th><th>التصنيف</th><th>السبب</th><th>ملاحظات</th><th>التواصل</th><th>المساءلة</th></tr></thead>
+    <tbody>${rows || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:22px">لا يوجد غياب مسجّل بالأسماء في هذه الفترة. تُسجَّل الأسماء من «إدخال الغياب» في رصد الغياب.</td></tr>`}</tbody></table></section>`;
+}
+function flReplyFor(reason, type){
+  const f = G().f, who = f ? 'ابنته' : 'ابنه';
+  if(!reason) return type === 'بعذر' ? 'قدّم عذرًا مقبولًا' : 'لم يقدّم عذرًا للغياب';
+  return (FL_REPLY[reason] || ('أفاد بأن سبب الغياب: ' + reason)).replace(/%s/g, who).replace(/%t/g, f ? 'ة' : '').replace('يتمكنة', 'تتمكن');
+}
+const actLabel = L => `${L.pct ? `إجراء ${L.pct}%` : 'إجراء 3 أيام متصلة / 5 منفصلة'}: ${L.type.replace(/^-\s*/, '').replace(/\n-\s*/g, '، ')}`;
+function flActOptions(x, ty){
+  const s = studentStats().find(o => o.key === x.cid + '|' + x.name), exc = (ty || (x.type === 'بعذر' ? 'بعذر' : 'بدون')) === 'بعذر';
+  if(exc) return {list: ['قبول العذر', 'تسجيل الغياب ومتابعة الطالب'], def: 'قبول العذر'};
+  const lv = s ? s.reached.map(actLabel) : [], due = s && s.due[0];
+  return {list: ['تنبيه شفهي للطالب', 'تسجيل الغياب ومتابعة الطالب'].concat(lv), def: due ? actLabel(due) : (lv.length ? lv[lv.length - 1] : 'تسجيل الغياب ومتابعة الطالب')};
+}
+function flContDlg(rid){
+  const x = flFindRow(rid); if(!x) return;
+  const old = flContactOf(rid), c = old || {date: today, method: 'اتصال', time: x.r.time || '', answer: x.r.answer || ''};
+  const ph = x.r.phone || phoneFor(x.cid, x.name) || '', un = x.type !== 'بعذر', A = flActOptions(x);
+  const act = c.action || A.def, reply = c.reply || flReplyFor(x.reason, x.type);
+  const so = studentStats().find(o => o.key === x.cid + '|' + x.name) || {unexc:0, exc:0};
+  openDlg(`<div class="reged-h"><b>التواصل مع ولي أمر: ${esc(x.name)}</b><span class="tag mute">غياب ${dayName(parse(x.date))} ${AR(dmy(parse(x.date)))}</span><span class="tag bad">بدون عذر ${AR(so.unexc)}</span><span class="tag ok">بعذر ${AR(so.exc)}</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b" data-rid="${esc(rid)}"><div class="fields">
+      <label class="f">رقم الهاتف<input class="input" id="fcP" type="tel" inputmode="tel" dir="ltr" autocomplete="off" value="${esc(ph)}" placeholder="05xxxxxxxx"></label>
+      <label class="f">تاريخ التواصل<input class="input" type="date" id="fcD" value="${esc(c.date)}"></label>
+      <label class="f">الزمن<input class="input" type="time" id="fcT" value="${esc(c.time || '')}"></label>
+      <label class="f">وسيلة التواصل<select class="input" id="fcM">${['اتصال', 'رسالة', 'واتساب', 'حضور ولي الأمر'].map(m => `<option ${m === c.method ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+      <label class="f">المجيب<input class="input" id="fcA" list="fcAl" value="${esc(c.answer || '')}"><datalist id="fcAl">${ANSWERS.map(a => `<option value="${a}">`).join('')}</datalist></label>
+      <div class="f" style="display:flex;flex-direction:column;gap:5px">نوع الغياب<div class="seg fc-seg" id="fcTy"><button type="button" data-fcty="بعذر" data-v="بعذر" class="${!un ? 'on' : ''}">بعذر</button><button type="button" data-fcty="بدون" data-v="بدون" class="${un ? 'on' : ''}">بدون عذر</button></div></div>
+      <label class="f">سبب الغياب<select class="input" id="fcS"><option value="">— بدون سبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select></label>
+      <label class="f">حالة العذر<select class="input" id="fcE">${EX_ST.map(o => `<option ${o === (x.r.exStatus || 'لم يُقدَّم') ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px;align-self:end;min-height:38px"><input type="checkbox" id="fcPr" ${x.r.proof ? 'checked' : ''}> استُلم الإثبات</label>
+      <div class="fc-proof" id="fcProof" style="grid-column:1/-1"></div>
+      <label class="f" style="grid-column:1/-1">رد ولي الأمر<input class="input" id="fcR" value="${esc(reply)}" data-auto="${old && old.reply ? '' : '1'}"></label>
+      <label class="f" style="grid-column:1/-1">الإجراء المتخذ<select class="input" id="fcX" data-saved="${esc(old && old.action || '')}">${A.list.map(o => `<option ${o === act ? 'selected' : ''}>${esc(o)}</option>`).join('')}${act && !A.list.includes(act) ? `<option selected>${esc(act)}</option>` : ''}</select></label>
+    </div></div>
+    <div class="reged-f">${old ? `<button class="btn danger" data-act="fcDel">حذف التواصل</button>` : ''}<a class="btn wa" id="fcWa" target="_blank" rel="noopener" style="display:none">واتساب</a><span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn primary" data-act="fcSave">حفظ التواصل</button></div>`);
+  flContSync();
+}
+function flContSync(){
+  const box = document.querySelector('#dlgBg .dlg-b[data-rid]'); if(!box) return;
+  const x = flFindRow(box.dataset.rid); if(!x) return;
+  const ty = (box.querySelector('#fcTy .on') || {}).dataset.fcty || 'بدون', un = ty !== 'بعذر';
+  [$('#fcS'), $('#fcPr')].forEach(el => { const l = el && el.closest('label'); if(l) l.style.display = un ? 'none' : ''; });
+  const rs = un ? '' : $('#fcS').value, r = $('#fcR');
+  if(r.dataset.auto) r.value = flReplyFor(rs, ty === 'بعذر' ? 'بعذر' : 'بدون عذر');
+  const pf = $('#fcProof'); if(pf) pf.style.display = un ? 'none' : ''; if(pf && !un){ const t = proofOf(rs); pf.innerHTML = rs ? `<b>الإثبات المطلوب (المادة 32):</b> ${esc(t || '—')}` : 'اختر سبب الغياب لمعرفة الإثبات المطلوب وفق المادة 32.'; }
+  const X = $('#fcX'); if(X){ const A = flActOptions(x, ty), cur = X.value, L = A.list.slice(); if(X.dataset.saved && cur === X.dataset.saved && !L.includes(cur)) L.push(cur); const keep = L.includes(cur) ? cur : A.def;
+    X.innerHTML = L.map(o => `<option ${o === keep ? 'selected' : ''}>${esc(o)}</option>`).join(''); }
+  const ph = $('#fcP').value.trim(), wa = $('#fcWa');
+  const on = $('#fcM').value === 'واتساب' && waPhone(ph);
+  wa.style.display = on ? '' : 'none';
+  if(on) wa.href = waUrl(ph, waAbsentText(x.cid, x.name, ty));
+}
+async function flContSave(){
+  const box = document.querySelector('#dlgBg .dlg-b'); const rid = box.dataset.rid, x = flFindRow(rid); if(!x) return;
+  const old = flContactOf(rid), ty = (box.querySelector('#fcTy .on') || {}).dataset.fcty || 'بدون', phone = $('#fcP').value.trim();
+  const rec = {id: old ? old.id : 'c' + Date.now().toString(36), rid, name: x.name, cid: x.cid, date: $('#fcD').value || today, time: $('#fcT').value, method: $('#fcM').value,
+    answer: $('#fcA').value.trim(), reply: $('#fcR').value.trim(), action: $('#fcX').value};
+  state.contacts = Object.assign({}, state.contacts, {items: (state.contacts.items || []).filter(c => c.id !== rec.id).concat(rec)});
+  await flSaveContacts();
+  await flRowUpdate(x, {phone, time: rec.time, answer: rec.answer, reason: ty === 'بعذر' ? $('#fcS').value : '', type: ty === 'بعذر' ? 'بعذر' : 'بدون', exStatus: $('#fcE').value, proof: ty === 'بعذر' && $('#fcPr').checked});
+  const st = rosterOf(x.cid).find(o => o.name === x.name); if(st && phone && st.phone !== phone){ st.phone = phone; await saveRoster(); }
+  let msg = 'تم حفظ التواصل، ويظهر في سجل التواصل';
+  if(/تحويل/.test(rec.action) && !(rec.refId && state.refs[rec.refId])){
+    const so = studentStats().find(o => o.key === x.cid + '|' + x.name) || {unexc:0, maxStreak:0, dates:[]}, f = G().f;
+    const ref = {id: 'r' + Date.now().toString(36), date: today, cid: x.cid, name: x.name, subject:'', period:'', reasons:['أخرى'], other:'تكرر الغياب بدون عذر', teacher: state.cfg.preparer || '',
+      problem: `غاب${f ? 'ت' : ''} ${so.unexc} ${so.unexc > 10 ? 'يومًا' : 'أيام'} بدون عذر مقبول${so.maxStreak >= 3 ? `، منها ${so.maxStreak} أيام متصلة` : ''}.\nآخر أيام الغياب: ${so.dates.slice(-5).map(k => hijriNum(k)).join('، ')}\nالتواصل مع ولي الأمر (${rec.method} ${hijriNum(rec.date)}): ${rec.reply}`,
+      dep:{text:'تم التحويل بسبب تكرر الغياب وفق قواعد السلوك والمواظبة. ' + rec.action, refer:true, by: state.cfg.deputy || '', date: today},
+      coun:{text:'', by: state.cfg.counselor || '', date:''}};
+    if(await saveRef(ref)){ rec.refId = ref.id; await flSaveContacts(); msg = 'تم حفظ التواصل وتحويل ' + G().studentDef + ' إلى ' + G().counselor; }
+  }
+  closeDlg(); toast(msg); render();
+}
+function absWarnHTML(x){
+  const cfg = state.cfg, g = G(), f = g.f, d = parse(x.date), logo = logoSrc();
+  const s = studentStats().find(o => o.key === x.cid + '|' + x.name) || {unexc: 1, exc: 0};
+  return `<article class="actf">
+    <div class="ahead"><div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
+      <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
+      <div class="d"><div>اليوم: <b>${dayName(new Date())}</b></div><div>التاريخ: <b>${hijriNum(today)}</b></div><div>الموافق: <b>${dmy(new Date()).replace(/ /g,'')}</b></div></div></div>
+    <h1>إنذار غياب</h1>
+    <table class="at1"><tr><th>اسم ${g.studentDef}</th><th>الصف</th><th>يوم الغياب</th><th>مجموع الغياب بدون عذر</th></tr>
+      <tr><td>${esc(x.name)}</td><td>${esc(flCls(x.cid))}</td><td>${dayName(d)} ${hijriNum(x.date)} هـ</td><td>${AR(s.unexc)} ${s.unexc > 10 ? 'يومًا' : s.unexc > 2 ? 'أيام' : 'يوم'}</td></tr></table>
+    <div class="abody">
+      <p>المكرّم ولي أمر ${f ? 'الطالبة' : 'الطالب'} / <b>${esc(x.name)}</b> &nbsp;&nbsp; سلّمه الله</p>
+      <p>السلام عليكم ورحمة الله وبركاته، وبعد:</p>
+      <p>نفيدكم بأن ${f ? 'ابنتكم' : 'ابنكم'} تغيّب${f ? 'ت' : ''} عن المدرسة يوم <b>${dayName(d)}</b> الموافق <b>${hijriNum(x.date)} هـ</b> بدون عذر مقبول، وبذلك بلغ مجموع غياب${f ? 'ها' : 'ه'} بدون عذر <b>(${AR(s.unexc)})</b> ${s.unexc > 10 ? 'يومًا' : s.unexc > 2 ? 'أيام' : 'يوم'}.</p>
+      <p>وحيث إن الانتظام في الدراسة من أهم أسباب التحصيل العلمي، وتكرار الغياب يترتب عليه اتخاذ الإجراءات النظامية الواردة في قواعد السلوك والمواظبة، نأمل منكم متابعة ${f ? 'ابنتكم' : 'ابنكم'} والحرص على انتظام${f ? 'ها' : 'ه'}، وتزويد المدرسة بالعذر المقبول عند الغياب.</p>
+      ${x.reason ? `<p>سبب الغياب المذكور: ${esc(x.reason)}</p>` : ''}
+      <p class="anote">شاكرين لكم تعاونكم، وتقبلوا خالص التحية والتقدير.</p>
+    </div>
+    <div class="asig3">
+      <div><div class="st">ولي الأمر</div><div>الاسم: ${esc(guardianOf({key: x.cid + '|' + x.name, name: x.name})) || '....................'}</div><div>التوقيع: ....................</div></div>
+      <div><div class="st">${g.studentDef}</div><div>التوقيع: ....................</div></div>
+      <div><div class="st">${esc(g.officer)}</div><div>الاسم: ${esc(cfg.preparer || '') || '....................'}</div><div>التوقيع: ....................</div></div>
+    </div>
+    <div class="alead"><div>${f ? 'قائدة' : 'قائد'} المدرسة: <b>${esc(cfg.principal || '')}</b><br>التوقيع: ....................</div><div class="stamp">الختم</div></div>
+  </article>`;
+}
+async function flWarnPrint(rid){
+  const x = flFindRow(rid); if(!x) return;
+  state.contacts = Object.assign({}, state.contacts, {warns: Object.assign({}, state.contacts.warns || {}, {[rid]: today})});
+  await flSaveContacts();
+  $('#printArea').innerHTML = absWarnHTML(x);
+  document.body.classList.add('printing-reg');
+  const done = () => { document.body.classList.remove('printing-reg'); $('#printArea').innerHTML = ''; window.removeEventListener('afterprint', done); render(); };
+  window.addEventListener('afterprint', done);
+  try{ window.print(); }catch(e){ done(); }
+}
+/* ---------- حالات الغياب: الحالة + قائمة التحقق ---------- */
+const CASE_STEPS = ['رصد الغياب وتحديد التاريخ', 'إشعار ولي الأمر وتسجيل وقت الإشعار', 'تسجيل رد ولي الأمر وسبب الغياب', 'استلام العذر ومراجعته',
+  'اعتماد العذر أو تسجيل نتيجة المراجعة', 'مراجعة تكرار الغياب وعدد الأيام', 'إحالة الحالة للموجه الطلابي عند استيفاء الشروط', 'إعداد خطة علاجية عند الحاجة',
+  'تنفيذ الإجراء النظامي وتوثيقه', 'مراجعة الحالة وإغلاقها أو استمرار متابعتها'];
+const CASE_ST = ['مفتوحة', 'قيد المتابعة', 'مغلقة'];
+const caseRec = key => ((state.contacts.cases || {})[key]) || {};
+function caseInfo(s){
+  const key = s.key, c = caseRec(key), m = c.manual || {};
+  const rows = flDailyAll().filter(x => x.cid === s.cid && x.name === s.name);
+  const cons = (state.contacts.items || []).filter(x => x.cid === s.cid && x.name === s.name);
+  const refs = Object.values(state.refs || {}).filter(r => r.cid === s.cid && (r.name || '').trim() === s.name);
+  const acts = state.actions[key] || {}, warned = rows.some(x => flWarnOf(flRid(x)));
+  const auto = [
+    rows.length > 0,
+    cons.length > 0,
+    cons.some(x => x.reply) && rows.some(x => x.reason),
+    rows.some(x => x.r.exStatus && x.r.exStatus !== 'لم يُقدَّم'),
+    rows.some(x => x.r.exStatus === 'مقبول' || x.r.exStatus === 'مرفوض'),
+    false,
+    refs.length > 0,
+    refs.some(r => r.coun && (r.coun.text || '').trim()),
+    ACT_LEVELS.some(L => acts[L.id]) || warned,
+    c.status === 'مغلقة'
+  ];
+  const done = auto.map((a, i) => a || !!m[i]);
+  const status = c.status || (cons.length || refs.length ? 'قيد المتابعة' : 'مفتوحة');
+  return {s, c, auto, done, n: done.filter(Boolean).length, status, rows, cons, refs};
+}
+function caseList(){
+  const q = normAr(state.fl.q || '');
+  return studentStats().filter(s => s.unexc + s.exc > 0 && (!q || normAr(s.name).includes(q))).map(caseInfo);
+}
+const CASE_ACT = [['exc', 'غياب بعذر فقط', 'قبول العذر واستكمال الإثبات'], ['notify', 'غياب 1–2 يوم', 'إشعار ولي الأمر ومتابعة الطالب'],
+  ['l3', '3 متصلة / 5 منفصلة', 'التحويل للموجه الطلابي لدراسة الحالة'], ['p10', 'بلغ 10%', 'إنذار واستدعاء ولي الأمر'], ['p15', 'بلغ 15%', 'إنذار وتعهد خطي والتحويل لوحدة الخدمات'],
+  ['p20', 'بلغ 20%', 'التحويل لإدارة التعليم والتزام ولي الأمر'], ['p25', 'بلغ 25%', 'الرفع لإدارة التعليم (طالب منتسب)']];
+const caseAct = s => s.top ? s.top.id : s.unexc > 0 ? 'notify' : 'exc';
+function casesView(){
+  const all = caseList(), f = state.fl.cst || 'all';
+  const fa = state.fl.cact || 'all';
+  const L = all.filter(x => (f === 'all' || x.status === f) && (fa === 'all' || caseAct(x.s) === fa)).sort((a, b) => CASE_ST.indexOf(a.status) - CASE_ST.indexOf(b.status) || b.s.unexc - a.s.unexc);
+  const cnt = st => all.filter(x => x.status === st).length;
+  const chip = (v, t, n) => `<button class="chip ${f === v ? 'on' : ''}" data-flcst="${v}">${t} <b style="margin-inline-start:6px">${AR(n)}</b></button>`;
+  const stTag = st => `<span class="tag ${st === 'مغلقة' ? 'ok' : st === 'قيد المتابعة' ? 'warn' : 'bad'}">${st}</span>`;
+  const cards = L.map(x => {
+    const s = x.s, pct = Math.round(x.n * 10);
+    return `<div class="acard ${x.status === 'مفتوحة' ? 'due' : ''}" data-ckey="${esc(s.key)}">
+      <div class="acard-h"><b>${esc(s.name)}</b><span class="tile-sub">${s.cls ? esc(clsLabel(s.cls)) : ''}</span></div>
+      <div class="acard-n"><span><b>${AR(s.unexc)}</b> بدون عذر</span><span><b>${AR(s.exc)}</b> بعذر</span><span><b>${AR(x.cons.length)}</b> تواصل</span></div>
+      <div class="sub" style="margin:6px 0 0"><b>الإجراء المناسب:</b> ${esc((CASE_ACT.find(a => a[0] === caseAct(s)) || [])[2] || '')}</div>
+      <div class="cprog"><div class="cprog-b"><i style="width:${pct}%"></i></div><span>${AR(x.n)} من ${AR(CASE_STEPS.length)}</span></div>
+      <div class="acard-t">${stTag(x.status)}${s.due.length ? `<span class="tag bad">إجراء مستحق: ${esc(s.due.map(L => L.short).join('، '))}</span>` : ''}${x.c.review ? `<span class="tag mute">مراجعة ${AR(dmy(parse(x.c.review)))}</span>` : ''}</div>
+      <div class="acard-f"><button class="btn sm primary" data-act="caseOpen">فتح الحالة</button></div>
+    </div>`;
+  }).join('');
+  return `<div class="kpis">
+      <div class="kpi ${cnt('مفتوحة') ? 'bad' : ''}"><span class="l">حالات مفتوحة</span><span class="v">${AR(cnt('مفتوحة'))}</span><span class="s">لم يبدأ التدخل</span></div>
+      <div class="kpi ${cnt('قيد المتابعة') ? 'warn' : ''}"><span class="l">قيد المتابعة</span><span class="v">${AR(cnt('قيد المتابعة'))}</span><span class="s">بدأ التواصل أو التحويل</span></div>
+      <div class="kpi good"><span class="l">مغلقة</span><span class="v">${AR(cnt('مغلقة'))}</span><span class="s">اكتملت المعالجة</span></div>
+      <div class="kpi"><span class="l">متوسط الإنجاز</span><span class="v">${all.length ? AR(Math.round(all.reduce((a, x) => a + x.n, 0) / all.length * 10)) + '%' : '—'}</span><span class="s">من قائمة التحقق</span></div>
+    </div>
+    <div class="bar" style="flex-direction:column;align-items:stretch;gap:10px"><div class="chips"><span class="sub" style="align-self:center;margin-inline-end:6px">الحالة:</span>${chip('all', 'الكل', all.length)}${CASE_ST.map(st => chip(st, st, cnt(st))).join('')}</div>
+      <div class="chips"><span class="sub" style="align-self:center;margin-inline-end:6px">الإجراء المناسب:</span><button class="chip ${fa === 'all' ? 'on' : ''}" data-flcact="all">الكل</button>${CASE_ACT.map(([k, t]) => { const n = all.filter(x => caseAct(x.s) === k).length; return n ? `<button class="chip ${fa === k ? 'on' : ''}" data-flcact="${k}">${t} <b style="margin-inline-start:6px">${AR(n)}</b></button>` : ''; }).join('')}</div></div>
+    ${fa !== 'all' ? `<div class="fc-proof" style="margin-bottom:12px"><b>الإجراء المناسب لهذه الفئة:</b> ${esc((CASE_ACT.find(a => a[0] === fa) || [])[2] || '')}</div>` : ''}
+    ${L.length ? `<div class="agrid">${cards}</div>` : `<div class="empty"><div class="ic">${ICON.users}</div><h2>لا توجد حالات</h2><p>تظهر هنا حالة لكل ${G().student} له غياب مسجّل بالاسم.</p></div>`}`;
+}
+function caseDlg(key){
+  const s = studentStats().find(o => o.key === key); if(!s) return;
+  const x = caseInfo(s);
+  const items = CASE_STEPS.map((t, i) => `<label class="cstep ${x.done[i] ? 'on' : ''}"><input type="checkbox" data-cstep="${i}" ${x.done[i] ? 'checked' : ''} ${x.auto[i] ? 'disabled' : ''}><span>${AR(i + 1)}. ${t}</span>${x.auto[i] ? '<small>تلقائي</small>' : ''}${i !== 5 && i !== 9 ? `<button type="button" class="btn sm cs-go" data-act="csGo" data-i="${i}">${x.done[i] ? 'عرض' : 'إكمال'} ←</button>` : ''}</label>`).join('');
+  openDlg(`<div class="reged-h"><b>حالة: ${esc(s.name)}</b><span class="tag bad">بدون عذر ${AR(s.unexc)}</span><span class="tag ok">بعذر ${AR(s.exc)}</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b" data-ckey="${esc(key)}">
+      <div class="fields" style="margin-bottom:12px">
+        <label class="f">حالة المتابعة<select class="input" id="csSt">${CASE_ST.map(o => `<option ${o === x.status ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
+        <label class="f">موعد المراجعة القادمة<input class="input" type="date" id="csRv" value="${esc(x.c.review || '')}"></label>
+      </div>
+      <div class="cprog" style="margin-bottom:10px"><div class="cprog-b"><i style="width:${x.n * 10}%"></i></div><span>${AR(x.n)} من ${AR(CASE_STEPS.length)}</span></div>
+      <div class="csteps">${items}</div>
+      <label class="f" style="margin-top:12px">الخطة العلاجية / ملاحظات المتابعة<textarea class="input" id="csPl" rows="3" style="min-height:80px;padding:8px">${esc(x.c.plan || '')}</textarea></label>
+      <p class="hint" style="margin:8px 0 0">البنود «التلقائية» تُعلَّم من عملك في التطبيق: الرصد، التواصل، حالة العذر، التحويل للإرشاد وإفادته، الإجراءات والإنذارات.</p>
+    </div>
+    <div class="reged-f"><span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn primary" data-act="caseSave">حفظ الحالة</button></div>`);
+}
+function caseGo(i){
+  const box = document.querySelector('#dlgBg .dlg-b[data-ckey]'); if(!box) return;
+  const key = box.dataset.ckey, s = studentStats().find(o => o.key === key); if(!s) return;
+  const x = caseInfo(s), rows = x.rows.slice().sort((a, b) => a.date.localeCompare(b.date));
+  const last = rows.filter(r => r.type !== 'بعذر').pop() || rows[rows.length - 1];
+  const ref = x.refs.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+  closeDlg();
+  if(i === 0){ state.view = 'follow'; state.fl.tab = 'daily'; state.fl.q = s.name; state.fl.flt = 'all'; render(); return; }
+  if(i >= 1 && i <= 4){ if(last){ flContDlg(flRid(last)); setTimeout(() => { const el = $(i === 3 || i === 4 ? '#fcE' : i === 2 ? '#fcR' : '#fcM'); if(el){ el.focus(); el.scrollIntoView({block:'center'}); } }, 50); } return; }
+  if(i === 6 || i === 7){
+    if(ref){ openRef(ref); return; }
+    openRef({cid:s.cid, name:s.name, reasons:['أخرى'], other:'تكرر الغياب بدون عذر', teacher: state.cfg.preparer || '',
+      problem: `غاب${G().f ? 'ت' : ''} ${s.unexc} ${s.unexc > 10 ? 'يومًا' : 'أيام'} بدون عذر مقبول${s.maxStreak >= 3 ? `، منها ${s.maxStreak} أيام متصلة` : ''}.`,
+      dep:{text:'تم التحويل بسبب تكرر الغياب وفق قواعد السلوك والمواظبة.', refer:true, by: state.cfg.deputy || '', date: today}});
+    return;
+  }
+  if(i === 8){ if(s.reached.length) openActRec(key); else if(last && last.type !== 'بعذر') flWarnPrint(flRid(last)); else toast('لا يوجد إجراء نظامي مستحق على ' + G().studentDef + ' حاليًا.'); return; }
+}
+async function caseSave(){
+  const box = document.querySelector('#dlgBg .dlg-b[data-ckey]'); if(!box) return;
+  const key = box.dataset.ckey, manual = {};
+  box.querySelectorAll('[data-cstep]').forEach(cb => { if(cb.checked && !cb.disabled) manual[cb.dataset.cstep] = true; });
+  const rec = {status: $('#csSt').value, review: $('#csRv').value, plan: $('#csPl').value.trim(), manual, at: today};
+  state.contacts = Object.assign({}, state.contacts, {cases: Object.assign({}, state.contacts.cases || {}, {[key]: rec})});
+  await flSaveContacts(); closeDlg(); toast('تم حفظ الحالة'); render();
+}
+function followView(){
+  const [a, b] = flRange(), tab = state.fl.tab;
+  const tabs = `<div class="tabs2 fl-tabs" role="tablist">${FL_TABS.map(([k, t]) => `<button role="tab" class="${tab === k ? 'on' : ''}" data-fltab="${k}">${t}</button>`).join('')}</div>`;
+  return `${periodBar(`${tab !== 'sum' ? `<input class="input" id="flQ" type="search" placeholder="ابحث بالاسم…" value="${esc(state.fl.q || '')}" style="min-width:170px">` : ''}
+      ${tab === 'contact' ? `<button class="btn" data-act="flAdd">+ تسجيل تواصل</button>` : ''}
+      <button class="btn" data-act="flPrint" data-all="0">${ICON.print} طباعة القسم</button>
+      <button class="btn primary" data-act="flPrint" data-all="1">${ICON.print} طباعة السجل كاملًا</button>`)}
+    <div style="overflow-x:auto;margin-bottom:14px">${tabs}</div>
+    ${tab === 'daily' ? flDailyView() : tab === 'acts' ? casesView() : `<section class="panel" style="padding:0;overflow-x:auto">${flTables(tab, false)}</section>`}`;
+}
+function flDlg(item){
+  const it = item || {date: today, method: 'اتصال'};
+  const names = [...new Map(flDaily().concat(studentStats().map(s => ({cid:s.cid, name:s.name}))).map(x => [x.cid + '|' + x.name, x])).values()];
+  openDlg(`<div class="reged-h"><b>${item ? 'تعديل' : 'تسجيل'} تواصل مع ولي الأمر</b><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b"><div class="fields">
+      <label class="f">اسم ${G().studentDef}<input class="input" id="flN" list="flNames" value="${esc(it.name || '')}"></label>
+      <datalist id="flNames">${names.map(x => `<option value="${esc(x.name)}">${esc(flCls(x.cid))}</option>`).join('')}</datalist>
+      <label class="f">تاريخ التواصل<input class="input" type="date" id="flD" value="${esc(it.date)}"></label>
+      <label class="f">وسيلة التواصل<select class="input" id="flM">${['اتصال', 'رسالة', 'واتساب', 'حضور ولي الأمر'].map(m => `<option ${m === it.method ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+      <label class="f">رد ولي الأمر<input class="input" id="flR" value="${esc(it.reply || '')}"></label>
+      <label class="f">الإجراء المتخذ<input class="input" id="flA" value="${esc(it.action || '')}"></label>
+    </div></div>
+    <div class="reged-f"><span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn primary" data-act="flSave" data-id="${item ? item.id : ''}">حفظ</button></div>`);
+}
+async function flSave(id){
+  const name = ($('#flN').value || '').trim(); if(!name){ toast('اكتب اسم ' + G().studentDef + '.', 'err'); return; }
+  const known = studentStats().find(s => s.name === name) || flDaily().find(x => x.name === name);
+  const rec = {id: id || ('c' + Date.now().toString(36)), name, cid: known ? known.cid : '', date: $('#flD').value || today, method: $('#flM').value, reply: $('#flR').value.trim(), action: $('#flA').value.trim()};
+  const items = (state.contacts.items || []).filter(x => x.id !== rec.id); items.push(rec);
+  state.contacts = {items}; lsSet('contacts', state.contacts); closeDlg(); toast('تم الحفظ'); render();
+}
+function flPrint(all){
+  const c = state.cfg, [a, b] = flRange();
+  const secs = (all ? FL_TABS : FL_TABS.filter(x => x[0] === state.fl.tab)).map(([k, t]) => `<h3>${t}</h3>${flTables(k, true)}`).join('');
+  printHTML(`<style>.flp{font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;direction:rtl;color:#000;padding:0 4mm}.flp h2{text-align:center;margin:0 0 4px;font-size:18px}.flp .meta{text-align:center;font-size:12px;margin-bottom:10px}
+.flp h3{font-size:14px;margin:14px 0 6px;background:#eef2f6;padding:5px 8px;border-right:4px solid #333}.flp table.pt{width:100%;border-collapse:collapse;font-size:11.5px;page-break-inside:auto}.flp .pt th,.flp .pt td{border:1px solid #555;padding:4px 6px;text-align:center}
+.flp .pt th{background:#e5e7eb}.flp .pt td.nm{text-align:right}.flp .sub{font-size:10px;color:#444}.flp .pt tr{page-break-inside:avoid}.flp .sign{display:flex;justify-content:space-between;margin-top:22px;font-size:12px}</style>
+<div class="flp"><div class="meta">${esc(c.edu || '')} — ${esc(c.school || '')}</div><h2>سجل متابعة الغياب</h2><div class="meta">الفترة من ${fd(a)} إلى ${fd(b)}</div>${secs}
+<div class="sign"><span>${esc(G().officer)}: ${esc(c.preparer || '')}</span><span>التوقيع: ..................</span><span>${esc(c.principalTitle || 'المدير')}: ${esc(c.principal || '')}</span></div></div>`);
+}
 function counselView(){
-  const all = Object.values(state.refs || {}).sort((a,b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || '').localeCompare(a.createdAt || ''));
+  const all = Object.values(state.refs || {}).filter(r => !r.date || inRange(r.date)).sort((a,b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || '').localeCompare(a.createdAt || ''));
   const cnt = k => all.filter(r => refStatus(r).k === k).length;
   const q = normAr(state.refQ);
   const list = all.filter(r => state.refSt === 'all' || refStatus(r).k === state.refSt).filter(r => !q || normAr(r.name).includes(q));
@@ -1918,11 +2437,11 @@ function counselView(){
       <div class="acard-h"><b>${esc(r.name)}</b><span class="tile-sub">${c ? esc(clsLabel(c)) : ''}</span></div>
       <div class="acard-n"><span>${dayName(parse(r.date))} ${hijriNum(r.date)}</span>${r.subject ? `<span>المادة: <b>${esc(r.subject)}</b></span>` : ''}${r.period ? `<span>الحصة ${esc(r.period)}</span>` : ''}</div>
       <div class="acard-t">${rs}</div>
-      <div class="acard-t"><span class="tag ${st.c}">${esc(st.t)}</span>${r.teacher ? `<span class="tag mute">${esc(r.teacher)}</span>` : ''}</div>
+      <div class="acard-t"><span class="tag ${st.c}">${esc(st.t)}</span>${st.k === 'closed' && !r.depSeen ? '<span class="tag ok">إفادة جديدة للوكيل</span>' : ''}${r.teacher ? `<span class="tag mute">${esc(r.teacher)}</span>` : ''}</div>
       <div class="acard-f"><button class="btn sm" data-act="refOpen">فتح وتحديث</button><button class="btn sm" data-act="refView">معاينة النموذج</button><button class="btn sm" data-act="refPrint">${ICON.print} طباعة</button>${waPhone(phoneFor(r.cid, r.name)) ? `<a class="btn sm wa" href="${esc(waUrl(phoneFor(r.cid, r.name), waRefText(r)))}" target="_blank" rel="noopener">واتساب</a>` : `<span class="tag mute">بلا جوال</span>`}</div>
     </div>`;
   }).join('');
-  return `<div class="bar">
+  return `${periodBar()}<div class="bar">
       <button class="btn primary" data-act="refNew">+ تحويل جديد (نموذج 31)</button>
       <span class="grow"></span>
       <input class="input" id="refQ" type="search" placeholder="ابحث بالاسم…" value="${esc(state.refQ)}" style="min-width:200px">
@@ -2595,13 +3114,21 @@ function settingsView(){
       <label class="f">الإدارة<input class="input" id="rEdu" value="${esc(cfg.edu)}"></label>
       <label class="f">العام الدراسي (هـ)<input class="input" id="rYear" value="${esc(cfg.year)}"></label>
     </div>
+    <h3 style="margin-top:16px">الفصول الدراسية</h3>
+    <p class="hint">تُملأ تلقائيًا حسب التقويم الدراسي، ويمكنك تعديلها ثم الحفظ. تُستخدم في «الفترات الجاهزة» أعلى التبويبات.</p>
+    <div class="fields">
+      <label class="f">بداية العام الدراسي<input class="input" type="date" id="rY1" value="${esc(calDates().y1)}"></label>
+      <label class="f">بداية الفصل الدراسي الأول<input class="input" type="date" id="rT1" value="${esc(calDates().t1)}"></label>
+      <label class="f">بداية الفصل الدراسي الثاني<input class="input" type="date" id="rT2" value="${esc(calDates().t2)}"></label>
+      <label class="f">نهاية العام الدراسي<input class="input" type="date" id="rYE" value="${esc(calDates().ye)}"></label>
+    </div>
     <div class="row-actions">
       <div class="logo-prev">${logoSrc() ? `<img src="${logoSrc()}" alt="الشعار">` : 'بدون شعار'}</div>
       <button class="btn" data-act="pickLogo">${ICON.up} تغيير الشعار</button>
       ${cfg.logo === 'none' ? `<button class="btn" data-act="defLogo">شعار الوزارة</button>` : `<button class="btn danger" data-act="rmLogo">إخفاء الشعار</button>`}
       <input type="file" id="rLogo" accept="image/*" hidden>
       <span class="grow"></span>
-      <button class="btn primary" data-act="savereg">حفظ الترويسة</button>
+      <button class="btn primary" data-act="savereg">حفظ الترويسة والفصول</button>
     </div>
   </section>
   ${rosterPanel()}
@@ -2645,7 +3172,8 @@ function rosterPanel(){
   const list = classes(), withR = list.filter(c => rosterOf(c.id).length), without = list.filter(c => !rosterOf(c.id).length);
   return `<section class="panel">
     <h3>قوائم أسماء ${G().students}</h3>
-    <p class="hint">استورد من نور ملف PDF واحدًا: «كشف بأسماء ${G().students}» أو «تقرير الغياب على مستوى أيام الشهر»، فيصير إدخال الغياب بالتحديد بدل الكتابة، مع زر «الكل غائب» لأيام الغياب الجماعي.</p>
+    <div class="banner" style="margin:0 0 12px"><span aria-hidden="true">ℹ️</span><span><strong>الكشف من برنامج نور:</strong> التقارير ← كشف الطلاب (PDF). يُستورد منه اسم ${G().student} ورقم جواله لكل الفصول دفعة واحدة.</span></div>
+    <p class="hint">تُقرأ أيضًا «كشف بأسماء ${G().students}» و«تقرير الغياب على مستوى أيام الشهر»، فيصير إدخال الغياب بالتحديد بدل الكتابة، مع زر «الكل غائب» لأيام الغياب الجماعي.</p>
     <div class="row-actions" style="margin-top:0">
       <button class="btn primary" data-act="noorPick">${ICON.up} استيراد من نور (PDF)</button>
       <button class="btn" data-act="pasteOpen">لصق أسماء فصل</button>
@@ -2660,6 +3188,7 @@ const exists = (stage, grade, section) => state.cfg.classes.some(c => c.stage ==
 
 /* ---------- events ---------- */
 document.addEventListener('click', async e => {
+  if(!e.target.closest('#ibPanel .ib-h') && !e.target.closest('.ib-btn')){ const ip = $('#ibPanel'); if(ip) setTimeout(() => ip.remove(), 0); }
   const t = e.target.closest('button'); if(!t) return;
   if(t.dataset.act === 'menu'){ $('#shell').classList.add('open'); return; }
   if(t.dataset.view){
@@ -2669,6 +3198,12 @@ document.addEventListener('click', async e => {
   if(t.dataset.go){ state.view = t.dataset.go; render(); return; }
   if(t.dataset.open){ if(isDirty()){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; } state.entryDate = t.dataset.open; loadDraft(); render(); window.scrollTo(0,0); return; }
   if(t.dataset.rtype){ state.rpt.type = t.dataset.rtype; render(); return; }
+  if(t.dataset.fcty){ t.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); flContSync(); return; }
+  if(t.dataset.pp){ const p = pPresets().find(x => x[0] === t.dataset.pp); if(p){ state.fl.from = p[2]; state.fl.to = p[3]; render(); } return; }
+  if(t.dataset.flcact){ state.fl.cact = t.dataset.flcact; render(); return; }
+  if(t.dataset.flcst){ state.fl.cst = t.dataset.flcst; render(); return; }
+  if(t.dataset.flflt){ state.fl.flt = t.dataset.flflt; render(); return; }
+  if(t.dataset.fltab){ state.fl.tab = t.dataset.fltab; render(); return; }
   if(t.dataset.cmptype){ state.cmp.type = t.dataset.cmptype; render(); return; }
   if(t.dataset.rtab){ state.rpt.tab = t.dataset.rtab; if(t.dataset.rtab === 'register') state.rpt.type = 'daily'; render(); return; }
   const act = t.dataset.act;
@@ -2757,7 +3292,7 @@ document.addEventListener('click', async e => {
   if(act === 'rday'){ state.rpt.date = iso(addDays(parse(state.rpt.date), +t.dataset.n)); render(); return; }
   if(act === 'rdown'){ downloadRegister(); return; }
   if(act === 'savereg'){
-    Object.assign(state.cfg, { edu:$('#rEdu').value.trim(), year:$('#rYear').value.trim() });
+    Object.assign(state.cfg, { edu:$('#rEdu').value.trim(), year:$('#rYear').value.trim(), yearStart:$('#rY1').value, term1Start:$('#rT1').value, term2Start:$('#rT2').value, yearEnd:$('#rYE').value }); state.fl.from = '';
     if(await saveCfg()) toast('تم حفظ ترويسة السجل'); return;
   }
   if(act === 'setterm'){ state.cfg.term = t.dataset.v; if(await saveCfg()) toast('الفصل الدراسي: ' + t.dataset.v); render(); return; }
@@ -2791,6 +3326,30 @@ document.addEventListener('click', async e => {
   if(act === 'sbIn' || act === 'sbUp'){ t.disabled = true; await sbLogin(act === 'sbUp'); if(t.isConnected) t.disabled = false; return; }
   if(act === 'auMode'){ sb.mode = sb.mode === 'up' ? 'in' : 'up'; sb.msg = ''; authRender(); return; }
   if(act === 'auRecheck'){ t.disabled = true; sb.profile = await sbLoadProfile(sb.user); if(profOK(sb.profile)){ await sbOnLogin(sb.user); } else { toast('لم يُفعَّل الحساب بعد.','err'); if(t.isConnected) t.disabled = false; } return; }
+  if(act === 'flType' || act === 'flCont' || act === 'flWarn'){
+    const rid = t.closest('tr').dataset.rid, x = flFindRow(rid); if(!x) return;
+    if(act === 'flCont'){ flContDlg(rid); return; }
+    if(act === 'flWarn'){ await flWarnPrint(rid); return; }
+    if(await flRowUpdate(x, {type: t.dataset.v === 'بعذر' ? 'بعذر' : 'بدون'})){ toast('تم تحديث التصنيف'); render(); } return;
+  }
+  if(act === 'caseOpen'){ caseDlg(t.closest('.acard').dataset.ckey); return; }
+  if(act === 'csGo'){ e.preventDefault(); caseGo(+t.dataset.i); return; }
+  if(act === 'caseSave'){ t.disabled = true; await caseSave(); return; }
+  if(act === 'fcSave'){ t.disabled = true; await flContSave(); return; }
+  if(act === 'fcDel'){ const rid = document.querySelector('#dlgBg .dlg-b').dataset.rid; state.contacts = Object.assign({}, state.contacts, {items: (state.contacts.items || []).filter(c => c.rid !== rid)}); await flSaveContacts(); closeDlg(); toast('تم حذف التواصل'); render(); return; }
+  if(act === 'ibOpen'){ inboxOpen(t); return; }
+  if(act === 'ibRef'){ const r = state.refs[t.dataset.rid]; if(r){ state.view = 'counsel'; render(); openRef(r); } return; }
+  if(act === 'ibNoc'){ state.view = 'follow'; state.fl.tab = 'daily'; state.fl.flt = 'noc'; state.fl.from = today; state.fl.to = today; state.fl.q = ''; render(); return; }
+  if(act === 'depView'){ const r = state.refs[t.dataset.rid]; if(r){ r.depSeen = true; await saveRef(r); openRef(r); render(); } return; }
+  if(act === 'depSeen'){ for(const r of refsNewForDep()){ r.depSeen = true; await saveRef(r); } toast('تم'); render(); return; }
+  if(act === 'flAdd'){ flDlg(null); return; }
+  if(act === 'flEdit'){ const it = (state.contacts.items || []).find(x => x.id === t.dataset.id); if(it && it.rid && flFindRow(it.rid)) flContDlg(it.rid); else flDlg(it); return; }
+  if(act === 'flSave'){ await flSave(t.dataset.id); return; }
+  if(act === 'flPrint'){ flPrint(t.dataset.all === '1'); return; }
+  if(act === 'flDel'){
+    if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد'; setTimeout(() => { if(t.isConnected){ t.classList.remove('armed'); t.textContent = 'حذف'; } }, 3500); return; }
+    state.contacts = {items: (state.contacts.items || []).filter(x => x.id !== t.dataset.id)}; lsSet('contacts', state.contacts); toast('تم الحذف'); render(); return;
+  }
   if(act === 'adReload'){ sb.admin = null; render(); return; }
   if(act === 'adSub'){ const p = adFind(t.dataset.id); if(p) adSubDlg(p); return; }
   if(act === 'adPass'){ const p = adFind(t.dataset.id); if(p) adPassDlg(p); return; }
@@ -2867,8 +3426,20 @@ document.addEventListener('click', e => {
 }, true);
 document.addEventListener('mousedown', e => { if(e.target && e.target.id === 'modalBg') closeModal(); if(e.target && e.target.id === 'dlgBg') closeDlg(); });
 document.querySelector('.overlay').addEventListener('click', () => $('#shell').classList.remove('open'));
+document.addEventListener('change', async e => {
+  const el = e.target; if(el.id === 'fcE'){ const v = el.value === 'مقبول' ? 'بعذر' : el.value === 'مرفوض' ? 'بدون' : ''; if(v) document.querySelectorAll('#fcTy button').forEach(b => b.classList.toggle('on', b.dataset.fcty === v)); flContSync(); return; }
+  if(el.id === 'fcM' || el.id === 'fcS'){ flContSync(); return; }
+  if(!el.classList || !el.classList.contains('fl-in')) return;
+  const tr = el.closest('tr'), x = tr && flFindRow(tr.dataset.rid); if(!x) return;
+  if(await flRowUpdate(x, {[el.dataset.flf]: el.value.trim()})) toast(el.dataset.flf === 'note' ? 'تم حفظ الملاحظة' : 'تم حفظ السبب');
+});
 document.addEventListener('input', e => {
   const inp = e.target;
+  if(inp.id === 'fcR'){ delete inp.dataset.auto; return; }
+  if(inp.id === 'fcE'){ const v = inp.value === 'مقبول' ? 'بعذر' : inp.value === 'مرفوض' ? 'بدون' : ''; if(v) document.querySelectorAll('#fcTy button').forEach(b => b.classList.toggle('on', b.dataset.fcty === v)); flContSync(); return; }
+  if(inp.id === 'fcP' || inp.id === 'fcM' || inp.id === 'fcS'){ flContSync(); return; }
+  if(inp.id === 'flQ'){ state.fl.q = inp.value; const pos = inp.selectionStart; render(); const n = $('#flQ'); if(n){ n.focus(); n.setSelectionRange(pos, pos); } return; }
+  if(inp.id === 'pFrom' || inp.id === 'pTo'){ if(inp.value){ state.fl[inp.id === 'pFrom' ? 'from' : 'to'] = inp.value; render(); } return; }
   if(inp.id === 'adQ'){ sb.adQ = inp.value; const pos = inp.selectionStart; render(); const n = $('#adQ'); if(n){ n.focus(); n.setSelectionRange(pos, pos); } return; }
   if(inp.id === 'refQ'){ state.refQ = inp.value; const q = normAr(inp.value); document.querySelectorAll('.acard[data-rid]').forEach(el => { el.style.display = !q || normAr(el.querySelector('.acard-h b').textContent).includes(q) ? '' : 'none'; }); return; }
   if(inp.id === 'rq'){ state.rq = inp.value; applyRq(); return; }
