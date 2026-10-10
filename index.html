@@ -632,6 +632,7 @@ const ACT_CSS = `
 `;
 const REF_CSS = `
 .actf.warnf .wbx{display:inline-block;width:14px;height:14px;border:1.5px solid #222;vertical-align:middle;text-align:center;line-height:12px;font-size:12px;font-family:Arial,sans-serif;font-weight:700;margin-inline-end:4px}.actf.warnf .wf-ck i{font-style:normal;margin-inline-start:16px;white-space:nowrap}
+.actf.refx .rfl{margin:2px 0 6px;padding-inline-start:20px}.actf.refx .rfl li{border-bottom:1px dotted #999;min-height:26px}.actf.refx .rsg{display:flex;justify-content:space-between;gap:12px;margin:8px 0 2px;font-size:13px}.actf.refx .abody{font-size:13.5px}.actf.refx .anote{font-size:11.5px}.actf.refx .adays{font-size:13.5px}
 .refm.callf{font-family:'Al-Mohanad','AL-Mohanad','Al Mohanad','Noto Naskh Arabic',serif;font-size:17px;line-height:2}
 .callf .cf-no{font-size:13px;margin-top:6px}.callf .cf-t{text-align:center;font-size:24px;margin:4px 0 14px;font-weight:700}
 .callf .cf-tb{width:100%;border-collapse:collapse;margin-bottom:18px;text-align:center}.callf .cf-tb th{background:#eef1f3;font-weight:700}.callf .cf-tb th,.callf .cf-tb td{border:1px solid #9aa5ad;padding:6px}
@@ -1058,7 +1059,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v67';
+const APP_VER = 'absence-v69';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -2213,18 +2214,18 @@ function flDailyView(){
       <td>${un ? '<span class="sub">—</span>' + exTag(x.r.exStatus) : `<select class="input fl-in" data-flf="reason"><option value="">— بدون سبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>${proofOf(x.reason) ? `<div class="sub" style="margin-top:4px">الإثبات: ${esc(proofOf(x.reason))}${x.r.proof ? ' ✓' : ''}</div>` : ''}${exTag(x.r.exStatus)}`}</td>
       <td><input class="input fl-in" data-flf="note" value="${esc(x.note)}" placeholder="ملاحظة…"></td>
       <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)} ${AR(dmy(parse(c.date)).slice(0, 7))}</button><div class="sub">${esc(c.reply || '')}</div>` : `<button class="btn sm" data-act="flCont">تواصل</button>`}</td>
-      <td>${un ? (w ? `<span class="tag ok">✓ صدر ${AR(dmy(parse(w)).slice(0, 7))}</span> <button class="btn sm" data-act="flWarn">إعادة</button>` : `<button class="btn sm danger-o" data-act="flWarn">${ICON.print} إنذار غياب</button>`) : '<span class="sub">—</span>'}</td>
+      <td>${un ? (w ? `<span class="tag ok">✓ صدر ${AR(dmy(parse(w)).slice(0, 7))}</span> <button class="btn sm" data-act="flWarn">إعادة</button>` : `<button class="btn sm" data-act="flWarn">${ICON.print} خطاب ولي الأمر</button>`) : '<span class="sub">—</span>'}</td>
     </tr>`;
   }).join('');
   return `<div class="kpis">
       ${k('', 'إجمالي أيام الغياب', AR(all.length), AR(new Set(all.map(x => x.cid + '|' + x.name)).size) + ' ' + G().students)}
-      ${k(nUn ? 'bad' : '', 'بدون عذر', AR(nUn), nUn - nW > 0 ? AR(nUn - nW) + ' بلا إنذار' : 'صدرت كل الإنذارات')}
+      ${k(nUn ? 'bad' : '', 'بدون عذر', AR(nUn), nUn - nW > 0 ? AR(nUn - nW) + ' بلا خطاب' : 'صدرت كل الخطابات')}
       ${k('good', 'بعذر', AR(nExc), 'عذر مقبول')}
       ${k(all.length - nC ? 'warn' : 'good', 'تم التواصل', AR(nC), AR(all.length - nC) + ' بانتظار التواصل')}
       ${k('', 'الأكثر غيابًا', top ? esc(top[0].split(' ').slice(0, 2).join(' ')) : '—', top ? AR(top[1]) + ' أيام' : 'لا يوجد غياب')}
     </div>
     <div class="bar"><div class="chips">${chip('all', 'الكل', all.length)}${chip('unexc', 'بدون عذر', nUn)}${chip('exc', 'بعذر', nExc)}${chip('noc', 'لم يُتواصل', all.length - nC)}</div></div>
-    <section class="panel" style="padding:0;overflow-x:auto"><table class="regt fl-t fl-d"><thead><tr><th>اليوم</th><th>${G().student}</th><th>التصنيف</th><th>السبب</th><th>ملاحظات</th><th>التواصل</th><th>المساءلة</th></tr></thead>
+    <section class="panel" style="padding:0;overflow-x:auto"><table class="regt fl-t fl-d"><thead><tr><th>اليوم</th><th>${G().student}</th><th>التصنيف</th><th>السبب</th><th>ملاحظات</th><th>التواصل</th><th>خطاب ولي الأمر</th></tr></thead>
     <tbody>${rows || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:22px">لا يوجد غياب مسجّل بالأسماء في هذه الفترة. تُسجَّل الأسماء من «إدخال الغياب» في رصد الغياب.</td></tr>`}</tbody></table></section>`;
 }
 function flReplyFor(reason, type){
@@ -2300,26 +2301,32 @@ async function flContSave(){
 }
 function absWarnHTML(x){
   const cfg = state.cfg, g = G(), f = g.f, d = parse(x.date), logo = logoSrc();
-  const s = studentStats().find(o => o.key === x.cid + '|' + x.name) || {unexc: 1, exc: 0};
-  return `<article class="actf">
+  const st = f ? 'الطالبة' : 'الطالب', son = f ? 'ابنتكم' : 'ابنكم';
+  const bx = '<span class="wbx"></span>';
+  const proofs = ['تقرير طبي / إجازة مرضية', 'إثبات مراجعة طبية', 'خطاب من جهة رسمية', 'أخرى: ....................'];
+  return `<article class="actf warnf">
     <div class="ahead"><div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
       <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
       <div class="d"><div>اليوم: <b>${dayName(new Date())}</b></div><div>التاريخ: <b>${hijriNum(today)}</b></div><div>الموافق: <b>${dmy(new Date()).replace(/ /g,'')}</b></div></div></div>
-    <h1>إنذار غياب</h1>
-    <table class="at1"><tr><th>اسم ${g.studentDef}</th><th>الصف</th><th>يوم الغياب</th><th>مجموع الغياب بدون عذر</th></tr>
-      <tr><td>${esc(x.name)}</td><td>${esc(flCls(x.cid))}</td><td>${dayName(d)} ${hijriNum(x.date)} هـ</td><td>${AR(s.unexc)} ${s.unexc > 10 ? 'يومًا' : s.unexc > 2 ? 'أيام' : 'يوم'}</td></tr></table>
+    <h1>خطاب استفسار عن سبب غياب</h1>
+    <table class="at1"><tr><th>اسم ${g.studentDef}</th><th>الصف</th><th>يوم الغياب</th><th>تاريخ الغياب</th></tr>
+      <tr><td>${esc(x.name)}</td><td>${esc(flCls(x.cid))}</td><td>${dayName(d)}</td><td>${hijriNum(x.date)}</td></tr></table>
     <div class="abody">
-      <p>المكرّم ولي أمر ${f ? 'الطالبة' : 'الطالب'} / <b>${esc(x.name)}</b> &nbsp;&nbsp; سلّمه الله</p>
+      <p>المكرّم ولي أمر ${st} / <b>${esc(x.name)}</b><span style="margin-inline-start:24px">${f ? 'حفظها' : 'حفظه'} الله</span></p>
       <p>السلام عليكم ورحمة الله وبركاته، وبعد:</p>
-      <p>نفيدكم بأن ${f ? 'ابنتكم' : 'ابنكم'} تغيّب${f ? 'ت' : ''} عن المدرسة يوم <b>${dayName(d)}</b> الموافق <b>${hijriNum(x.date)} هـ</b> بدون عذر مقبول، وبذلك بلغ مجموع غياب${f ? 'ها' : 'ه'} بدون عذر <b>(${AR(s.unexc)})</b> ${s.unexc > 10 ? 'يومًا' : s.unexc > 2 ? 'أيام' : 'يوم'}.</p>
-      <p>وحيث إن الانتظام في الدراسة من أهم أسباب التحصيل العلمي، وتكرار الغياب يترتب عليه اتخاذ الإجراءات النظامية الواردة في قواعد السلوك والمواظبة، نأمل منكم متابعة ${f ? 'ابنتكم' : 'ابنكم'} والحرص على انتظام${f ? 'ها' : 'ه'}، وتزويد المدرسة بالعذر المقبول عند الغياب.</p>
-      ${x.reason ? `<p>سبب الغياب المذكور: ${esc(x.reason)}</p>` : ''}
+      <p>نفيدكم بأن ${son} تغيّب${f ? 'ت' : ''} عن المدرسة يوم <b>${dayName(d)}</b> الموافق <b>${hijriNum(x.date)}</b>، ونأمل منكم إفادتنا عن <b>سبب الغياب</b> مع إرفاق <b>ما يثبت العذر</b>، وذلك خلال ثلاثة أيام من تاريخه.</p>
+      <p>علمًا بأنه في حال عدم تقديم ما يثبت العذر يُصنَّف الغياب <b>بدون عذر</b> ويُحسم من درجات المواظبة وفق قواعد السلوك والمواظبة.</p>
+      <div class="adays"><div class="adays-h">إفادة ولي الأمر</div>
+        <p style="margin:6px 0">سبب الغياب: ........................................................................................................</p>
+        <p class="wf-ck" style="margin:6px 0">المرفقات: ${proofs.map(p => `<i>${bx} ${p}</i>`).join('')}</p>
+        <p style="margin:6px 0">اسم ولي الأمر: ................................ التوقيع: .................... التاريخ: ....../....../١٤٤هـ</p></div>
+      <div class="adays"><div class="adays-h">خاص بالمدرسة</div>
+        <p class="wf-ck" style="margin:6px 0">نتيجة المراجعة: <i>${bx} قُبل العذر (غياب بعذر)</i><i>${bx} لم يُقبل العذر (غياب بدون عذر)</i></p></div>
       <p class="anote">شاكرين لكم تعاونكم، وتقبلوا خالص التحية والتقدير.</p>
     </div>
-    <div class="asig3">
-      <div><div class="st">ولي الأمر</div><div>الاسم: ${esc(guardianOf({key: x.cid + '|' + x.name, name: x.name})) || '....................'}</div><div>التوقيع: ....................</div></div>
-      <div><div class="st">${g.studentDef}</div><div>التوقيع: ....................</div></div>
+    <div class="asig3" style="grid-template-columns:1fr 1fr">
       <div><div class="st">${esc(g.officer)}</div><div>الاسم: ${esc(cfg.preparer || '') || '....................'}</div><div>التوقيع: ....................</div></div>
+      <div><div class="st">${g.affairs}</div><div>الاسم: ${esc(cfg.deputy || '') || '....................'}</div><div>التوقيع: ....................</div></div>
     </div>
     <div class="alead"><div>${f ? 'قائدة' : 'قائد'} المدرسة: <b>${esc(cfg.principal || '')}</b><br>التوقيع: ....................</div><div class="stamp">الختم</div></div>
   </article>`;
@@ -2443,7 +2450,7 @@ function stuDlg(key){
     return `<tr data-rid="${esc(rid)}"><td><b>${dayName(parse(r.date))}</b><div class="sub">${AR(dmy(parse(r.date)))}</div></td>
       <td>${un ? '<span class="tag bad">بدون عذر</span>' : '<span class="tag ok">بعذر</span>'}${r.reason ? `<div class="sub">${esc(r.reason)}</div>` : ''}${exTag(r.r.exStatus)}</td>
       <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)}</button>` : `<button class="btn sm" data-act="flCont">تواصل</button>`}</td>
-      <td>${un ? (flWarnOf(rid) ? '<span class="tag ok">✓ إنذار</span>' : `<button class="btn sm danger-o" data-act="flWarn">إنذار</button>`) : '—'}</td></tr>`;
+      <td>${un ? (flWarnOf(rid) ? '<span class="tag ok">✓ خطاب</span>' : `<button class="btn sm" data-act="flWarn">خطاب</button>`) : '—'}</td></tr>`;
   }).join('');
   const lv = s.reached.map(L => `<span class="tag ${acts[L.id] ? 'ok' : 'bad'}">${acts[L.id] ? '✓ ' : 'مستحق: '}${esc(L.short)}</span>`).join('');
   const rf = x.refs.map(r => `<span class="tag ${refStatus(r).c}">تحويل ${hijriNum(r.date)}: ${esc(refStatus(r).t)}</span>`).join('');
@@ -2454,7 +2461,7 @@ function stuDlg(key){
         ${s.reached.length ? `<button class="btn" data-act="actRec">تسجيل الإجراء</button><button class="btn" data-act="actPrint">${ICON.print} طباعة النموذج</button>` : ''}
         ${s.unexc >= 3 ? `<button class="btn ${warnDue(s).length ? 'danger-o' : ''}" data-act="warnOpen">الإنذارات${warnDue(s).length ? ' — ' + esc(warnDue(s).map(L => L.t).join('، ')) + ' مستحق' : ''}</button>` : ''}<button class="btn" data-act="actRefer">تحويل للموجه</button><button class="btn" data-act="stuCase">الحالة (${AR(x.n)}/${AR(CASE_STEPS.length)})</button></div>
       ${lv || rf ? `<div class="acard-t" style="margin:4px 0 10px"><span class="tag ${x.status === 'مغلقة' ? 'ok' : x.status === 'قيد المتابعة' ? 'warn' : 'bad'}">${x.status}</span>${lv}${rf}</div>` : ''}
-      <div style="overflow-x:auto"><table class="regt stu-t"><thead><tr><th>اليوم</th><th>الغياب</th><th>التواصل</th><th>المساءلة</th></tr></thead><tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">لا يوجد غياب مسجّل</td></tr>'}</tbody></table></div>
+      <div style="overflow-x:auto"><table class="regt stu-t"><thead><tr><th>اليوم</th><th>الغياب</th><th>التواصل</th><th>خطاب ولي الأمر</th></tr></thead><tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">لا يوجد غياب مسجّل</td></tr>'}</tbody></table></div>
     </div>`);
 }
 function caseList(){
@@ -2667,35 +2674,36 @@ function readRef(){
   return r;
 }
 function refFormHTML(r){
-  const cfg = state.cfg, g = G(), c = state.cfg.classes.find(x => x.id === r.cid), logo = logoSrc();
-  const box = on => on ? '☑' : '☐';
-  const lines = (t, min) => { const L = String(t || '').split('\n').map(x => x.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean); while(L.length < min) L.push(''); return L.map(x => `<div class="fl"><span class="bl">•</span><span class="ln">${esc(x)}</span></div>`).join(''); };
-  const hd = iso => iso ? hijriNum(iso) : '&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;١٤هـ';
+  const cfg = state.cfg, g = G(), f = g.f, c = cfg.classes.find(x => x.id === r.cid), logo = logoSrc(), dd = parse(r.date || today);
+  const box = on => `<span class="wbx">${on ? '✓' : ''}</span>`;
+  const lines = (t, min) => { const L = String(t || '').split('\n').map(x => x.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean); while(L.length < min) L.push(''); return `<ul class="rfl">${L.map(x => `<li>${esc(x) || '&#8203;'}</li>`).join('')}</ul>`; };
+  const hd = iso => iso ? hijriNum(iso) : '...../...../١٤٤هـ';
+  const cl = (r.coun && r.coun.call) || {};
   const notes = [
-    `يتم إخبار ${g.f ? 'وكيلة' : 'وكيل'} المرحلة حسب هذا النموذج بعد انتهاء الحصة الدراسية.`,
-    `${g.f ? 'تقوم وكيلة' : 'يقوم وكيل'} المرحلة باستدعاء ${g.studentDef} في وقت لا يؤثر ${g.f ? 'عليها' : 'عليه'} دراسيًا.`,
+    `يتم إخبار ${f ? 'وكيلة' : 'وكيل'} المرحلة حسب هذا النموذج بعد انتهاء الحصة الدراسية.`,
+    `${f ? 'تقوم وكيلة' : 'يقوم وكيل'} المرحلة باستدعاء ${g.studentDef} في وقت لا يؤثر ${f ? 'عليها' : 'عليه'} دراسيًا.`,
     `يتم تحويل ${g.studentDef} إلى ${g.counselor} في حالة تكرار السلوك أو الضعف الدراسي.`,
-    `${g.f ? 'تقوم' : 'يقوم'} ${g.counselor} بإخبار ${g.teacherT} بما تم حيال ${g.studentDef}.`,
+    `${f ? 'تقوم' : 'يقوم'} ${g.counselor} بإخبار ${g.teacherT} بما تم حيال ${g.studentDef}.`,
     `يحفظ هذا النموذج لدى ${g.affairs} ونسخة لدى ${g.counselor}.`];
-  return `<article class="refm">
+  return `<article class="actf warnf refx">
     <div class="ahead"><div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
       <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
-      <div class="d"><div>اليوم: <b>${dayName(parse(r.date || today))}</b></div><div>التاريخ: <b>${hijriNum(r.date || today)}</b></div><div>الموافق: <b>${dmy(parse(r.date || today)).replace(/ /g,'')}</b></div></div></div>
-    <div class="rbox">
-      <div class="rt"><div>نموذج رقم (31)</div><h1>تحويل ${g.student} ${g.f ? 'لوكيلة شؤون الطالبات' : 'لوكيل شؤون الطلاب'}</h1></div>
-      <table class="rtb"><tr><td><b>اسم ${g.studentDef}:</b> ${esc(r.name)}</td><td><b>المادة:</b> ${esc(r.subject)}</td></tr>
-        <tr><td><b>الشعبة:</b> ${c ? esc(clsLabel(c)) : ''}</td><td><b>الحصة:</b> ${esc(r.period)}</td></tr></table>
-      <div class="rl"><b>سبب التحويل:</b></div>
-      <div class="rsnp">${RSN.slice(0,4).map(x => `<span>${box((r.reasons || []).includes(x))} ${x}</span>`).join('')}</div>
-      <div class="rsnp"><span>${box((r.reasons || []).includes('أخرى'))} أخرى: <u>${esc(r.other) || '&nbsp;'.repeat(60)}</u></span></div>
-      <div class="rl"><b>إيضاح المشكلة:</b></div>${lines(r.problem, 4)}
-      <table class="rtb rsig"><tr><td><b>اسم ${g.teacherT}:</b> ${esc(r.teacher)}</td><td><b>التوقيع:</b></td><td><b>التاريخ:</b> ${hd(r.date)}</td></tr></table>
-      <div class="rl"><b>ما تم حيال ${g.studentDef}: ( خاص بـ${g.affairs} ):</b></div>${lines(r.dep && r.dep.text, 2)}
-      <div class="rl" style="margin-top:10px"><b>${box(r.dep && r.dep.refer)} تمت إحالت${g.his} إلى ${g.counselor}</b></div>
-      <div class="rsl"><span><b>${g.f ? 'وكيلة' : 'وكيل'} المدرسة:</b> ${esc((r.dep && r.dep.by) || '')}</span><span><b>التوقيع:</b> ............</span><span><b>التاريخ:</b> ${hd(r.dep && r.dep.text ? r.dep.date : '')}</span></div>
-      <div class="rl"><b>ما تم حيال ${g.studentDef}: ( خاص بـ${g.counselor} ):</b></div>${lines(r.coun && r.coun.text, 2)}
-      <div class="rsl"><span><b>${g.counselor}:</b> ${esc((r.coun && r.coun.by) || '')}</span><span><b>التوقيع:</b> ............</span><span><b>التاريخ:</b> ${hd(r.coun && r.coun.text ? r.coun.date : '')}</span></div>
-      <div class="rnotes"><b>ملاحظات:</b><ol>${notes.map(n => `<li>${n}</li>`).join('')}</ol></div>
+      <div class="d"><div>اليوم: <b>${dayName(dd)}</b></div><div>التاريخ: <b>${hijriNum(r.date || today)}</b></div><div>الموافق: <b>${dmy(dd).replace(/ /g,'')}</b></div></div></div>
+    <h1>تحويل ${g.student} ${f ? 'لوكيلة شؤون الطالبات' : 'لوكيل شؤون الطلاب'} — نموذج (31)</h1>
+    <table class="at1"><tr><th>اسم ${g.studentDef}</th><th>الصف</th><th>المادة</th><th>الحصة</th></tr>
+      <tr><td>${esc(r.name)}</td><td>${c ? esc(clsLabel(c)) : ''}</td><td>${esc(r.subject || '')}</td><td>${esc(r.period || '')}</td></tr></table>
+    <div class="abody">
+      <div class="adays"><div class="adays-h">سبب التحويل</div>
+        <p class="wf-ck" style="margin:4px 0">${RSN.slice(0,4).map(x => `<i>${box((r.reasons || []).includes(x))} ${x}</i>`).join('')}<i>${box((r.reasons || []).includes('أخرى'))} أخرى: ${esc(r.other) || '....................'}</i></p></div>
+      <div class="adays"><div class="adays-h">إيضاح المشكلة</div>${lines(r.problem, 3)}
+        <p class="rsg"><span>اسم ${g.teacherT}: <b>${esc(r.teacher || '')}</b></span><span>التوقيع: ..................</span><span>التاريخ: ${hd(r.date)}</span></p></div>
+      <div class="adays"><div class="adays-h">ما تم حيال ${g.studentDef} (خاص بـ${g.affairs})</div>${lines(r.dep && r.dep.text, 2)}
+        <p class="wf-ck" style="margin:4px 0"><i>${box(r.dep && r.dep.refer)} تمت إحالت${g.his} إلى ${g.counselor}</i></p>
+        <p class="rsg"><span>${f ? 'الوكيلة' : 'الوكيل'}: <b>${esc((r.dep && r.dep.by) || '')}</b></span><span>التوقيع: ..................</span><span>التاريخ: ${hd(r.dep && r.dep.text ? r.dep.date : '')}</span></p></div>
+      <div class="adays"><div class="adays-h">ما تم حيال ${g.studentDef} (خاص بـ${g.counselor})</div>${lines(r.coun && r.coun.text, 2)}
+        ${cl.on ? `<p class="wf-ck" style="margin:4px 0"><i>${box(true)} استدعاء ولي الأمر${cl.date ? ` بتاريخ ${hijriNum(cl.date)}` : ''}</i><i>${box(cl.done)} حضر ولي الأمر وعولجت المشكلة</i></p>` : ''}
+        <p class="rsg"><span>${g.counselor}: <b>${esc((r.coun && r.coun.by) || '')}</b></span><span>التوقيع: ..................</span><span>التاريخ: ${hd(r.coun && r.coun.text ? r.coun.date : '')}</span></p></div>
+      <div class="anote"><b>ملاحظات:</b><ol style="margin:2px 0 0;padding-inline-start:22px">${notes.map(n => `<li>${n}</li>`).join('')}</ol></div>
     </div>
   </article>`;
 }
@@ -3518,7 +3526,7 @@ document.addEventListener('click', async e => {
   if(act === 'flType' || act === 'flCont' || act === 'flWarn'){
     const rid = t.closest('tr').dataset.rid, x = flFindRow(rid); if(!x) return;
     if(act === 'flCont'){ flContDlg(rid); return; }
-    if(act === 'flWarn'){ warnDlg(x.cid + '|' + x.name); return; }
+    if(act === 'flWarn'){ await flWarnPrint(rid); return; }
     if(await flRowUpdate(x, {type: t.dataset.v === 'بعذر' ? 'بعذر' : 'بدون'})){ toast('تم تحديث التصنيف'); render(); } return;
   }
   if(act === 'stuCase'){ caseDlg(t.closest('[data-ckey]').dataset.ckey); return; }

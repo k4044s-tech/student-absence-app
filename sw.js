@@ -1,5 +1,5 @@
 // متابعة غياب الطلاب — يعمل بدون إنترنت
-const VERSION = 'absence-v67';
+const VERSION = 'absence-v69';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
