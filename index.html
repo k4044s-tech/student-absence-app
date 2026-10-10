@@ -1144,7 +1144,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v83';
+const APP_VER = 'absence-v84';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -1202,7 +1202,18 @@ function waPhone(p){
   if(d.startsWith('05')) d = '966' + d.slice(1); else if(/^5\d{8}$/.test(d)) d = '966' + d;
   return /^9665\d{8}$/.test(d) ? d : '';
 }
-const waUrl = (phone, text) => `https://wa.me/${phone ? waPhone(phone) : ''}?text=${encodeURIComponent(text)}`;
+const waNote = () => `\n\nملاحظة: سيتم إرسال ${G().f ? 'الخطاب أو العذر' : 'الخطاب أو العذر'} بشكل رسمي لكم مع ${G().studentDef}، نرجو الإفادة عليه وإعادته إلى المدرسة في أقرب وقت.`;
+const waUrl = (phone, text) => `https://wa.me/${phone ? waPhone(phone) : ''}?text=${encodeURIComponent(phone ? text + waNote() : text)}`;
+function waCallText(r){
+  const g = G(), f = g.f, cl = (r.coun && r.coun.call) || {}, st = f ? 'الطالبة' : 'الطالب', son = f ? 'ابنتكم' : 'ابنكم';
+  const tm = (cl.time || '09:00').split(':'), hh = +tm[0], t12 = `${String(hh % 12 || 12).padStart(2, '0')}:${tm[1] || '00'}`, ap = hh < 12 ? 'صباحًا' : 'مساءً';
+  return `المكرّم ولي أمر ${st} / ${r.name}    ${f ? 'حفظها' : 'حفظه'} الله
+السلام عليكم ورحمة الله وبركاته، وبعد:
+سعيًا من المدرسة للأخذ بيد ${st} ومساعدت${g.his} للتغلب على الصعوبات التي تواجه${g.his}، ونظرًا لأهمية التعاون بين المدرسة والمنزل،
+يرجى منكم التكرم بالحضور إلى المدرسة يوم ${cl.date ? dayName(parse(cl.date)) + ' الموافق ' + hijriNum(cl.date) : '........'} في تمام الساعة (${t12}) ${ap} لمقابلة ${g.counselor} لأمر هام يتعلق ب${son}${cl.phone ? `، وفي حالة الاعتذار عن الحضور نأمل إبلاغنا بالاتصال على الهاتف (${cl.phone})` : ''}.
+شاكرين لكم حسن تعاونكم وتجاوبكم معنا لتحقيق مصلحة ${st}.
+${state.cfg.school || ''}`;
+}
 function monthCountFor(cid, name, date){
   const m = date.slice(0, 7); let n = 0;
   Object.keys(state.days).forEach(k => { if(k.slice(0, 7) !== m || k === date) return;
@@ -2896,7 +2907,7 @@ function counselView(){
       <div class="acard-n"><span>${dayName(parse(r.date))} ${hijriNum(r.date)}</span>${r.subject ? `<span>المادة: <b>${esc(r.subject)}</b></span>` : ''}${r.period ? `<span>الحصة ${esc(r.period)}</span>` : ''}</div>
       <div class="acard-t">${rs}</div>
       <div class="acard-t"><span class="tag ${st.c}">${esc(st.t)}</span>${st.k === 'closed' && !r.depSeen ? '<span class="tag ok">إفادة جديدة للوكيل</span>' : ''}${r.teacher ? `<span class="tag mute">${esc(r.teacher)}</span>` : ''}</div>
-      <div class="acard-f"><button class="btn sm" data-act="refOpen">فتح وتحديث</button>${r.coun && r.coun.call && r.coun.call.on ? `<button class="btn sm" data-act="refCall">${ICON.print} الاستدعاء</button>` : ''}<button class="btn sm" data-act="refView">معاينة النموذج</button><button class="btn sm" data-act="refPrint">${ICON.print} طباعة</button>${waPhone(phoneFor(r.cid, r.name)) ? `<a class="btn sm wa" href="${esc(waUrl(phoneFor(r.cid, r.name), waRefText(r)))}" target="_blank" rel="noopener">واتساب</a>` : `<span class="tag mute">بلا جوال</span>`}</div>
+      <div class="acard-f"><button class="btn sm" data-act="refOpen">فتح وتحديث</button>${r.coun && r.coun.call && r.coun.call.on ? `<button class="btn sm" data-act="refCall">${ICON.print} الاستدعاء</button>` + (waPhone(phoneFor(r.cid, r.name)) ? `<a class="btn sm wa" href="${esc(waUrl(phoneFor(r.cid, r.name), waCallText(r)))}" target="_blank" rel="noopener">واتساب الاستدعاء</a>` : '') : ''}<button class="btn sm" data-act="refView">معاينة النموذج</button><button class="btn sm" data-act="refPrint">${ICON.print} طباعة</button>${waPhone(phoneFor(r.cid, r.name)) ? `<a class="btn sm wa" href="${esc(waUrl(phoneFor(r.cid, r.name), waRefText(r)))}" target="_blank" rel="noopener">واتساب</a>` : `<span class="tag mute">بلا جوال</span>`}</div>
     </div>`;
   }).join('');
   return `${periodBar()}<div class="bar">
@@ -2954,7 +2965,7 @@ function openRef(r){
         <p class="hint" id="rfCallHint" style="margin:6px 0 0" ${cl.on && !cl.done ? '' : 'hidden'}>يبقى التحويل «قيد المعالجة» حتى يحضر ولي الأمر وتُعالج المشكلة.</p>
       </div>
     </div>
-    <div class="reged-f">${isNew ? '' : `<button class="btn danger" data-act="refDel">حذف</button>`}<span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn" data-act="refCallPv" id="rfCallBtn" ${cl.on ? '' : 'hidden'}>${ICON.print} طباعة الاستدعاء</button><button class="btn" data-act="refPreview">معاينة</button><button class="btn primary" data-act="refSave">حفظ</button></div>`);
+    <div class="reged-f">${isNew ? '' : `<button class="btn danger" data-act="refDel">حذف</button>`}<span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn" data-act="refCallPv" id="rfCallBtn" ${cl.on ? '' : 'hidden'}>${ICON.print} طباعة الاستدعاء</button><button class="btn wa" data-act="refCallWa" id="rfCallWa" ${cl.on ? '' : 'hidden'}>واتساب الاستدعاء</button><button class="btn" data-act="refPreview">معاينة</button><button class="btn primary" data-act="refSave">حفظ</button></div>`);
   $('#dlgBg .modal').classList.add('dlg-wide');
 }
 function readRef(){
@@ -3740,6 +3751,7 @@ document.addEventListener('click', async e => {
   if(act === 'refOpen'){ openRef(state.refs[t.closest('.acard').dataset.rid]); return; }
   if(act === 'refView'){ const r = state.refs[t.closest('.acard').dataset.rid]; if(r) previewHTML('نموذج 31: ' + r.name, refFormHTML(r)); return; }
   if(act === 'refPrint'){ const r = state.refs[t.closest('.acard').dataset.rid]; if(r) printHTML(refFormHTML(r)); return; }
+  if(act === 'refCallWa'){ const r = readRef(), ph = phoneFor(r.cid, r.name); if(!waPhone(ph)){ toast('لا يوجد رقم جوال لولي الأمر — استورد كشف الطلاب من نور.', 'err'); return; } window.open(waUrl(ph, waCallText(r)), '_blank'); return; }
   if(act === 'refCallPv'){ const r = readRef(); previewHTML('استدعاء ولي أمر: ' + (r.name || ''), callFormHTML(r)); return; }
   if(act === 'refCall'){ const r = state.refs[t.closest('[data-rid]').dataset.rid]; if(r) previewHTML('استدعاء ولي أمر: ' + r.name, callFormHTML(r)); return; }
   if(act === 'refPreview'){ const r = readRef(); state.refEdit = r; const html = refFormHTML(r); const keep = r; previewHTML('معاينة: ' + (r.name || 'تحويل'), html); state.refBack = keep; return; }
@@ -3954,7 +3966,7 @@ document.addEventListener('change', async e => {
 });
 document.addEventListener('input', e => {
   const inp = e.target;
-  if(inp.id === 'rfCall' || inp.id === 'rfCallDone'){ const on = $('#rfCall').checked, dn = $('#rfCallDone').checked; $('#rfCallBox').hidden = !on; $('#rfCallBtn').hidden = !on; $('#rfCallHint').hidden = !on || dn; return; }
+  if(inp.id === 'rfCall' || inp.id === 'rfCallDone'){ const on = $('#rfCall').checked, dn = $('#rfCallDone').checked; $('#rfCallBox').hidden = !on; $('#rfCallBtn').hidden = !on; $('#rfCallWa').hidden = !on; $('#rfCallHint').hidden = !on || dn; return; }
   if(inp.id === 'fcR'){ delete inp.dataset.auto; return; }
   if(inp.id === 'fcE'){ const v = inp.value === 'مقبول' ? 'بعذر' : inp.value === 'مرفوض' ? 'بدون' : ''; if(v) document.querySelectorAll('#fcTy button').forEach(b => b.classList.toggle('on', b.dataset.fcty === v)); flContSync(); return; }
   if(inp.id === 'fcP' || inp.id === 'fcM' || inp.id === 'fcS'){ flContSync(); return; }
