@@ -1072,12 +1072,26 @@ async function saveCfg(){
   if(state.mode === 'db') return dbWrite(() => state.db.doc('config/main').set(clone(state.cfg)));
   lsSet('cfg', state.cfg); onData(); return true;
 }
+async function refsPrune(days){
+  const absent = new Set(), unexc = new Set();
+  Object.entries(days || {}).forEach(([k, d]) => Object.entries((d && d.students) || {}).forEach(([cid, rows]) => (rows || []).forEach(r => {
+    const nm = (r.name || '').trim(); if(!nm) return; absent.add(k + '|' + cid + '|' + nm); if(r.type !== 'بعذر') unexc.add(cid + '|' + nm);
+  })));
+  const items = (state.contacts && state.contacts.items) || [], drop = new Set();
+  items.forEach(c => { if(c.refId && !absent.has(c.rid)) drop.add(c.refId); });
+  Object.values(state.refs || {}).forEach(r => { const auto = r.src === 'abs' || r.other === 'تكرر الغياب بدون عذر'; if(auto && !unexc.has(r.cid + '|' + (r.name || '').trim())) drop.add(r.id); });
+  let n = 0;
+  for(const id of drop){ if(state.refs[id] && await deleteRef(id)) n++; }
+  if(n){ state.contacts = Object.assign({}, state.contacts, {items: items.map(c => drop.has(c.refId) ? Object.assign({}, c, {refId: ''}) : c)}); await flSaveContacts(); }
+  return n;
+}
 async function saveDay(date, entries, students){
   const total = Object.values(entries).reduce((a,b) => a + (+b||0), 0);
   const prev = state.days[date];
   const body = { date, entries, total, students: students !== undefined ? students : ((prev && prev.students) || {}), savedAt: new Date().toISOString() };
-  if(state.mode === 'db') return dbWrite(() => state.db.doc('days/' + date).set(body));
-  state.days[date] = body; lsSet('days', state.days); return true;
+  const nd = Object.assign({}, state.days, {[date]: body});
+  if(state.mode === 'db'){ const ok = await dbWrite(() => state.db.doc('days/' + date).set(body)); if(ok) await refsPrune(nd); return ok; }
+  state.days[date] = body; lsSet('days', state.days); await refsPrune(state.days); return true;
 }
 async function saveNoorM(){
   if(state.mode === 'db') return dbWrite(() => state.db.doc('config/noorm').set(clone(state.noorM)));
@@ -1100,8 +1114,9 @@ async function saveRoster(){
   lsSet('roster', state.roster); return true;
 }
 async function deleteDay(date){
-  if(state.mode === 'db') return dbWrite(() => state.db.doc('days/' + date).delete());
-  delete state.days[date]; lsSet('days', state.days); return true;
+  const nd = Object.assign({}, state.days); delete nd[date];
+  if(state.mode === 'db'){ const ok = await dbWrite(() => state.db.doc('days/' + date).delete()); if(ok) await refsPrune(nd); return ok; }
+  delete state.days[date]; lsSet('days', state.days); await refsPrune(state.days); return true;
 }
 
 function useLocal(){
@@ -1144,7 +1159,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v84';
+const APP_VER = 'absence-v85';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -2551,7 +2566,7 @@ async function flContSave(){
   let msg = 'تم حفظ التواصل، ويظهر في سجل التواصل';
   if(/تحويل/.test(rec.action) && !(rec.refId && state.refs[rec.refId])){
     const so = studentStats().find(o => o.key === x.cid + '|' + x.name) || {unexc:0, maxStreak:0, dates:[]}, f = G().f;
-    const ref = {id: 'r' + Date.now().toString(36), date: today, cid: x.cid, name: x.name, subject:'', period:'', reasons:['أخرى'], other:'تكرر الغياب بدون عذر', teacher: state.cfg.preparer || '',
+    const ref = {id: 'r' + Date.now().toString(36), src:'abs', date: today, cid: x.cid, name: x.name, subject:'', period:'', reasons:['أخرى'], other:'تكرر الغياب بدون عذر', teacher: state.cfg.preparer || '',
       problem: `غاب${f ? 'ت' : ''} ${so.unexc} ${so.unexc > 10 ? 'يومًا' : 'أيام'} بدون عذر مقبول${so.maxStreak >= 3 ? `، منها ${so.maxStreak} أيام متصلة` : ''}.\nآخر أيام الغياب: ${so.dates.slice(-5).map(k => hijriNum(k)).join('، ')}\nالتواصل مع ولي الأمر (${rec.method} ${hijriNum(rec.date)}): ${rec.reply}`,
       dep:{text:'تم التحويل بسبب تكرر الغياب وفق قواعد السلوك والمواظبة. ' + rec.action, refer:true, by: state.cfg.deputy || '', date: today},
       coun:{text:'', by: state.cfg.counselor || '', date:''}};
