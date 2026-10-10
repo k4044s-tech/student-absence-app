@@ -249,6 +249,21 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 .acard-h b{ font-size:14.5px; }
 .stu-n{ all:unset; cursor:pointer; font-weight:700; color:inherit; border-bottom:1px dashed currentColor; }
 .stu-n:hover{ color:var(--accent, #0b6b55); }
+.sp-h{ display:flex; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid var(--border); }
+.sp-av{ width:46px; height:46px; border-radius:12px; background:#e8f1ee; color:#0b6b55; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; flex:none; }
+.sp-id{ flex:1; min-width:0; } .sp-id b{ font-size:17px; }
+.sp{ background:var(--bg, #f6f7f8); display:flex; flex-direction:column; gap:12px; }
+.sp-k{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+.sp-k>div{ background:var(--card, #fff); border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center; display:flex; flex-direction:column; gap:2px; }
+.sp-k b{ font-size:22px; } .sp-k span{ font-size:12px; color:var(--muted); }
+.sp-k .bad b{ color:#c0392b; } .sp-k .good b{ color:#1e8e5a; }
+.sp-g{ display:grid; grid-template-columns:1fr 1.6fr 1.2fr; gap:10px; }
+.sp-sec{ background:var(--card, #fff); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+.sp-t{ font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:8px; }
+.sp-b{ display:flex; flex-wrap:wrap; gap:6px; }
+.sp-m{ display:flex; flex-wrap:wrap; gap:8px; } .sp-m>div{ display:flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--border); border-radius:20px; font-size:13px; }
+.sp-tb td.n{ color:var(--muted); width:36px; } .sp-tb td, .sp-tb th{ padding:8px 12px; }
+@media screen and (max-width:860px){ .sp-k{ grid-template-columns:repeat(3,1fr); } .sp-g{ grid-template-columns:1fr; } }
 .stu-k{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
 .stu-k div{ background:var(--soft, #f3f5f4); border-radius:10px; padding:8px; text-align:center; display:flex; flex-direction:column; }
 .stu-k b{ font-size:20px; } .stu-k span{ font-size:12px; color:var(--muted); }
@@ -1059,7 +1074,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v72';
+const APP_VER = 'absence-v73';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -2446,31 +2461,80 @@ function caseInfo(s){
   return {s, c, auto, done, n: done.filter(Boolean).length, status, rows, cons, refs};
 }
 /* ---------- ملف الطالب ---------- */
-function stuDlg(key){
+function stuData(key){
   const f = state.fl, sv = [f.from, f.to]; f.from = '0000-01-01'; f.to = '9999-12-31';
   let s; try{ s = studentStats().find(o => o.key === key); } finally { f.from = sv[0]; f.to = sv[1]; }
   const i = key.indexOf('|'), cid = key.slice(0, i), name = key.slice(i + 1);
   if(!s){ const c = state.cfg.classes.find(x => x.id === cid); s = {key, cid, name, unexc:0, exc:0, maxStreak:0, dates:[], phone:'', cls:c, reached:[], due:[]}; }
-  const x = caseInfo(s), ph = s.phone || phoneFor(cid, name), wa = waPhone(ph);
-  const acts = state.actions[key] || {};
-  const rows = x.rows.slice().sort((a, b) => b.date.localeCompare(a.date)).map(r => {
-    const rid = flRid(r), c = flContactOf(rid), un = r.type !== 'بعذر';
-    return `<tr data-rid="${esc(rid)}"><td><b>${dayName(parse(r.date))}</b><div class="sub">${AR(dmy(parse(r.date)))}</div></td>
+  const x = caseInfo(s), ph = s.phone || phoneFor(cid, name);
+  const rows = x.rows.slice().sort((a, b) => b.date.localeCompare(a.date));
+  const hm = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {month:'long'});
+  const months = []; rows.slice().reverse().forEach(r => { const m = hm.format(parse(r.date)); let o = months.find(z => z.m === m); if(!o){ o = {m, un:0, ex:0}; months.push(o); } r.type === 'بعذر' ? o.ex++ : o.un++; });
+  const pct = Math.round(s.unexc / actDays() * 1000) / 10;
+  return {s, x, ph, rows, months, pct, name, cid};
+}
+function stuDlg(key){
+  const {s, x, ph, rows, months, pct, name, cid} = stuData(key), g = G(), wa = waPhone(ph), acts = state.actions[key] || {}, wd = warnDue(s), w3 = warnRec(key);
+  const stTag = `<span class="tag ${x.status === 'مغلقة' ? 'ok' : x.status === 'قيد المتابعة' ? 'warn' : 'bad'}">${x.status}</span>`;
+  const kpi = (v, l, cls) => `<div class="${cls || ''}"><b>${v}</b><span>${l}</span></div>`;
+  const tl = [];
+  WARN_LV.forEach(L => { const v = w3['w' + L.n]; if(v) tl.push(`<span class="tag ok">✓ ${L.t}</span>`); else if(s.unexc >= L.d) tl.push(`<span class="tag bad">${L.t} مستحق</span>`); });
+  s.reached.forEach(L => tl.push(`<span class="tag ${acts[L.id] ? 'ok' : 'bad'}">${acts[L.id] ? '✓ ' : 'مستحق: '}${esc(L.short)}</span>`));
+  x.refs.forEach(r => tl.push(`<span class="tag ${refStatus(r).c}">تحويل ${hijriNum(r.date)}: ${esc(refStatus(r).t)}</span>`));
+  const trs = rows.map((r, k) => {
+    const rid = flRid(r), c = flContactOf(rid), un = r.type !== 'بعذر', d = parse(r.date);
+    return `<tr data-rid="${esc(rid)}"><td class="n">${AR(rows.length - k)}</td><td><b>${dayName(d)}</b> <span class="sub">${hijriNum(r.date)}</span></td>
       <td>${un ? '<span class="tag bad">بدون عذر</span>' : '<span class="tag ok">بعذر</span>'}${r.reason ? `<div class="sub">${esc(r.reason)}</div>` : ''}${exTag(r.r.exStatus)}</td>
-      <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)}</button>` : `<button class="btn sm" data-act="flCont">تواصل</button>`}</td>
-      <td>${un ? (flWarnOf(rid) ? '<span class="tag ok">✓ خطاب</span>' : `<button class="btn sm" data-act="flWarn">خطاب</button>`) : '—'}</td></tr>`;
+      <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)}</button>` : `<button class="btn sm" data-act="flCont">تسجيل</button>`}</td>
+      <td>${un ? (flWarnOf(rid) ? '<span class="tag ok">✓ صدر</span>' : `<button class="btn sm" data-act="flWarn">${ICON.print} خطاب</button>`) : '<span class="sub">—</span>'}</td></tr>`;
   }).join('');
-  const lv = s.reached.map(L => `<span class="tag ${acts[L.id] ? 'ok' : 'bad'}">${acts[L.id] ? '✓ ' : 'مستحق: '}${esc(L.short)}</span>`).join('');
-  const rf = x.refs.map(r => `<span class="tag ${refStatus(r).c}">تحويل ${hijriNum(r.date)}: ${esc(refStatus(r).t)}</span>`).join('');
-  openDlg(`<div class="reged-h"><b>ملف ${G().student}: ${esc(name)}</b><span class="tag mute">${s.cls ? esc(clsLabel(s.cls)) : ''}</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
-    <div class="dlg-b" data-key="${esc(key)}" data-ckey="${esc(key)}">
-      <div class="stu-k"><div><b>${AR(s.unexc)}</b><span>بدون عذر</span></div><div><b>${AR(s.exc)}</b><span>بعذر</span></div><div><b>${AR(x.cons.length)}</b><span>تواصل</span></div><div><b>${AR(s.maxStreak)}</b><span>أطول متصل</span></div></div>
-      <div class="stu-a">${wa ? `<a class="btn wa" href="${esc(waUrl(ph, s.unexc ? waActText(s) : waAbsentText(cid, name, 'بدون')))}" target="_blank" rel="noopener">واتساب ولي الأمر</a><a class="btn" href="tel:${esc(ph)}">اتصال ${esc(ph)}</a>` : '<span class="tag mute">لا يوجد رقم جوال — استورد كشف الطلاب من نور</span>'}
-        ${s.reached.length ? `<button class="btn" data-act="actRec">تسجيل الإجراء</button><button class="btn" data-act="actPrint">${ICON.print} طباعة النموذج</button>` : ''}
-        ${s.unexc >= 3 ? `<button class="btn ${warnDue(s).length ? 'danger-o' : ''}" data-act="warnOpen">الإنذارات${warnDue(s).length ? ' — ' + esc(warnDue(s).map(L => L.t).join('، ')) + ' مستحق' : ''}</button>` : ''}<button class="btn" data-act="actRefer">تحويل للموجه</button><button class="btn" data-act="stuCase">الحالة (${AR(x.n)}/${AR(CASE_STEPS.length)})</button></div>
-      ${lv || rf ? `<div class="acard-t" style="margin:4px 0 10px"><span class="tag ${x.status === 'مغلقة' ? 'ok' : x.status === 'قيد المتابعة' ? 'warn' : 'bad'}">${x.status}</span>${lv}${rf}</div>` : ''}
-      <div style="overflow-x:auto"><table class="regt stu-t"><thead><tr><th>اليوم</th><th>الغياب</th><th>التواصل</th><th>خطاب ولي الأمر</th></tr></thead><tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">لا يوجد غياب مسجّل</td></tr>'}</tbody></table></div>
+  openDlg(`<div class="sp-h">
+      <div class="sp-av">${esc(name.trim().charAt(0))}</div>
+      <div class="sp-id"><b>${esc(name)}</b><div class="sub">${s.cls ? esc(clsLabel(s.cls)) : ''}${ph ? ` · <span dir="ltr">${esc(ph)}</span>` : ''}</div></div>
+      <div class="sp-st">${stTag}</div>
+      <button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b sp" data-key="${esc(key)}" data-ckey="${esc(key)}">
+      <div class="sp-k">${kpi(AR(s.unexc), 'بدون عذر', s.unexc >= 3 ? 'bad' : '')}${kpi(AR(s.exc), 'بعذر', 'good')}${kpi(AR(pct) + '%', 'نسبة الغياب بدون عذر')}${kpi(AR(s.maxStreak), 'أطول غياب متصل')}${kpi(AR(x.cons.length), 'مرات التواصل')}</div>
+      <div class="sp-g">
+        <div class="sp-sec"><div class="sp-t">التواصل مع ولي الأمر</div><div class="sp-b">${wa ? `<a class="btn wa" href="${esc(waUrl(ph, s.unexc ? waActText(s) : waAbsentText(cid, name, 'بدون')))}" target="_blank" rel="noopener">واتساب</a><a class="btn" href="tel:${esc(ph)}">اتصال</a>` : '<span class="sub">لا يوجد رقم جوال — استورد كشف الطلاب من نور</span>'}</div></div>
+        <div class="sp-sec"><div class="sp-t">الإجراءات</div><div class="sp-b">
+          ${s.unexc >= 3 ? `<button class="btn ${wd.length ? 'danger-o' : ''}" data-act="warnOpen">الإنذارات${wd.length ? ` <span class="tag bad">${AR(wd.length)}</span>` : ''}</button>` : ''}
+          ${s.reached.length ? `<button class="btn" data-act="actRec">تسجيل الإجراء</button>` : ''}
+          <button class="btn" data-act="actRefer">تحويل للموجه</button><button class="btn" data-act="stuCase">الحالة ${AR(x.n)}/${AR(CASE_STEPS.length)}</button></div></div>
+        <div class="sp-sec"><div class="sp-t">الطباعة</div><div class="sp-b"><button class="btn primary" data-act="stuRep">${ICON.print} إحصائية ${g.studentDef}</button>${s.reached.length ? `<button class="btn" data-act="actPrint">${ICON.print} نموذج الإجراء</button>` : ''}</div></div>
+      </div>
+      ${tl.length ? `<div class="sp-sec sp-tl"><div class="sp-t">سجل الإجراءات</div><div class="acard-t" style="margin:0">${tl.join('')}</div></div>` : ''}
+      ${months.length ? `<div class="sp-sec"><div class="sp-t">الغياب حسب الشهر</div><div class="sp-m">${months.map(o => `<div><b>${o.m}</b><span class="tag bad">${AR(o.un)}</span>${o.ex ? `<span class="tag ok">${AR(o.ex)}</span>` : ''}</div>`).join('')}</div></div>` : ''}
+      <div class="sp-sec" style="padding:0;overflow:hidden"><div class="sp-t" style="padding:12px 14px 0">أيام الغياب (${AR(rows.length)})</div>
+        <div style="overflow-x:auto"><table class="regt stu-t sp-tb"><thead><tr><th>#</th><th>اليوم والتاريخ</th><th>الغياب</th><th>التواصل</th><th>خطاب ولي الأمر</th></tr></thead><tbody>${trs || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">لا يوجد غياب مسجّل</td></tr>'}</tbody></table></div></div>
     </div>`);
+  $('#dlgBg .modal').classList.add('dlg-wide');
+}
+function stuRepHTML(key){
+  const {s, x, ph, rows, months, pct, name} = stuData(key), cfg = state.cfg, g = G(), f = g.f, logo = formLogo(), acts = state.actions[key] || {}, w3 = warnRec(key);
+  const asc = rows.slice().reverse();
+  const tl = [];
+  WARN_LV.forEach(L => { const v = w3['w' + L.n], d = v && (v.date || v); if(d || s.unexc >= L.d) tl.push([L.t, d ? 'صدر ' + hijriNum(d) : 'مستحق — لم يصدر']); });
+  s.reached.forEach(L => tl.push([L.short, acts[L.id] ? 'نُفّذ ' + hijriNum(acts[L.id].date) : 'مستحق — لم يُنفّذ']));
+  x.refs.forEach(r => tl.push(['تحويل للموجه ' + hijriNum(r.date), refStatus(r).t]));
+  return `<article class="actf">
+    <div class="ahead"><div class="r">وزارة التعليم<br>${esc(cfg.edu)}<br><span class="sch">${esc(cfg.school)}</span></div>
+      <div class="c">${logo ? `<img src="${logo}" alt="وزارة التعليم">` : ''}</div>
+      <div class="d"><div>اليوم: <b>${dayName(new Date())}</b></div><div>التاريخ: <b>${hijriNum(today)}</b></div><div>العام الدراسي: <b>${esc(cfg.year || '')}</b></div></div></div>
+    <h1>إحصائية غياب ${g.studentDef}</h1>
+    <table class="at1"><tr><th>اسم ${g.studentDef}</th><th>الصف</th><th>جوال ولي الأمر</th><th>حالة المتابعة</th></tr>
+      <tr><td><b>${esc(name)}</b></td><td>${s.cls ? esc(clsLabel(s.cls)) : ''}</td><td dir="ltr">${esc(ph || '—')}</td><td>${x.status}</td></tr></table>
+    <table class="at1"><tr><th>إجمالي الغياب</th><th>بدون عذر</th><th>بعذر</th><th>نسبة الغياب بدون عذر</th><th>أطول غياب متصل</th><th>مرات التواصل</th></tr>
+      <tr><td><b>${s.unexc + s.exc}</b></td><td><b>${s.unexc}</b></td><td>${s.exc}</td><td>${pct}% من ${actDays()} يومًا</td><td>${s.maxStreak}</td><td>${x.cons.length}</td></tr></table>
+    ${months.length ? `<table class="at1"><tr><th>الشهر</th>${months.map(o => `<th>${o.m}</th>`).join('')}</tr><tr><td>بدون عذر</td>${months.map(o => `<td>${o.un}</td>`).join('')}</tr><tr><td>بعذر</td>${months.map(o => `<td>${o.ex}</td>`).join('')}</tr></table>` : ''}
+    <table class="at1 sr-d"><tr><th>#</th><th>اليوم</th><th>التاريخ</th><th>نوع الغياب</th><th>السبب / حالة العذر</th><th>التواصل مع ولي الأمر</th><th>خطاب</th></tr>
+      ${asc.map((r, k) => { const rid = flRid(r), c = flContactOf(rid); return `<tr><td>${k + 1}</td><td>${dayName(parse(r.date))}</td><td>${hijriNum(r.date)}</td><td>${r.type === 'بعذر' ? 'بعذر' : 'بدون عذر'}</td><td>${esc([r.reason, r.r.exStatus && r.r.exStatus !== 'لم يُقدَّم' ? r.r.exStatus : ''].filter(Boolean).join(' — ') || '—')}</td><td>${c ? esc(c.method + (c.reply ? ': ' + c.reply : '')) : '—'}</td><td>${flWarnOf(rid) ? '✓' : '—'}</td></tr>`; }).join('') || '<tr><td colspan="7">لا يوجد غياب مسجّل</td></tr>'}</table>
+    ${tl.length ? `<table class="at1"><tr><th>الإجراء</th><th>الحالة</th></tr>${tl.map(([a, b]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td></tr>`).join('')}</table>` : ''}
+    <div class="asig3" style="grid-template-columns:1fr 1fr">
+      <div><div class="st">${esc(g.officer)}</div><div>الاسم: ${esc(cfg.preparer || '') || '....................'}</div><div>التوقيع: ....................</div></div>
+      <div><div class="st">${g.affairs}</div><div>الاسم: ${esc(cfg.deputy || '') || '....................'}</div><div>التوقيع: ....................</div></div></div>
+    <div class="alead"><div>${f ? 'قائدة' : 'قائد'} المدرسة: <b>${esc(cfg.principal || '')}</b><br>التوقيع: ....................</div><div class="stamp">الختم</div></div>
+  </article>`;
 }
 function caseList(){
   const q = normAr(state.fl.q || '');
@@ -3533,6 +3597,7 @@ document.addEventListener('click', async e => {
     if(act === 'flWarn'){ await flWarnPrint(rid); return; }
     if(await flRowUpdate(x, {type: t.dataset.v === 'بعذر' ? 'بعذر' : 'بدون'})){ toast('تم تحديث التصنيف'); render(); } return;
   }
+  if(act === 'stuRep'){ const k = keyOf(t); previewHTML('إحصائية: ' + k.split('|').slice(1).join('|'), stuRepHTML(k)); return; }
   if(act === 'stuCase'){ caseDlg(t.closest('[data-ckey]').dataset.ckey); return; }
   if(act === 'warnOpen'){ warnDlg(keyOf(t)); return; }
   if(act === 'warnIssue' || act === 'warnUndo'){ const key = keyOf(t), n = +t.dataset.n; await warnSet(key, n, act === 'warnUndo' ? null : (n === 2 ? {date: today, method: ($('#w2m') || {}).value || 'رسالة نصية'} : {date: today})); toast(act === 'warnUndo' ? 'تم الإلغاء' : 'تم تسجيل الإنذار'); return; }
