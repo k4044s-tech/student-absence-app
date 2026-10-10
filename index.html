@@ -469,7 +469,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 .fl-d .fl-bd{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; align-items:center; }
 .fl-d .fl-ct, .fl-d .fl-wr{ min-width:140px; } .fl-d .fl-wr{ white-space:nowrap; } .fl-d .fl-wr .tag{ margin-inline-end:6px; }
 .fl-d .fl-full{ width:100%; justify-content:center; } .fl-d .fl-rp{ margin-top:4px; font-size:12px; text-align:center; }
-.fl-d tr.fl-done td{ background:var(--good-soft); }
+.fl-d tr.fl-done td, .sp-tb tr.sp-done td{ background:var(--good-soft); } .sp-tb .fl-file{ width:32px; height:32px; padding:0 !important; justify-content:center; }
 .fl-d td{ vertical-align:middle; } .fl-d .input{ min-height:36px; min-width:130px; } .fl-d tr.fl-pend td{ background:var(--warn-soft); }
 .fl-d .seg button{ padding:6px 10px; } .btn.danger-o{ color:var(--bad); border-color:var(--bad-line); } .btn.fl-ok{ color:var(--good); border-color:var(--good-line); background:var(--good-soft); }
 .fc-seg{ display:flex; min-height:38px; } .fc-seg button{ flex:1; font-size:13.5px; }
@@ -1144,7 +1144,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v81';
+const APP_VER = 'absence-v83';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -1209,13 +1209,13 @@ function monthCountFor(cid, name, date){
     if(((state.days[k].students || {})[cid] || []).some(r => (r.name || '').trim() === name)) n++; });
   return n + 1;
 }
-function waAbsentText(cid, name, type){
-  const g = G(), f = g.f, d = parse(state.entryDate), n = monthCountFor(cid, name, state.entryDate);
-  let hm = ''; try{ hm = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {month:'long'}).format(d); }catch(e){}
-  return `السلام عليكم ورحمة الله وبركاته
-ولي أمر ${f ? 'الطالبة' : 'الطالب'} / ${name} المحترم
-نفيدكم بغياب ${f ? 'ابنتكم' : 'ابنكم'} اليوم ${dayName(d)} ${hijriFull(d)}${type === 'بعذر' ? ' (بعذر)' : ''}.
-${n > 1 ? `وهذا غياب${f ? 'ها' : 'ه'} رقم (${n}) خلال شهر ${hm}.\n` : ''}نأمل حرصكم على انتظام${f ? 'ها' : 'ه'} في الدراسة.
+function waAbsentText(cid, name, type, date){
+  const g = G(), f = g.f, k = date || state.entryDate, d = parse(k);
+  const st = f ? 'الطالبة' : 'الطالب', son = f ? 'ابنتكم' : 'ابنكم';
+  return `المكرّم ولي أمر ${st} / ${name}    ${f ? 'حفظها' : 'حفظه'} الله
+السلام عليكم ورحمة الله وبركاته، وبعد:
+نفيدكم بأن ${son} تغيّب${f ? 'ت' : ''} عن المدرسة يوم ${dayName(d)} الموافق ${hijriNum(k)}، ونأمل منكم إفادتنا عن سبب الغياب مع إرفاق ما يثبت العذر، وذلك خلال ثلاثة أيام من تاريخه.
+علمًا بأنه في حال عدم تقديم ما يثبت العذر يُصنَّف الغياب بدون عذر ويُحسم من درجات المواظبة وفق قواعد السلوك والمواظبة.
 ${state.cfg.school || ''}`;
 }
 function waActText(s){
@@ -2300,7 +2300,7 @@ function flDailyView(){
   const chip = (v, t, n) => `<button class="chip ${f === v ? 'on' : ''}" data-flflt="${v}">${t} <b style="margin-inline-start:6px">${AR(n)}</b></button>`;
   const rows = L.map(x => {
     const rid = flRid(x), c = flContactOf(rid), w = flWarnOf(rid), d = parse(x.date), un = x.type !== 'بعذر', fo = fileOf(rid);
-    const done = !un && c && (x.r.proof || fo) && x.r.exStatus !== 'مرفوض';
+    const done = flDone(x);
     const reasonSel = `<select class="input fl-in" data-flf="reason"><option value="">— اختر السبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>`;
     const fbtn = fo ? `<button class="btn sm fl-file" data-act="fileView" data-rid="${esc(rid)}" title="عرض ملف العذر" aria-label="عرض ملف العذر">📎</button>` : '';
     const st = x.r.exStatus && x.r.exStatus !== 'مقبول' && x.r.exStatus !== 'لم يُقدَّم' ? exTag(x.r.exStatus) : '';
@@ -2364,6 +2364,7 @@ function flContDlg(rid){
   flContSync();
 }
 /* ---------- مرفقات الأعذار (صورة أو PDF) ---------- */
+const flDone = x => x.type === 'بعذر' && !!flContactOf(flRid(x)) && !!(x.r.proof || fileOf(flRid(x))) && x.r.exStatus !== 'مرفوض';
 const fileKey = rid => rid.replace(/[\/|.#$\[\]]/g, '_');
 const fileOf = rid => (state.files || {})[fileKey(rid)] || null;
 async function saveFile(rid, obj){
@@ -2525,7 +2526,7 @@ function flContSync(){
   const ph = $('#fcP').value.trim(), wa = $('#fcWa');
   const on = $('#fcM').value === 'واتساب' && waPhone(ph);
   wa.style.display = on ? '' : 'none';
-  if(on) wa.href = waUrl(ph, waAbsentText(x.cid, x.name, ty));
+  if(on) wa.href = waUrl(ph, waAbsentText(x.cid, x.name, ty, x.date));
 }
 async function flContSave(){
   const box = document.querySelector('#dlgBg .dlg-b'); const rid = box.dataset.rid, x = flFindRow(rid); if(!x) return;
@@ -2682,7 +2683,8 @@ function caseInfo(s){
     c.status === 'مغلقة'
   ];
   const done = auto.map((a, i) => a || !!m[i]);
-  const status = c.status || (cons.length || refs.length ? 'قيد المتابعة' : 'مفتوحة');
+  const allDone = rows.length && rows.every(flDone);
+  const status = c.status || (allDone ? 'مغلقة' : cons.length || refs.length ? 'قيد المتابعة' : 'مفتوحة');
   return {s, c, auto, done, n: done.filter(Boolean).length, status, rows, cons, refs};
 }
 /* ---------- ملف الطالب ---------- */
@@ -2700,14 +2702,17 @@ function stuData(key){
 }
 function stuDlg(key){
   const {s, x, ph, rows, months, pct, name, cid} = stuData(key), g = G(), wa = waPhone(ph), acts = state.actions[key] || {}, wd = warnDue(s), w3 = warnRec(key);
-  const stTag = `<span class="tag ${x.status === 'مغلقة' ? 'ok' : x.status === 'قيد المتابعة' ? 'warn' : 'bad'}">${x.status}</span>`;
+  const stTag = `<span class="tag ${x.status === 'مغلقة' ? 'ok' : x.status === 'قيد المتابعة' ? 'warn' : 'bad'}">${x.status === 'مغلقة' ? '✓ مكتمل' : x.status}</span>`;
   const kpi = (v, l, cls) => `<div class="${cls || ''}"><b>${v}</b><span>${l}</span></div>`;
   const tl = [];
   WARN_LV.forEach(L => { const v = w3['w' + L.n]; if(v) tl.push(`<span class="tag ok">✓ ${L.t}</span>`); else if(s.unexc >= L.d) tl.push(`<span class="tag bad">${L.t} مستحق</span>`); });
   s.reached.forEach(L => tl.push(`<span class="tag ${acts[L.id] ? 'ok' : 'bad'}">${acts[L.id] ? '✓ ' : 'مستحق: '}${esc(L.short)}</span>`));
   x.refs.forEach(r => tl.push(`<span class="tag ${refStatus(r).c}">تحويل ${hijriNum(r.date)}: ${esc(refStatus(r).t)}</span>`));
   const trs = rows.map((r, k) => {
-    const rid = flRid(r), c = flContactOf(rid), un = r.type !== 'بعذر', d = parse(r.date);
+    const rid = flRid(r), c = flContactOf(rid), un = r.type !== 'بعذر', d = parse(r.date), dn = flDone(r), fo = fileOf(rid);
+    if(dn) return `<tr data-rid="${esc(rid)}" class="sp-done"><td class="n">${AR(rows.length - k)}</td><td><b>${dayName(d)}</b> <span class="sub">${hijriNum(r.date)}</span></td>
+      <td><span class="tag ok">بعذر</span> <span class="sub">${esc(r.reason || '')}</span>${fo ? ` <button class="btn sm fl-file" data-act="fileView" data-rid="${esc(rid)}" title="ملف العذر">📎</button>` : ''}</td>
+      <td colspan="2"><button class="btn sm fl-ok" data-act="flCont">✓ مكتمل</button></td></tr>`;
     return `<tr data-rid="${esc(rid)}"><td class="n">${AR(rows.length - k)}</td><td><b>${dayName(d)}</b> <span class="sub">${hijriNum(r.date)}</span></td>
       <td>${un ? '<span class="tag bad">بدون عذر</span>' : '<span class="tag ok">بعذر</span>'}${r.reason ? `<div class="sub">${esc(r.reason)}</div>` : ''}${exTag(r.r.exStatus)}${fileOf(rid) ? ` <button class="btn sm" data-act="fileView" data-rid="${esc(rid)}">📎 العذر</button>` : ''}</td>
       <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)}</button>` : `<button class="btn sm" data-act="flCont">تسجيل</button>`}</td>
@@ -2721,7 +2726,7 @@ function stuDlg(key){
     <div class="dlg-b sp" data-key="${esc(key)}" data-ckey="${esc(key)}">
       <div class="sp-k">${kpi(AR(s.unexc), 'بدون عذر', s.unexc >= 3 ? 'bad' : '')}${kpi(AR(s.exc), 'بعذر', 'good')}${kpi(AR(pct) + '%', 'نسبة الغياب بدون عذر')}${kpi(AR(s.maxStreak), 'أطول غياب متصل')}${kpi(AR(x.cons.length), 'مرات التواصل')}</div>
       <div class="sp-g">
-        <div class="sp-sec"><div class="sp-t">التواصل مع ولي الأمر</div><div class="sp-b">${wa ? `<a class="btn wa" href="${esc(waUrl(ph, s.unexc ? waActText(s) : waAbsentText(cid, name, 'بدون')))}" target="_blank" rel="noopener">واتساب</a><a class="btn" href="tel:${esc(ph)}">اتصال</a>` : '<span class="sub">لا يوجد رقم جوال — استورد كشف الطلاب من نور</span>'}</div></div>
+        <div class="sp-sec"><div class="sp-t">التواصل مع ولي الأمر</div><div class="sp-b">${wa ? `<a class="btn wa" href="${esc(waUrl(ph, s.unexc ? waActText(s) : waAbsentText(cid, name, 'بدون', rows[0] && rows[0].date)))}" target="_blank" rel="noopener">واتساب</a><a class="btn" href="tel:${esc(ph)}">اتصال</a>` : '<span class="sub">لا يوجد رقم جوال — استورد كشف الطلاب من نور</span>'}</div></div>
         <div class="sp-sec"><div class="sp-t">الإجراءات</div><div class="sp-b">
           ${s.unexc >= 3 ? `<button class="btn ${wd.length ? 'danger-o' : ''}" data-act="warnOpen">الإنذارات${wd.length ? ` <span class="tag bad">${AR(wd.length)}</span>` : ''}</button>` : ''}
           ${s.reached.length ? `<button class="btn" data-act="actRec">تسجيل الإجراء</button>` : ''}
