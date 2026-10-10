@@ -527,7 +527,12 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   .phead .school{ font-size:15.5px !important; line-height:1.5; }
   .phead .sub{ font-size:13px !important; line-height:1.6; }
   .pbar-min .pbar-r{ flex-direction:column; align-items:stretch; gap:8px; }
-  .pbar-min .chip{ font-size:13px !important; padding:9px 12px !important; justify-content:center; text-align:center; white-space:normal; line-height:1.6; }
+  .pbar-min .chip{ font-size:13.5px !important; padding:8px 14px !important; display:flex; flex-direction:column; align-items:center; gap:0; border-radius:14px !important; line-height:1.5; }
+  .pbar-min .chip .pb-l{ font-weight:700; }
+  .fl-d td:nth-child(6), .fl-d td:nth-child(7){ display:flex; flex-direction:column; gap:6px; align-self:stretch; justify-content:flex-start; }
+  .fl-d td:nth-child(7){ flex-direction:row; align-items:center; } .fl-d td:nth-child(7) .tag{ flex:1; justify-content:center; text-align:center; padding:8px 6px; } .fl-d td:nth-child(7) .btn{ width:auto !important; flex:1 1 0; justify-content:center; } .fl-d td:nth-child(7) .tag{ flex:1 1 0; }
+  .fl-d td:nth-child(6) .sub{ font-size:12.5px; text-align:center; }
+  .tabs2:not(.fl-tabs){ display:grid !important; grid-template-columns:1fr 1fr; overflow:visible; gap:4px; } .tabs2:not(.fl-tabs) button{ white-space:normal; text-align:center; }
   .pbar .pbar-r > .input, .pbar .pbar-r > input{ width:100%; }
   .tabs2{ overflow-x:auto; flex-wrap:nowrap !important; scrollbar-width:none; } .tabs2::-webkit-scrollbar{ display:none; }
   .tabs2 button{ white-space:nowrap; flex:0 0 auto; }
@@ -1133,7 +1138,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v78';
+const APP_VER = 'absence-v79';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -1211,7 +1216,7 @@ function waActText(s){
   const g = G(), f = g.f, last = s.dates.length ? hijriNum(s.dates[s.dates.length - 1]) : '';
   return `السلام عليكم ورحمة الله وبركاته
 ولي أمر ${f ? 'الطالبة' : 'الطالب'} / ${s.name} المحترم
-نفيدكم بأن غياب ${f ? 'ابنتكم' : 'ابنكم'} بدون عذر بلغ (${s.unexc}) ${s.unexc > 10 ? 'يومًا' : 'أيام'}${last ? `، آخرها ${last} هـ` : ''}.
+نفيدكم بأن غياب ${f ? 'ابنتكم' : 'ابنكم'} بدون عذر بلغ (${s.unexc}) ${s.unexc > 10 ? 'يومًا' : 'أيام'}${last ? `، آخرها ${last}` : ''}.
 نأمل مراجعة المدرسة لمناقشة وضع${f ? 'ها' : 'ه'} وفق قواعد السلوك والمواظبة.
 ${state.cfg.school || ''}`;
 }
@@ -2024,7 +2029,7 @@ async function saveActRec(){
   closeDlg();
   if(await saveActions()){ toast('تم حفظ الإجراءات'); render(); }
 }
-function hijriNum(iso){ try{ return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'}).format(parse(iso)); }catch(e){ return iso; } }
+function hijriNum(iso){ try{ const p = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn',{day:'numeric',month:'numeric',year:'numeric'}).formatToParts(parse(iso)); const g = t => parseInt((p.find(x => x.type === t) || {}).value, 10); const d = g('day'), m = g('month'), y = g('year'); if(!(d && m && y)) throw 0; return `${d}‏/${m}‏/${y}`.replace(/\d/g, c => '٠١٢٣٤٥٦٧٨٩'[c]) + ' هـ'; }catch(e){ return iso; } }
 function actFormHTML(s, lvId){
   const cfg = state.cfg, L = ACT_LEVELS.find(x => x.id === lvId) || curLevel(s) || ACT_LEVELS[0];
   const rec = (state.actions[s.key] || {})[L.id] || null, g = G(), f = g.f;
@@ -2134,7 +2139,7 @@ function refStatus(r){
 function waRefText(r){
   const g = G(), f = g.f, rs = (r.reasons || []).map(x => x === 'أخرى' && r.other ? r.other : x).join('، ');
   const L = [`السلام عليكم ورحمة الله وبركاته`, `ولي أمر ${f ? 'الطالبة' : 'الطالب'} / ${r.name} المحترم`,
-    `نفيدكم بأنه تم تحويل ${f ? 'ابنتكم' : 'ابنكم'} بتاريخ ${hijriNum(r.date)} هـ${r.subject ? ` من حصة ${r.subject}` : ''}${rs ? ` بسبب: ${rs}` : ''}.`];
+    `نفيدكم بأنه تم تحويل ${f ? 'ابنتكم' : 'ابنكم'} بتاريخ ${hijriNum(r.date)}${r.subject ? ` من حصة ${r.subject}` : ''}${rs ? ` بسبب: ${rs}` : ''}.`];
   if(r.dep && r.dep.text) L.push(`وقد تم: ${r.dep.text.split('\n').join('، ')}.`);
   if(r.dep && r.dep.refer) L.push(`وتمت إحالت${f ? 'ها' : 'ه'} إلى ${g.counselor} لمتابعة ${f ? 'حالتها' : 'حالته'}.`);
   L.push('نأمل تعاونكم ومتابعتكم، ونرحب بزيارتكم للمدرسة.', state.cfg.school || '');
@@ -2170,7 +2175,7 @@ function periodBar(extra){
   const [a, b] = flRange(), P = pPresets(), cur = pCurTerm(), on = P.find(p => p[2] === a && p[3] === b);
   if(!state.pbOpen){
     const lbl = on ? on[1] : (a === b ? 'يوم ' + AR(dmy(parse(a))) : 'فترة مخصصة');
-    return `<div class="bar pbar pbar-min"><div class="pbar-r"><button class="chip on" data-act="pbToggle">📅 ${lbl}${on ? '' : ''} <span class="sub" style="margin-inline-start:6px">${AR(dmy(parse(a)))} – ${AR(dmy(parse(b)))}</span> ▾</button><span class="grow"></span>${extra || ''}</div></div>`;
+    return `<div class="bar pbar pbar-min"><div class="pbar-r"><button class="chip on" data-act="pbToggle"><span class="pb-l">📅 ${lbl} ▾</span><span class="sub" style="margin-inline-start:6px">${AR(dmy(parse(a)))} – ${AR(dmy(parse(b)))}</span></button><span class="grow"></span>${extra || ''}</div></div>`;
   }
   return `<div class="bar pbar">
     <div class="pbar-r"><button class="chip" data-act="pbToggle" title="إخفاء">▴ إخفاء</button><label class="f">من تاريخ<input class="input" type="date" id="pFrom" value="${a}"></label><label class="f">إلى تاريخ<input class="input" type="date" id="pTo" value="${b}"></label><span class="grow"></span>${extra || ''}</div>
@@ -2290,7 +2295,7 @@ function flDailyView(){
   const rows = L.map(x => {
     const rid = flRid(x), c = flContactOf(rid), w = flWarnOf(rid), d = parse(x.date), un = x.type !== 'بعذر';
     return `<tr class="${un && !c ? 'fl-pend' : ''}" data-rid="${esc(rid)}">
-      <td><b>${dayName(d)}</b><div class="sub">${AR(dmy(d))}</div><div class="sub">${hijriNum(x.date)} هـ</div></td>
+      <td><b>${dayName(d)}</b><div class="sub">${AR(dmy(d))}</div><div class="sub">${hijriNum(x.date)}</div></td>
       <td class="nm"><button class="stu-n" data-stu="${esc(x.cid + '|' + x.name)}">${esc(x.name)}</button><div class="sub">${esc(flCls(x.cid))} · الغياب رقم ${AR(x.n)}</div></td>
       <td><div class="seg"><button data-act="flType" data-v="بعذر" class="${!un ? 'on' : ''}">بعذر</button><button data-act="flType" data-v="بدون" class="${un ? 'on' : ''}">بدون عذر</button></div></td>
       <td>${fileOf(rid) ? `<button class="btn sm" data-act="fileView" data-rid="${esc(rid)}" title="ملف العذر">📎 العذر</button> ` : ''}${un ? '<span class="sub">—</span>' + exTag(x.r.exStatus) : `<select class="input fl-in" data-flf="reason"><option value="">— بدون سبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>${proofOf(x.reason) ? `<div class="sub" style="margin-top:4px">الإثبات: ${esc(proofOf(x.reason))}${x.r.proof ? ' ✓' : ''}</div>` : ''}${exTag(x.r.exStatus)}`}</td>
