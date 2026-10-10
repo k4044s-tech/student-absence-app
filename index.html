@@ -513,6 +513,47 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 @media screen and (min-width:1100px){ .shell, .auth, #dlgBg, .toast, .updbar{ zoom:1.12; } .rail{ height:calc(100vh / 1.12); } .auth{ height:calc(100vh / 1.12); } }
 @media screen and (min-width:1600px){ .shell, .auth, #dlgBg, .toast, .updbar{ zoom:1.2; } .rail{ height:calc(100vh / 1.2); } .auth{ height:calc(100vh / 1.2); } }
 @media screen and (max-width:1099px){ body{ font-size:15px; } }
+
+/* ===== تنسيق الجوال ===== */
+@media screen and (max-width:860px){
+  .topbar{ gap:8px; padding:8px 12px; min-height:56px; }
+  .topbar .tb-title{ font-size:16.5px !important; font-weight:700; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .topbar .role-q{ max-width:104px; min-height:38px; font-size:12.5px; border-radius:10px; }
+  .topbar .ib-btn{ width:40px; height:40px; border-radius:10px; }
+  .topbar .tb-out{ width:40px; height:40px; padding:0 !important; align-items:center; justify-content:center; border-radius:10px; color:var(--muted); }
+  #ibPanel{ left:8px !important; right:8px !important; width:auto !important; max-width:none !important; max-height:70vh; overflow-y:auto; }
+  .phead{ margin-bottom:10px; }
+  .phead h1{ display:none; }
+  .phead .school{ font-size:15.5px !important; line-height:1.5; }
+  .phead .sub{ font-size:13px !important; line-height:1.6; }
+  .pbar-min .pbar-r{ flex-direction:column; align-items:stretch; gap:8px; }
+  .pbar-min .chip{ font-size:13px !important; padding:9px 12px !important; justify-content:center; text-align:center; white-space:normal; line-height:1.6; }
+  .pbar .pbar-r > .input, .pbar .pbar-r > input{ width:100%; }
+  .tabs2{ overflow-x:auto; flex-wrap:nowrap !important; scrollbar-width:none; } .tabs2::-webkit-scrollbar{ display:none; }
+  .tabs2 button{ white-space:nowrap; flex:0 0 auto; }
+  .nav button .nl{ display:none !important; } .nav button .ns{ display:block !important; font-size:11.5px; white-space:nowrap; }
+  /* سجل الغياب اليومي: بطاقات بدل الجدول */
+  .fl-d thead{ display:none; } .fl-d, .fl-d tbody{ display:block; min-width:0 !important; width:100%; }
+  .fl-d tr{ display:grid; grid-template-columns:1fr 1fr; gap:8px 10px; padding:14px 12px; border-bottom:1px solid var(--border); align-items:center; }
+  .fl-d td{ border:0 !important; padding:0 !important; min-width:0; }
+  .fl-d td:nth-child(2){ grid-column:1/-1; order:-2; } .fl-d td:nth-child(2) b, .fl-d td:nth-child(2) .stu-n{ font-size:16px; }
+  .fl-d td:nth-child(1){ grid-column:1/-1; order:-1; color:var(--muted); font-size:13px; }
+  .fl-d td:nth-child(1) b, .fl-d td:nth-child(1) div{ display:inline; margin-inline-end:8px; font-size:13px; }
+  .fl-d td:nth-child(3), .fl-d td:nth-child(4), .fl-d td:nth-child(5){ grid-column:1/-1; }
+  .fl-d td:nth-child(3) .seg{ width:100%; display:flex; } .fl-d td:nth-child(3) .seg button{ flex:1; }
+  .fl-d td:nth-child(6) .btn, .fl-d td:nth-child(7) .btn{ width:100%; justify-content:center; }
+  .fl-d td:nth-child(4):has(> .sub:only-child){ display:none; }
+  /* جدول الفصول في الإعدادات */
+  .ctable thead{ display:none; } .ctable, .ctable tbody{ display:block; width:100%; min-width:0 !important; } .ctable-wrap{ overflow:visible; }
+  .pbar-min .chip .sub{ display:block; margin:2px 0 0 !important; font-size:12px; opacity:.85; }
+  .ctable tr{ display:grid; grid-template-columns:1fr 1fr 70px; gap:8px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .ctable td{ padding:0 !important; border:0 !important; }
+  .ctable td:nth-child(4){ grid-column:1/3; } .ctable td:nth-child(5){ grid-column:3; } .ctable td .btn{ width:100%; }
+  .ctable td .input{ width:100% !important; }
+  .kpis .kpi .v{ font-size:26px; }
+  .acard-f{ flex-wrap:wrap; } .acard-f .btn{ flex:1 1 auto; justify-content:center; }
+  .reged-h{ flex-wrap:wrap; }
+}
 </style>
 <style id="report-css"></style>
 </head>
@@ -522,7 +563,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   <button class="hamburger" data-act="menu" aria-label="فتح القائمة"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
   <div class="tb-title" id="tbTitle">متابعة الغياب</div>
   <button type="button" class="ib-btn" data-act="ibOpen" aria-label="صندوق الرسائل"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><span class="ib-n"></span></button>
-  <button class="tb-out" data-act="sbOut">خروج</button>
+  <button class="tb-out" data-act="sbOut" aria-label="خروج" title="تسجيل الخروج"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
 </div>
 <div class="shell" id="shell">
   <div class="overlay no-print" data-act="menu-close"></div>
@@ -1092,7 +1133,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v77';
+const APP_VER = 'absence-v78';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -3982,6 +4023,18 @@ document.addEventListener('focusin', e => { if(e.target.closest && e.target.clos
 window.addEventListener('beforeunload', e => { if(isDirty()){ e.preventDefault(); e.returnValue = ''; } });
 
 init();
+
+/* الجوال: أسماء مختصرة للشريط السفلي + ملاءمة صفحات التقارير لعرض الشاشة */
+(function(){
+  const S = {entry:'الرصد', follow:'المتابعة', actions:'الإجراءات', counsel:'الإرشاد', reports:'التقارير', settings:'الإعدادات', admin:'الحسابات'};
+  document.querySelectorAll('.nav button[data-view]').forEach(b => { const sp = b.querySelector('span:not(.nbadge)'); if(sp && !b.querySelector('.ns')){ sp.classList.add('nl'); const n = document.createElement('span'); n.className = 'ns'; n.style.display = 'none'; n.textContent = S[b.dataset.view] || sp.textContent; b.appendChild(n); } });
+  window.fitSheets = function(){
+    const small = window.innerWidth < 861;
+    document.querySelectorAll('.main .sheet, .main .reg').forEach(el => { if(!small){ el.style.zoom = ''; return; } const w = (el.parentElement.clientWidth || window.innerWidth) - 4; el.style.zoom = Math.min(1, w / 794); });
+  };
+  const _r = render; render = function(){ const out = _r.apply(this, arguments); try{ fitSheets(); }catch(e){} return out; };
+  window.addEventListener('resize', () => { try{ fitSheets(); }catch(e){} });
+})();
 </script>
 </body>
 </html>
