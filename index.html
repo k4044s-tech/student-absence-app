@@ -464,6 +464,12 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 .topbar .tb-out{ display:none; background:none; border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:13px; color:var(--muted); }
 .fl-t{ min-width:720px; } .fl-t th,.fl-t td{ padding:9px 10px; text-align:center; border-bottom:1px solid var(--border); } .fl-t th{ background:var(--accent-soft); font-weight:600; position:sticky; top:0; }
 .fl-t td.nm{ text-align:right; font-weight:500; } .fl-t .sub{ font-size:12px; color:var(--muted); font-weight:400; }
+.fl-d .fl-day b{ display:block; } .fl-d .fl-day .sub{ display:block; white-space:nowrap; }
+.fl-d .fl-rs .input{ width:100%; } .fl-d .fl-hint{ margin-top:4px; font-size:12px; }
+.fl-d .fl-bd{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; align-items:center; }
+.fl-d .fl-ct, .fl-d .fl-wr{ min-width:140px; } .fl-d .fl-wr{ white-space:nowrap; } .fl-d .fl-wr .tag{ margin-inline-end:6px; }
+.fl-d .fl-full{ width:100%; justify-content:center; } .fl-d .fl-rp{ margin-top:4px; font-size:12px; text-align:center; }
+.fl-d tr.fl-done td{ background:var(--good-soft); }
 .fl-d td{ vertical-align:middle; } .fl-d .input{ min-height:36px; min-width:130px; } .fl-d tr.fl-pend td{ background:var(--warn-soft); }
 .fl-d .seg button{ padding:6px 10px; } .btn.danger-o{ color:var(--bad); border-color:var(--bad-line); } .btn.fl-ok{ color:var(--good); border-color:var(--good-line); background:var(--good-soft); }
 .fc-seg{ display:flex; min-height:38px; } .fc-seg button{ flex:1; font-size:13.5px; }
@@ -530,7 +536,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   .pbar-min .chip{ font-size:13.5px !important; padding:8px 14px !important; display:flex; flex-direction:column; align-items:center; gap:0; border-radius:14px !important; line-height:1.5; }
   .pbar-min .chip .pb-l{ font-weight:700; }
   .fl-d td:nth-child(6), .fl-d td:nth-child(7){ display:flex; flex-direction:column; gap:6px; align-self:stretch; justify-content:flex-start; }
-  .fl-d td:nth-child(7){ flex-direction:row; align-items:center; } .fl-d td:nth-child(7) .tag{ flex:1; justify-content:center; text-align:center; padding:8px 6px; } .fl-d td:nth-child(7) .btn{ width:auto !important; flex:1 1 0; justify-content:center; } .fl-d td:nth-child(7) .tag{ flex:1 1 0; }
+  .fl-d td:nth-child(7){ flex-direction:row; align-items:center; } .fl-d td:nth-child(7) .tag{ flex:1; justify-content:center; text-align:center; padding:6px; margin:0 !important; } .fl-d td:nth-child(7) > *{ min-height:36px; display:flex; align-items:center; } .fl-d td:nth-child(7) .btn{ width:auto !important; flex:1 1 0; justify-content:center; } .fl-d td:nth-child(7) .tag{ flex:1 1 0; }
   .fl-d td:nth-child(6) .sub{ font-size:12.5px; text-align:center; }
   .tabs2:not(.fl-tabs){ display:grid !important; grid-template-columns:1fr 1fr; overflow:visible; gap:4px; } .tabs2:not(.fl-tabs) button{ white-space:normal; text-align:center; }
   .pbar .pbar-r > .input, .pbar .pbar-r > input{ width:100%; }
@@ -543,7 +549,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
   .fl-d td{ border:0 !important; padding:0 !important; min-width:0; }
   .fl-d td:nth-child(2){ grid-column:1/-1; order:-2; } .fl-d td:nth-child(2) b, .fl-d td:nth-child(2) .stu-n{ font-size:16px; }
   .fl-d td:nth-child(1){ grid-column:1/-1; order:-1; color:var(--muted); font-size:13px; }
-  .fl-d td:nth-child(1) b, .fl-d td:nth-child(1) div{ display:inline; margin-inline-end:8px; font-size:13px; }
+  .fl-d td:nth-child(1) b, .fl-d td:nth-child(1) .sub{ display:inline !important; margin-inline-end:8px; font-size:13px; }
   .fl-d td:nth-child(3), .fl-d td:nth-child(4), .fl-d td:nth-child(5){ grid-column:1/-1; }
   .fl-d td:nth-child(3) .seg{ width:100%; display:flex; } .fl-d td:nth-child(3) .seg button{ flex:1; }
   .fl-d td:nth-child(6) .btn, .fl-d td:nth-child(7) .btn{ width:100%; justify-content:center; }
@@ -1138,7 +1144,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v79';
+const APP_VER = 'absence-v80';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -2293,15 +2299,19 @@ function flDailyView(){
   const k = (cls, l, v, s) => `<div class="kpi ${cls}"><span class="l">${l}</span><span class="v">${v}</span><span class="s">${s}</span></div>`;
   const chip = (v, t, n) => `<button class="chip ${f === v ? 'on' : ''}" data-flflt="${v}">${t} <b style="margin-inline-start:6px">${AR(n)}</b></button>`;
   const rows = L.map(x => {
-    const rid = flRid(x), c = flContactOf(rid), w = flWarnOf(rid), d = parse(x.date), un = x.type !== 'بعذر';
-    return `<tr class="${un && !c ? 'fl-pend' : ''}" data-rid="${esc(rid)}">
-      <td><b>${dayName(d)}</b><div class="sub">${AR(dmy(d))}</div><div class="sub">${hijriNum(x.date)}</div></td>
+    const rid = flRid(x), c = flContactOf(rid), w = flWarnOf(rid), d = parse(x.date), un = x.type !== 'بعذر', fo = fileOf(rid);
+    const done = !un && c && (x.r.proof || fo) && x.r.exStatus !== 'مرفوض';
+    const reasonSel = `<select class="input fl-in" data-flf="reason"><option value="">— اختر السبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>`;
+    const badges = [fo ? `<button class="btn sm fl-file" data-act="fileView" data-rid="${esc(rid)}">📎 ملف العذر</button>` : '', !un && (x.r.proof || fo) ? '<span class="tag ok">✓ الإثبات</span>' : '', exTag(x.r.exStatus)].filter(Boolean).join('');
+    const proofHint = !un && proofOf(x.reason) && !(x.r.proof || fo) ? `<div class="sub fl-hint">المطلوب: ${esc(proofOf(x.reason))}</div>` : '';
+    return `<tr class="${done ? 'fl-done' : un && !c ? 'fl-pend' : ''}" data-rid="${esc(rid)}">
+      <td class="fl-day"><b>${dayName(d)}</b><span class="sub">${hijriNum(x.date)}</span><span class="sub">${AR(dmy(d))}</span></td>
       <td class="nm"><button class="stu-n" data-stu="${esc(x.cid + '|' + x.name)}">${esc(x.name)}</button><div class="sub">${esc(flCls(x.cid))} · الغياب رقم ${AR(x.n)}</div></td>
       <td><div class="seg"><button data-act="flType" data-v="بعذر" class="${!un ? 'on' : ''}">بعذر</button><button data-act="flType" data-v="بدون" class="${un ? 'on' : ''}">بدون عذر</button></div></td>
-      <td>${fileOf(rid) ? `<button class="btn sm" data-act="fileView" data-rid="${esc(rid)}" title="ملف العذر">📎 العذر</button> ` : ''}${un ? '<span class="sub">—</span>' + exTag(x.r.exStatus) : `<select class="input fl-in" data-flf="reason"><option value="">— بدون سبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>${proofOf(x.reason) ? `<div class="sub" style="margin-top:4px">الإثبات: ${esc(proofOf(x.reason))}${x.r.proof ? ' ✓' : ''}</div>` : ''}${exTag(x.r.exStatus)}`}</td>
+      <td class="fl-rs">${un ? (badges ? `<div class="fl-bd">${badges}</div>` : '<span class="sub">—</span>') : `${reasonSel}${proofHint}${badges ? `<div class="fl-bd">${badges}</div>` : ''}`}</td>
       <td><input class="input fl-in" data-flf="note" value="${esc(x.note)}" placeholder="ملاحظة…"></td>
-      <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)} ${AR(dmy(parse(c.date)).slice(0, 7))}</button><div class="sub">${esc(c.reply || '')}</div>` : `<button class="btn sm" data-act="flCont">تواصل</button>`}</td>
-      <td>${un ? (w ? `<span class="tag ok">✓ صدر ${AR(dmy(parse(w)).slice(0, 7))}</span> <button class="btn sm" data-act="flWarn">إعادة</button>` : `<button class="btn sm" data-act="flWarn">${ICON.print} خطاب ولي الأمر</button>`) : '<span class="sub">—</span>'}</td>
+      <td class="fl-ct">${done ? `<button class="btn sm fl-ok fl-full" data-act="flCont">✓ مكتمل</button>` : c ? `<button class="btn sm fl-ok fl-full" data-act="flCont">✓ تم التواصل</button>` : `<button class="btn sm fl-full" data-act="flCont">تواصل</button>`}${c && c.reply && !done ? `<div class="sub fl-rp">${esc(c.reply)}</div>` : ''}</td>
+      <td class="fl-wr">${un ? (w ? `<span class="tag ok">✓ صدر</span><button class="btn sm" data-act="flWarn">إعادة</button>` : `<button class="btn sm fl-full" data-act="flWarn">${ICON.print} خطاب ولي الأمر</button>`) : '<span class="sub">—</span>'}</td>
     </tr>`;
   }).join('');
   return `<div class="kpis">
