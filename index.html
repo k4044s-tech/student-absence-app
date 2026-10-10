@@ -465,7 +465,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 .fl-t{ min-width:720px; } .fl-t th,.fl-t td{ padding:9px 10px; text-align:center; border-bottom:1px solid var(--border); } .fl-t th{ background:var(--accent-soft); font-weight:600; position:sticky; top:0; }
 .fl-t td.nm{ text-align:right; font-weight:500; } .fl-t .sub{ font-size:12px; color:var(--muted); font-weight:400; }
 .fl-d .fl-day b{ display:block; } .fl-d .fl-day .sub{ display:block; white-space:nowrap; }
-.fl-d .fl-rs .input{ width:100%; } .fl-d .fl-hint{ margin-top:4px; font-size:12px; }
+.fl-d .fl-rs .input{ width:100%; min-width:0; } .fl-d .fl-rw{ display:flex; gap:6px; align-items:center; } .fl-d .fl-rw .input{ flex:1; } .fl-d .fl-file{ flex:none; width:38px; height:38px; padding:0 !important; justify-content:center; font-size:16px; } .fl-d .fl-hint{ margin-top:4px; font-size:12px; }
 .fl-d .fl-bd{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; align-items:center; }
 .fl-d .fl-ct, .fl-d .fl-wr{ min-width:140px; } .fl-d .fl-wr{ white-space:nowrap; } .fl-d .fl-wr .tag{ margin-inline-end:6px; }
 .fl-d .fl-full{ width:100%; justify-content:center; } .fl-d .fl-rp{ margin-top:4px; font-size:12px; text-align:center; }
@@ -1144,7 +1144,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v80';
+const APP_VER = 'absence-v81';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -2302,13 +2302,14 @@ function flDailyView(){
     const rid = flRid(x), c = flContactOf(rid), w = flWarnOf(rid), d = parse(x.date), un = x.type !== 'بعذر', fo = fileOf(rid);
     const done = !un && c && (x.r.proof || fo) && x.r.exStatus !== 'مرفوض';
     const reasonSel = `<select class="input fl-in" data-flf="reason"><option value="">— اختر السبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>`;
-    const badges = [fo ? `<button class="btn sm fl-file" data-act="fileView" data-rid="${esc(rid)}">📎 ملف العذر</button>` : '', !un && (x.r.proof || fo) ? '<span class="tag ok">✓ الإثبات</span>' : '', exTag(x.r.exStatus)].filter(Boolean).join('');
+    const fbtn = fo ? `<button class="btn sm fl-file" data-act="fileView" data-rid="${esc(rid)}" title="عرض ملف العذر" aria-label="عرض ملف العذر">📎</button>` : '';
+    const st = x.r.exStatus && x.r.exStatus !== 'مقبول' && x.r.exStatus !== 'لم يُقدَّم' ? exTag(x.r.exStatus) : '';
     const proofHint = !un && proofOf(x.reason) && !(x.r.proof || fo) ? `<div class="sub fl-hint">المطلوب: ${esc(proofOf(x.reason))}</div>` : '';
     return `<tr class="${done ? 'fl-done' : un && !c ? 'fl-pend' : ''}" data-rid="${esc(rid)}">
       <td class="fl-day"><b>${dayName(d)}</b><span class="sub">${hijriNum(x.date)}</span><span class="sub">${AR(dmy(d))}</span></td>
       <td class="nm"><button class="stu-n" data-stu="${esc(x.cid + '|' + x.name)}">${esc(x.name)}</button><div class="sub">${esc(flCls(x.cid))} · الغياب رقم ${AR(x.n)}</div></td>
       <td><div class="seg"><button data-act="flType" data-v="بعذر" class="${!un ? 'on' : ''}">بعذر</button><button data-act="flType" data-v="بدون" class="${un ? 'on' : ''}">بدون عذر</button></div></td>
-      <td class="fl-rs">${un ? (badges ? `<div class="fl-bd">${badges}</div>` : '<span class="sub">—</span>') : `${reasonSel}${proofHint}${badges ? `<div class="fl-bd">${badges}</div>` : ''}`}</td>
+      <td class="fl-rs">${un ? `<div class="fl-rw"><span class="sub">—</span>${fbtn}</div>${st}` : `<div class="fl-rw">${reasonSel}${fbtn}</div>${proofHint}${st ? `<div class="fl-bd">${st}</div>` : ''}`}</td>
       <td><input class="input fl-in" data-flf="note" value="${esc(x.note)}" placeholder="ملاحظة…"></td>
       <td class="fl-ct">${done ? `<button class="btn sm fl-ok fl-full" data-act="flCont">✓ مكتمل</button>` : c ? `<button class="btn sm fl-ok fl-full" data-act="flCont">✓ تم التواصل</button>` : `<button class="btn sm fl-full" data-act="flCont">تواصل</button>`}${c && c.reply && !done ? `<div class="sub fl-rp">${esc(c.reply)}</div>` : ''}</td>
       <td class="fl-wr">${un ? (w ? `<span class="tag ok">✓ صدر</span><button class="btn sm" data-act="flWarn">إعادة</button>` : `<button class="btn sm fl-full" data-act="flWarn">${ICON.print} خطاب ولي الأمر</button>`) : '<span class="sub">—</span>'}</td>
