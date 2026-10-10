@@ -264,6 +264,14 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 .sp-m{ display:flex; flex-wrap:wrap; gap:8px; } .sp-m>div{ display:flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--border); border-radius:20px; font-size:13px; }
 .sp-tb td.n{ color:var(--muted); width:36px; } .sp-tb td, .sp-tb th{ padding:8px 12px; }
 @media screen and (max-width:860px){ .sp-k{ grid-template-columns:repeat(3,1fr); } .sp-g{ grid-template-columns:1fr; } }
+.fc-att{ display:flex; align-items:center; gap:10px; border:1px dashed var(--border); border-radius:12px; padding:10px 12px; background:var(--card, #fff); }
+.fc-up{ cursor:pointer; } .fc-up:hover{ border-color:#0b6b55; background:#f3faf7; }
+.fc-ic{ width:38px; height:38px; border-radius:9px; background:#e8f1ee; color:#0b6b55; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex:none; }
+.fv-bg{ position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; }
+.fv{ background:#fff; border-radius:14px; width:min(900px,100%); height:min(90vh,100%); display:flex; flex-direction:column; overflow:hidden; }
+.fv-h{ display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid #e5e7eb; }
+.fv-b{ flex:1; overflow:auto; background:#f3f4f6; display:flex; align-items:flex-start; justify-content:center; }
+.fv-b img{ max-width:100%; height:auto; display:block; } .fv-b iframe{ width:100%; height:100%; border:0; }
 .stu-k{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
 .stu-k div{ background:var(--soft, #f3f5f4); border-radius:10px; padding:8px; text-align:center; display:flex; flex-direction:column; }
 .stu-k b{ font-size:20px; } .stu-k span{ font-size:12px; color:var(--muted); }
@@ -765,7 +773,7 @@ function lsSetRaw(k, v){ try{ localStorage.setItem('absence:' + k, v); }catch(e)
 function lsSet(k, v){ try{ localStorage.setItem('absence:' + k, JSON.stringify(v)); }catch(e){} sbTrack(k, v); }
 
 /* ---------- المزامنة السحابية (Supabase) ---------- */
-const SB_KINDS = ['cfg', 'days', 'roster', 'actions', 'refs', 'noorm', 'contacts'], SB_MULTI = {days:1, refs:1};
+const SB_KINDS = ['cfg', 'days', 'roster', 'actions', 'refs', 'noorm', 'contacts', 'files'], SB_MULTI = {days:1, refs:1, files:1};
 const sb = { client:null, user:null, ch:null, snap:{}, dirty:{}, applying:false, timer:null, status:'off', err:'', last:'', profile:null, booting:true, mode:'in', msg:'', admin:null };
 const SB_DEF = {url:'https://zgadvzvlvyhavugeguks.supabase.co', key:'sb_publishable_82JRQTuJ7XZ_HPznx_LsMQ_FjavCD88'};
 const sbCfg = () => { let c = {}; try{ c = JSON.parse(localStorage.getItem('absence:sbcfg') || '{}'); }catch(e){} return c.url && c.key ? c : SB_DEF; };
@@ -808,10 +816,11 @@ function sbApply(kind, key, data, del){
   else if(kind === 'refs'){ if(del) delete state.refs[key]; else state.refs[key] = data; }
   else if(kind === 'roster'){ state.roster = del ? {} : (data || {}); }
   else if(kind === 'actions'){ state.actions = del ? {} : (data || {}); }
+  else if(kind === 'files'){ state.files = state.files || {}; if(del) delete state.files[key]; else state.files[key] = data; }
   else if(kind === 'contacts'){ state.contacts = del ? {items:[]} : (data || {items:[]}); }
   else if(kind === 'noorm'){ state.noorM = Object.assign({files:[], days:'', red:5, min:3, unOnly:false}, del ? {} : data); }
   sb.applying = true;
-  const map = {cfg: state.cfg, days: state.days, refs: state.refs, roster: state.roster, actions: state.actions, noorm: state.noorM, contacts: state.contacts};
+  const map = {cfg: state.cfg, days: state.days, refs: state.refs, roster: state.roster, actions: state.actions, noorm: state.noorM, contacts: state.contacts, files: state.files || {}};
   lsSet(kind, map[kind]);
   sb.applying = false;
 }
@@ -1044,6 +1053,7 @@ function useLocal(){
   state.refs = lsGet('refs', {});
   state.noorM = Object.assign({files:[], days:'', red:5, min:3, unOnly:false}, lsGet('noorm', {}));
   state.contacts = lsGet('contacts', {items:[]});
+  state.files = lsGet('files', {});
   state.ready = {cfg:true, days:true};
   onData();
   sbStart();
@@ -1074,7 +1084,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v73';
+const APP_VER = 'absence-v74';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -2234,7 +2244,7 @@ function flDailyView(){
       <td><b>${dayName(d)}</b><div class="sub">${AR(dmy(d))}</div><div class="sub">${hijriNum(x.date)} هـ</div></td>
       <td class="nm"><button class="stu-n" data-stu="${esc(x.cid + '|' + x.name)}">${esc(x.name)}</button><div class="sub">${esc(flCls(x.cid))} · الغياب رقم ${AR(x.n)}</div></td>
       <td><div class="seg"><button data-act="flType" data-v="بعذر" class="${!un ? 'on' : ''}">بعذر</button><button data-act="flType" data-v="بدون" class="${un ? 'on' : ''}">بدون عذر</button></div></td>
-      <td>${un ? '<span class="sub">—</span>' + exTag(x.r.exStatus) : `<select class="input fl-in" data-flf="reason"><option value="">— بدون سبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>${proofOf(x.reason) ? `<div class="sub" style="margin-top:4px">الإثبات: ${esc(proofOf(x.reason))}${x.r.proof ? ' ✓' : ''}</div>` : ''}${exTag(x.r.exStatus)}`}</td>
+      <td>${fileOf(rid) ? `<button class="btn sm" data-act="fileView" data-rid="${esc(rid)}" title="ملف العذر">📎 العذر</button> ` : ''}${un ? '<span class="sub">—</span>' + exTag(x.r.exStatus) : `<select class="input fl-in" data-flf="reason"><option value="">— بدون سبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select>${proofOf(x.reason) ? `<div class="sub" style="margin-top:4px">الإثبات: ${esc(proofOf(x.reason))}${x.r.proof ? ' ✓' : ''}</div>` : ''}${exTag(x.r.exStatus)}`}</td>
       <td><input class="input fl-in" data-flf="note" value="${esc(x.note)}" placeholder="ملاحظة…"></td>
       <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)} ${AR(dmy(parse(c.date)).slice(0, 7))}</button><div class="sub">${esc(c.reply || '')}</div>` : `<button class="btn sm" data-act="flCont">تواصل</button>`}</td>
       <td>${un ? (w ? `<span class="tag ok">✓ صدر ${AR(dmy(parse(w)).slice(0, 7))}</span> <button class="btn sm" data-act="flWarn">إعادة</button>` : `<button class="btn sm" data-act="flWarn">${ICON.print} خطاب ولي الأمر</button>`) : '<span class="sub">—</span>'}</td>
@@ -2281,11 +2291,56 @@ function flContDlg(rid){
       <label class="f">حالة العذر<select class="input" id="fcE">${EX_ST.map(o => `<option ${o === (x.r.exStatus || 'لم يُقدَّم') ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
       <label class="f" style="flex-direction:row;align-items:center;gap:8px;align-self:end;min-height:38px"><input type="checkbox" id="fcPr" ${x.r.proof ? 'checked' : ''}> استُلم الإثبات</label>
       <div class="fc-proof" id="fcProof" style="grid-column:1/-1"></div>
+      <div id="fcFile" style="grid-column:1/-1">${fileBlock(rid)}</div>
       <label class="f" style="grid-column:1/-1">رد ولي الأمر<input class="input" id="fcR" value="${esc(reply)}" data-auto="${old && old.reply ? '' : '1'}"></label>
       <label class="f" style="grid-column:1/-1">الإجراء المتخذ<select class="input" id="fcX" data-saved="${esc(old && old.action || '')}">${A.list.map(o => `<option ${o === act ? 'selected' : ''}>${esc(o)}</option>`).join('')}${act && !A.list.includes(act) ? `<option selected>${esc(act)}</option>` : ''}</select></label>
     </div></div>
     <div class="reged-f">${old ? `<button class="btn danger" data-act="fcDel">حذف التواصل</button>` : ''}<a class="btn wa" id="fcWa" target="_blank" rel="noopener" style="display:none">واتساب</a><span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn primary" data-act="fcSave">حفظ التواصل</button></div>`);
   flContSync();
+}
+/* ---------- مرفقات الأعذار (صورة أو PDF) ---------- */
+const fileKey = rid => rid.replace(/[\/|.#$\[\]]/g, '_');
+const fileOf = rid => (state.files || {})[fileKey(rid)] || null;
+async function saveFile(rid, obj){
+  const k = fileKey(rid); state.files = state.files || {};
+  if(state.mode === 'db'){
+    const ok = await dbWrite(() => obj ? state.db.collection('files').doc(k).set(clone(obj)) : state.db.collection('files').doc(k).delete());
+    if(ok){ if(obj) state.files[k] = obj; else delete state.files[k]; } return ok;
+  }
+  if(obj) state.files[k] = obj; else delete state.files[k];
+  lsSet('files', state.files); return true;
+}
+function readFileData(file){
+  return new Promise((res, rej) => {
+    const fr = new FileReader(); fr.onerror = rej;
+    if(file.type === 'application/pdf'){
+      if(file.size > 1.5 * 1024 * 1024){ rej(new Error('big')); return; }
+      fr.onload = () => res({name:file.name, type:file.type, size:file.size, data:fr.result, at:today}); fr.readAsDataURL(file); return;
+    }
+    fr.onload = () => { const img = new Image(); img.onerror = rej; img.onload = () => {
+      const m = 1600, r = Math.min(1, m / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+      const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, c.width, c.height); cx.drawImage(img, 0, 0, c.width, c.height);
+      const data = c.toDataURL('image/jpeg', 0.72);
+      res({name:file.name.replace(/\.[^.]+$/, '') + '.jpg', type:'image/jpeg', size:Math.round(data.length * 0.75), data, at:today}); };
+      img.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+const kb = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' م.ب' : Math.round(n / 1024) + ' ك.ب';
+function fileBlock(rid){
+  const f = fileOf(rid);
+  return f ? `<div class="fc-att"><span class="fc-ic">${f.type === 'application/pdf' ? 'PDF' : '🖼'}</span><span class="grow"><b>ملف العذر مرفق</b><div class="sub">${esc(f.name)} · ${kb(f.size || 0)} · ${hijriNum(f.at || today)}</div></span><button type="button" class="btn sm" data-act="fileView" data-rid="${esc(rid)}">عرض</button><button type="button" class="btn sm danger-o" data-act="fileDel" data-rid="${esc(rid)}">حذف</button></div>`
+    : `<label class="fc-att fc-up"><span class="fc-ic">📎</span><span class="grow"><b>إرفاق ملف العذر</b><div class="sub">صورة أو PDF (حتى ١٫٥ م.ب) — تُضغط الصور تلقائيًا</div></span><span class="btn sm">اختيار ملف</span><input type="file" id="fcFileIn" accept="image/*,application/pdf" hidden></label>`;
+}
+async function fileShow(rid){
+  const f = fileOf(rid); if(!f) return;
+  let url = f.data; try{ url = URL.createObjectURL(await (await fetch(f.data)).blob()); }catch(e){}
+  let v = $('#fileView'); if(v) v.remove();
+  v = document.createElement('div'); v.id = 'fileView'; v.className = 'fv-bg no-print';
+  v.innerHTML = `<div class="fv"><div class="fv-h"><b>${esc(f.name)}</b><span class="grow"></span><a class="btn sm" href="${url}" download="${esc(f.name)}">تنزيل</a><button type="button" class="btn sm" data-act="fileClose">إغلاق</button></div>
+    <div class="fv-b">${f.type === 'application/pdf' ? `<iframe src="${url}" title="ملف العذر"></iframe>` : `<img src="${url}" alt="ملف العذر">`}</div></div>`;
+  document.body.appendChild(v);
 }
 function flContSync(){
   const box = document.querySelector('#dlgBg .dlg-b[data-rid]'); if(!box) return;
@@ -2484,7 +2539,7 @@ function stuDlg(key){
   const trs = rows.map((r, k) => {
     const rid = flRid(r), c = flContactOf(rid), un = r.type !== 'بعذر', d = parse(r.date);
     return `<tr data-rid="${esc(rid)}"><td class="n">${AR(rows.length - k)}</td><td><b>${dayName(d)}</b> <span class="sub">${hijriNum(r.date)}</span></td>
-      <td>${un ? '<span class="tag bad">بدون عذر</span>' : '<span class="tag ok">بعذر</span>'}${r.reason ? `<div class="sub">${esc(r.reason)}</div>` : ''}${exTag(r.r.exStatus)}</td>
+      <td>${un ? '<span class="tag bad">بدون عذر</span>' : '<span class="tag ok">بعذر</span>'}${r.reason ? `<div class="sub">${esc(r.reason)}</div>` : ''}${exTag(r.r.exStatus)}${fileOf(rid) ? ` <button class="btn sm" data-act="fileView" data-rid="${esc(rid)}">📎 العذر</button>` : ''}</td>
       <td>${c ? `<button class="btn sm fl-ok" data-act="flCont">✓ ${esc(c.method)}</button>` : `<button class="btn sm" data-act="flCont">تسجيل</button>`}</td>
       <td>${un ? (flWarnOf(rid) ? '<span class="tag ok">✓ صدر</span>' : `<button class="btn sm" data-act="flWarn">${ICON.print} خطاب</button>`) : '<span class="sub">—</span>'}</td></tr>`;
   }).join('');
@@ -3597,6 +3652,9 @@ document.addEventListener('click', async e => {
     if(act === 'flWarn'){ await flWarnPrint(rid); return; }
     if(await flRowUpdate(x, {type: t.dataset.v === 'بعذر' ? 'بعذر' : 'بدون'})){ toast('تم تحديث التصنيف'); render(); } return;
   }
+  if(act === 'fileView'){ fileShow(t.dataset.rid); return; }
+  if(act === 'fileClose'){ const v = $('#fileView'); if(v) v.remove(); return; }
+  if(act === 'fileDel'){ if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد الحذف'; return; } const rid = t.dataset.rid; if(await saveFile(rid, null)){ const b = $('#fcFile'); if(b) b.innerHTML = fileBlock(rid); toast('تم حذف الملف'); render(); } return; }
   if(act === 'stuRep'){ const k = keyOf(t); previewHTML('إحصائية: ' + k.split('|').slice(1).join('|'), stuRepHTML(k)); return; }
   if(act === 'stuCase'){ caseDlg(t.closest('[data-ckey]').dataset.ckey); return; }
   if(act === 'warnOpen'){ warnDlg(keyOf(t)); return; }
@@ -3703,6 +3761,14 @@ document.addEventListener('change', async e => {
   if(!el.classList || !el.classList.contains('fl-in')) return;
   const tr = el.closest('tr'), x = tr && flFindRow(tr.dataset.rid); if(!x) return;
   if(await flRowUpdate(x, {[el.dataset.flf]: el.value.trim()})) toast(el.dataset.flf === 'note' ? 'تم حفظ الملاحظة' : 'تم حفظ السبب');
+});
+document.addEventListener('change', async e => {
+  if(e.target.id !== 'fcFileIn') return;
+  const file = e.target.files && e.target.files[0], box = document.querySelector('#dlgBg .dlg-b[data-rid]'); if(!file || !box) return;
+  if(!/^image\//.test(file.type) && file.type !== 'application/pdf'){ toast('الملف يجب أن يكون صورة أو PDF.', 'err'); return; }
+  const rid = box.dataset.rid; toast('جارٍ رفع الملف…');
+  try{ const obj = await readFileData(file); if(await saveFile(rid, obj)){ $('#fcFile').innerHTML = fileBlock(rid); const pr = $('#fcPr'); if(pr) pr.checked = true; toast('تم إرفاق ملف العذر'); render(); } else toast('تعذّر حفظ الملف.', 'err'); }
+  catch(err){ toast(err && err.message === 'big' ? 'ملف PDF أكبر من ١٫٥ م.ب — صغّره ثم أعد المحاولة.' : 'تعذّرت قراءة الملف.', 'err'); }
 });
 document.addEventListener('input', e => {
   const inp = e.target;
