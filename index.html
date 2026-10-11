@@ -663,6 +663,24 @@ const REPORT_CSS = `
 .sheet .foot{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#777}
 .sheet .nodata{padding:50px 0;text-align:center;color:#888;border:1px dashed #d8dde2;border-radius:12px;margin:10px 0 24px}
 .sheet .rt tr{break-inside:avoid}
+@media print{
+.sheet{padding:14px 22px 10px !important;box-shadow:none !important;width:100% !important;line-height:1.35}
+.sheet h1{font-size:22px;margin:0 0 4px}
+.sheet .sub{margin:0 0 10px;line-height:1.5;font-size:12px}.sheet .sub .sch{font-size:14px}
+.sheet .charts{gap:16px;margin-bottom:6px}
+.sheet .charts svg{max-height:150px;width:auto;max-width:100%}.sheet{page-break-inside:auto}html,body{margin:0}
+.sheet figcaption{font-size:12.5px;margin-bottom:4px}
+.sheet .legend{gap:3px 14px;margin-top:4px;font-size:10.5px}
+.sheet .tcap{margin:6px 0 5px;font-size:13px}
+.sheet table.rt{font-size:11px}
+.sheet .rt th{padding:3px 4px}
+.sheet .rt td{padding:2.5px 4px}
+.sheet .note{margin:4px 0 8px;font-size:9.5px}
+.sheet .sigs{margin:2px 0 4px;gap:10px;font-size:11px}.sheet .sigs .nm{min-height:0}
+.sheet .sigs .ln{margin-top:6px}
+.sheet .ins2{margin:6px 0 !important}.sheet .ins2 .box{padding:6px 12px !important;font-size:11px}.sheet .ins2 h3{margin:0 0 3px !important;font-size:12.5px}.sheet .ins2 li{margin:1px 0 !important}
+.sheet .foot{font-size:9.5px}
+}
 `;
 const REG_CSS = `
 .reg{width:794px;background:#fff;color:#1c2b36;padding:30px 30px 26px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;box-shadow:0 1px 3px rgba(15,41,58,.12),0 14px 34px rgba(15,41,58,.10);line-height:1.4}
@@ -1173,7 +1191,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v88';
+const APP_VER = 'absence-v89';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -3287,7 +3305,7 @@ function cmpReportHTML(C, M){
     <div class="ins2 ${days.length > 1 ? '' : 'one'}"><div class="box"><h3>أبرز النتائج</h3><ul>${nmInsights(C, T, DAYS, M.per).map(x => `<li>${x}</li>`).join('') || '<li>لا يوجد غياب مسجّل.</li>'}</ul></div>
       ${days.length > 1 ? `<div class="box"><h3>الغياب اليومي خلال ${M.per || 'الشهر'}</h3>${nmDaily(C)}</div>` : ''}</div>
     <div class="sigs">${sig(g.officer, cfg.preparer)}${sig(g.deputy, cfg.deputy)}${sig(g.principal, cfg.principal)}</div>
-    <div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}${cfg.preparer ? ' — ' + esc(cfg.preparer) : ''}</span><span>جميع الحقوق محفوظة © ${COPYRIGHT}</span></div>
+    <div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}${cfg.preparer ? ' — ' + esc(cfg.preparer) : ''}</span></div>
   </article>`;
 }
 function stuSheet(){
@@ -3325,7 +3343,7 @@ function stuSheet(){
       <tbody>${rows.map((x, i) => `<tr><td class="idx">${i+1}</td><td class="name">${esc(x.s.name)}</td><td class="name">${esc(x.c.short)}</td><td class="${x.s.ex ? '' : 'zero'}">${x.s.ex}</td><td class="${x.s.un ? 'bad' : 'zero'}">${x.s.un}</td><td><b>${x.t}</b></td>${t === 'daily' ? '' : pctTd(x)}<td class="dl">${x.s.marks.map(m => m.un ? `<span class="u">${m.day}ب</span>` : m.day).join('، ')}</td></tr>`).join('') || `<tr><td colspan="8" class="zero" style="padding:18px">لا يوجد ضمن هذا الحد.</td></tr>`}</tbody></table>
     <p class="note">${rows.length} ${g.student} · الأيام المميزة بـ«ب» غياب بدون عذر · بالأحمر: نسبة غياب ١٠٪ فأكثر.</p>
     <div class="sigs">${sig(g.officer, cfg.preparer)}${sig(g.deputy, cfg.deputy)}${sig(g.principal, cfg.principal)}</div>
-    <div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}</span><span>جميع الحقوق محفوظة © ${COPYRIGHT}</span></div>
+    <div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}</span></div>
   </article>`;
 }
 function cmpStudentsHTML(C, M){
@@ -3565,7 +3583,7 @@ function buildSheet(){
 
   const sig = (role, nm) => `<div><div class="role">${role}</div><div class="nm">${esc(nm || '')}</div><div class="ln">التوقيع: ..................</div></div>`;
   const sigs = `<div class="sigs">${sig(G().officer, cfg.preparer)}${sig(G().deputy, cfg.deputy)}${sig(G().principal, cfg.principal)}</div>`;
-  const foot = sigs + `<div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}${cfg.preparer ? ' — ' + esc(cfg.preparer) : ''}</span><span>جميع الحقوق محفوظة © ${COPYRIGHT}</span></div>`;
+  const foot = sigs + `<div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}${cfg.preparer ? ' — ' + esc(cfg.preparer) : ''}</span></div>`;
   if(!list.length || !recN){
     return `<article class="sheet"><h1>${title}</h1><p class="sub">${sub}</p><div class="nodata">${!list.length ? 'لا توجد فصول مسجلة بعد.' : 'لا يوجد غياب مرصود في هذه الفترة.'}</div>${foot}</article>`;
   }
