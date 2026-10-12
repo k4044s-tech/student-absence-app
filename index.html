@@ -520,6 +520,13 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 @media screen and (min-width:1600px){ .shell, .auth, #dlgBg, .toast, .updbar{ zoom:1.2; } .rail{ height:calc(100vh / 1.2); } .auth{ height:calc(100vh / 1.2); } }
 @media screen and (max-width:1099px){ body{ font-size:15px; } }
 
+/* contact count */
+.fl-cw{position:relative;display:block}.fl-cnt{position:absolute;top:-8px;inset-inline-start:-8px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#ef4444;color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center;z-index:1;box-shadow:0 0 0 2px #fff}
+#fcMs button.on{background:#0f172a;color:#fff}
+.fc-mx{margin-top:8px}.fc-mx:empty{display:none}
+.fc-msg{white-space:pre-wrap;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.8;margin-bottom:8px;max-height:220px;overflow:auto}
+.fc-call{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px}.fc-call b{font-size:20px;letter-spacing:.5px}
+.fc-let{border:1px solid var(--border);border-radius:10px;height:260px;overflow:auto;background:#f8fafc;margin-bottom:8px}.fc-let-in{zoom:.55;padding:10px}
 /* reports home */
 .rhero{display:flex;align-items:center;gap:16px;padding:22px 24px;border-radius:18px;background:linear-gradient(120deg,#0f766e,#0ea5e9);color:#fff;margin-bottom:14px}
 .rhero-i{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:28px;flex:none}
@@ -1191,7 +1198,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v90';
+const APP_VER = 'absence-v92';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -2369,7 +2376,7 @@ function flDailyView(){
       <td><div class="seg"><button data-act="flType" data-v="بعذر" class="${!un ? 'on' : ''}">بعذر</button><button data-act="flType" data-v="بدون" class="${un ? 'on' : ''}">بدون عذر</button></div></td>
       <td class="fl-rs">${un ? `<div class="fl-rw"><span class="sub">—</span>${fbtn}</div>${st}` : `<div class="fl-rw">${reasonSel}${fbtn}</div>${proofHint}${st ? `<div class="fl-bd">${st}</div>` : ''}`}</td>
       <td><input class="input fl-in" data-flf="note" value="${esc(x.note)}" placeholder="ملاحظة…"></td>
-      <td class="fl-ct">${done ? `<button class="btn sm fl-ok fl-full" data-act="flCont">✓ مكتمل</button>` : c ? `<button class="btn sm fl-ok fl-full" data-act="flCont">✓ تم التواصل</button>` : `<button class="btn sm fl-full" data-act="flCont">تواصل</button>`}${c && c.reply && !done ? `<div class="sub fl-rp">${esc(c.reply)}</div>` : ''}</td>
+      <td class="fl-ct"><div class="fl-cw">${flCnt(rid) ? `<span class="fl-cnt" title="عدد مرات التواصل">${AR(flCnt(rid))}</span>` : ''}${done ? `<button class="btn sm fl-ok fl-full" data-act="flCont">✓ مكتمل</button>` : c ? `<button class="btn sm fl-ok fl-full" data-act="flCont">✓ تم التواصل</button>` : `<button class="btn sm fl-full" data-act="flCont">تواصل</button>`}</div>${c && c.reply && !done ? `<div class="sub fl-rp">${esc(c.reply)}</div>` : ''}</td>
       <td class="fl-wr">${un ? (w ? `<span class="tag ok">✓ صدر</span><button class="btn sm" data-act="flWarn">إعادة</button>` : `<button class="btn sm fl-full" data-act="flWarn">${ICON.print} خطاب ولي الأمر</button>`) : '<span class="sub">—</span>'}</td>
     </tr>`;
   }).join('');
@@ -2407,7 +2414,7 @@ function flContDlg(rid){
       <label class="f">رقم الهاتف<input class="input" id="fcP" type="tel" inputmode="tel" dir="ltr" autocomplete="off" value="${esc(ph)}" placeholder="05xxxxxxxx"></label>
       <label class="f">تاريخ التواصل<input class="input" type="date" id="fcD" value="${esc(c.date)}"></label>
       <label class="f">الزمن<input class="input" type="time" id="fcT" value="${esc(c.time || '')}"></label>
-      <label class="f">وسيلة التواصل<select class="input" id="fcM">${['اتصال', 'رسالة', 'واتساب', 'حضور ولي الأمر'].map(m => `<option ${m === c.method ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+      <div class="f" style="display:flex;flex-direction:column;gap:5px;grid-column:1/-1">وسيلة التواصل <span class="sub" style="display:inline">· عدد مرات التواصل: <b id="fcCnt">${AR(flCnt(rid))}</b></span><input type="hidden" id="fcM" value="${esc(FC_M.includes(c.method) ? c.method : 'اتصال')}"><div class="seg fc-seg" id="fcMs">${FC_M.map(m => `<button type="button" data-act="fcMeth" data-v="${m}" class="${m === (FC_M.includes(c.method) ? c.method : 'اتصال') ? 'on' : ''}">${{'اتصال':'📞 ','واتساب':'💬 ','خطاب ولي الأمر':'✉️ '}[m]}${m}</button>`).join('')}</div><div id="fcMx" class="fc-mx"></div></div>
       <label class="f">المجيب<input class="input" id="fcA" list="fcAl" value="${esc(c.answer || '')}"><datalist id="fcAl">${ANSWERS.map(a => `<option value="${a}">`).join('')}</datalist></label>
       <div class="f" style="display:flex;flex-direction:column;gap:5px">نوع الغياب<div class="seg fc-seg" id="fcTy"><button type="button" data-fcty="بعذر" data-v="بعذر" class="${!un ? 'on' : ''}">بعذر</button><button type="button" data-fcty="بدون" data-v="بدون" class="${un ? 'on' : ''}">بدون عذر</button></div></div>
       <label class="f">سبب الغياب<select class="input" id="fcS"><option value="">— بدون سبب —</option>${FL_REASONS.map(o => `<option ${o === x.reason ? 'selected' : ''}>${o}</option>`).join('')}${x.reason && !FL_REASONS.includes(x.reason) ? `<option selected>${esc(x.reason)}</option>` : ''}</select></label>
@@ -2581,10 +2588,21 @@ function flContSync(){
   const pf = $('#fcProof'); if(pf) pf.style.display = un ? 'none' : ''; if(pf && !un){ const t = proofOf(rs); pf.innerHTML = rs ? `<b>الإثبات المطلوب (المادة 32):</b> ${esc(t || '—')}` : 'اختر سبب الغياب لمعرفة الإثبات المطلوب وفق المادة 32.'; }
   const X = $('#fcX'); if(X){ const A = flActOptions(x, ty), cur = X.value, L = A.list.slice(); if(X.dataset.saved && cur === X.dataset.saved && !L.includes(cur)) L.push(cur); const keep = L.includes(cur) ? cur : A.def;
     X.innerHTML = L.map(o => `<option ${o === keep ? 'selected' : ''}>${esc(o)}</option>`).join(''); }
-  const ph = $('#fcP').value.trim(), wa = $('#fcWa');
-  const on = $('#fcM').value === 'واتساب' && waPhone(ph);
-  wa.style.display = on ? '' : 'none';
-  if(on) wa.href = waUrl(ph, waAbsentText(x.cid, x.name, ty, x.date));
+  const ph = $('#fcP').value.trim(), wa = $('#fcWa'), m = $('#fcM').value, mx = $('#fcMx'), rid = box.dataset.rid;
+  if(wa) wa.style.display = 'none';
+  if(mx){
+    if(m === 'واتساب') mx.innerHTML = waPhone(ph) ? `<div class="fc-msg">${esc(waAbsentText(x.cid, x.name, ty, x.date) + waNote())}</div><a class="btn wa" data-cnt="1" target="_blank" rel="noopener" href="${esc(waUrl(ph, waAbsentText(x.cid, x.name, ty, x.date)))}">💬 إرسال عبر واتساب</a>` : '<div class="sub">أدخل رقم الهاتف أعلاه لإرسال رسالة واتساب.</div>';
+    else if(m === 'خطاب ولي الأمر') mx.innerHTML = `<div class="fc-let"><div class="fc-let-in">${absWarnHTML(x)}</div></div><button type="button" class="btn primary" data-act="fcLetter">${ICON.print} طباعة خطاب ولي الأمر</button>`;
+    else mx.innerHTML = ph ? `<div class="fc-call"><span>رقم ولي الأمر</span><b dir="ltr">${esc(ph)}</b><a class="btn" data-cnt="1" href="tel:${esc(ph.replace(/[^\d+]/g, ''))}">📞 اتصال الآن</a></div>` : '<div class="sub">أدخل رقم الهاتف أعلاه لعرض رقم الاتصال.</div>';
+    mx.querySelectorAll('[data-cnt]').forEach(a => a.onclick = () => flCntInc(rid));
+  }
+}
+const FC_M = ['اتصال', 'واتساب', 'خطاب ولي الأمر'];
+const flCnt = rid => +(((state.contacts || {}).cnt || {})[rid] || 0);
+async function flCntInc(rid, setMin){
+  const n = setMin ? Math.max(flCnt(rid), setMin) : flCnt(rid) + 1; if(n === flCnt(rid)) return;
+  state.contacts = Object.assign({}, state.contacts, {cnt: Object.assign({}, state.contacts.cnt || {}, {[rid]: n})});
+  await flSaveContacts(); const b = $('#fcCnt'); if(b) b.textContent = AR(n);
 }
 async function flContSave(){
   const box = document.querySelector('#dlgBg .dlg-b'); const rid = box.dataset.rid, x = flFindRow(rid); if(!x) return;
@@ -2604,6 +2622,7 @@ async function flContSave(){
       coun:{text:'', by: state.cfg.counselor || '', date:''}};
     if(await saveRef(ref)){ rec.refId = ref.id; await flSaveContacts(); msg = 'تم حفظ التواصل وتحويل ' + G().studentDef + ' إلى ' + G().counselor; }
   }
+  await flCntInc(rid, 1);
   closeDlg(); toast(msg); render();
 }
 function absWarnHTML(x){
@@ -2641,7 +2660,7 @@ function absWarnHTML(x){
 async function flWarnPrint(rid){
   const x = flFindRow(rid); if(!x) return;
   state.contacts = Object.assign({}, state.contacts, {warns: Object.assign({}, state.contacts.warns || {}, {[rid]: today})});
-  await flSaveContacts();
+  await flSaveContacts(); await flCntInc(rid);
   $('#printArea').innerHTML = absWarnHTML(x);
   document.body.classList.add('printing-reg');
   const done = () => { document.body.classList.remove('printing-reg'); $('#printArea').innerHTML = ''; window.removeEventListener('afterprint', done); render(); };
@@ -2929,7 +2948,7 @@ async function flSave(id){
   const known = studentStats().find(s => s.name === name) || flDaily().find(x => x.name === name);
   const rec = {id: id || ('c' + Date.now().toString(36)), name, cid: known ? known.cid : '', date: $('#flD').value || today, method: $('#flM').value, reply: $('#flR').value.trim(), action: $('#flA').value.trim()};
   const items = (state.contacts.items || []).filter(x => x.id !== rec.id); items.push(rec);
-  state.contacts = {items}; lsSet('contacts', state.contacts); closeDlg(); toast('تم الحفظ'); render();
+  state.contacts = Object.assign({}, state.contacts, {items}); lsSet('contacts', state.contacts); closeDlg(); toast('تم الحفظ'); render();
 }
 function flPrint(all){
   const c = state.cfg, [a, b] = flRange();
@@ -3134,6 +3153,18 @@ function lstHTML(){
     if(!L.stu) return '';
     return stuRepHTML(L.stu).replace('<table class="at1 sr-d"', stuChartsHTML(L.stu) + '<table class="at1 sr-d"');
   }
+  if(L.kind === 'cont'){
+    const ord = classes().map(c => c.id), cst = L.cst || 'all';
+    const all = flDailyAll().filter(x => inRange(x.date) && (L.cid === 'all' || x.cid === L.cid)).map(x => { const rid = flRid(x), c = flContactOf(rid); return {x, c, n: flCnt(rid), w: flWarnOf(rid)}; });
+    const rows = all.filter(o => cst === 'all' || (cst === 'done' ? (o.c || o.n) : !(o.c || o.n))).sort((a, b) => a.x.date.localeCompare(b.x.date) || ord.indexOf(a.x.cid) - ord.indexOf(b.x.cid));
+    const dn = all.filter(o => o.c || o.n).length, tot = all.reduce((a, o) => a + o.n, 0);
+    const by = m => all.filter(o => o.c && o.c.method === m).length;
+    return `<article class="actf">${moeHead(`سجل التواصل مع أولياء أمور ${g.students}`, clsT + (cst === 'done' ? ' · تم التواصل' : cst === 'none' ? ' · لم يُتواصل' : ''))}
+      <table class="at1"><tr><th>حالات الغياب</th><th>تم التواصل</th><th>لم يُتواصل</th><th>نسبة التواصل</th><th>مرات التواصل</th><th>اتصال</th><th>واتساب</th><th>خطاب</th></tr>
+      <tr><td><b>${all.length}</b></td><td><b>${dn}</b></td><td><b>${all.length - dn}</b></td><td><b>${all.length ? Math.round(dn / all.length * 100) : 0}%</b></td><td>${tot}</td><td>${by('اتصال')}</td><td>${by('واتساب')}</td><td>${by('خطاب ولي الأمر') || all.filter(o => o.w).length}</td></tr></table>
+      <table class="at1" style="font-size:12px"><tr><th style="width:28px">م</th><th>اسم ${g.studentDef}</th><th style="width:90px">الصف</th><th style="width:80px">تاريخ الغياب</th><th style="width:56px">النوع</th><th style="width:70px">الوسيلة</th><th style="width:40px">المرات</th><th>رد ولي الأمر</th><th>الإجراء</th></tr>
+      ${rows.map((o, i) => `<tr><td>${i + 1}</td><td style="text-align:start"><b>${esc(o.x.name)}</b></td><td>${esc(flCls(o.x.cid))}</td><td>${hijriNum(o.x.date).replace(' هـ', '')}</td><td>${o.x.type === 'بعذر' ? 'بعذر' : 'بدون'}</td><td>${o.c ? esc(o.c.method) : o.w ? 'خطاب' : '<b>—</b>'}</td><td>${o.n || '—'}</td><td style="text-align:start">${o.c ? esc(o.c.reply || '') : ''}</td><td style="text-align:start">${o.c ? esc(o.c.action || '') : ''}</td></tr>`).join('') || `<tr><td colspan="9">لا توجد حالات في هذه الفترة</td></tr>`}</table>${moeSign()}</article>`;
+  }
   if(L.kind === 'unexc' || L.kind === 'exc'){
     const ex = L.kind === 'exc', rows = lstStudents().map(s => ex ? {s, n:s.exc, d:lstExcDates(s)} : {s, n:s.unexc, d:s.dates.map(k => ({k}))}).filter(o => o.n > 0);
     const tot = rows.reduce((a, o) => a + o.n, 0);
@@ -3188,6 +3219,7 @@ function listsView(){
   <div class="bar">
     <label class="f" style="flex-direction:row;align-items:center;gap:8px">الفصل<select class="input" id="lstCls"><option value="all">جميع الفصول</option>${cl.map(c => `<option value="${c.id}" ${L.cid === c.id ? 'selected' : ''}>${esc(clsLabel(c))}</option>`).join('')}</select></label>
     ${L.kind === 'student' ? `<label class="f" style="flex-direction:row;align-items:center;gap:8px">${g.studentDef}<select class="input" id="lstStu" style="min-width:220px">${st.map(s => `<option value="${esc(s.key)}" ${L.stu === s.key ? 'selected' : ''}>${esc(s.name)} — ${s.unexc + s.exc} ${s.cls && L.cid === 'all' ? '· ' + esc(clsLabel(s.cls)) : ''}</option>`).join('') || '<option value="">لا يوجد غياب</option>'}</select></label>` : ''}
+    ${L.kind === 'cont' ? `<label class="f" style="flex-direction:row;align-items:center;gap:8px">الحالة<select class="input" id="lstCst">${[['all','الكل'],['done','تم التواصل'],['none','لم يُتواصل']].map(([v, t]) => `<option value="${v}" ${(L.cst || 'all') === v ? 'selected' : ''}>${t}</option>`).join('')}</select></label>` : ''}
     ${L.kind === 'acts' ? `<label class="f" style="flex-direction:row;align-items:center;gap:8px">الإجراء<select class="input" id="lstAct"><option value="all">جميع الإجراءات</option>${LST_ACTS().map(a => `<option value="${a.id}" ${L.act === a.id ? 'selected' : ''}>${esc(a.t)}</option>`).join('')}</select></label>` : ''}
   </div>
   <div class="sheet-wrap lst-wrap">${html || `<div class="empty"><h2>لا يوجد ${g.students} لهم غياب في الفترة</h2></div>`}</div>`;
@@ -3522,6 +3554,7 @@ const RCARDS = () => { const g = G(); return [
     ['lists', 'unexc', '🚫', '#fef2f2', 'كشف الغياب بدون عذر', `${g.students} الغائبين بدون عذر مع عدد الأيام وتواريخها`],
     ['lists', 'exc', '📎', '#f8fafc', 'كشف الغياب بعذر', 'أيام الغياب بعذر مع سبب كل عذر'],
     ['lists', 'student', '👤', '#f5f3ff', 'تقرير ' + g.student, `إحصائية ${g.student} محدد مع رسوم بيانية تفصيلية`],
+    ['lists', 'cont', '📞', '#ecfeff', 'التواصل مع أولياء الأمور', 'كل غياب مع وسيلة التواصل وعدد مراته ورد ولي الأمر والإجراء'],
     ['lists', 'acts', '⚖️', '#fefce8', 'من بلغوا الإجراءات', 'الإنذارات والتحويل والنسب مع حالة التنفيذ — فلتر لكل إجراء']]]]; };
 function reportsHome(){
   return `<div class="rhero"><div class="rhero-i">📑</div><div class="rhero-t"><h2>التقارير والكشوف</h2><p>اختر التقرير، ثم حدّد الفترة والفصل واطبعه بترويسة التعليم.</p></div></div>
@@ -4001,6 +4034,8 @@ document.addEventListener('click', async e => {
     if(act === 'flWarn'){ await flWarnPrint(rid); return; }
     if(await flRowUpdate(x, {type: t.dataset.v === 'بعذر' ? 'بعذر' : 'بدون'})){ toast('تم تحديث التصنيف'); render(); } return;
   }
+  if(act === 'fcMeth'){ $('#fcM').value = t.dataset.v; t.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); flContSync(); return; }
+  if(act === 'fcLetter'){ const rid = t.closest('.dlg-b').dataset.rid; await flWarnPrint(rid); const b = $('#fcCnt'); if(b) b.textContent = AR(flCnt(rid)); return; }
   if(act === 'fileView'){ fileShow(t.dataset.rid); return; }
   if(act === 'fileClose'){ const v = $('#fileView'); if(v) v.remove(); return; }
   if(act === 'fileDel'){ if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد الحذف'; return; } const rid = t.dataset.rid; if(await saveFile(rid, null)){ const b = $('#fcFile'); if(b) b.innerHTML = fileBlock(rid); toast('تم حذف الملف'); render(); } return; }
@@ -4026,7 +4061,7 @@ document.addEventListener('click', async e => {
   if(act === 'flPrint'){ flPrint(t.dataset.all === '1'); return; }
   if(act === 'flDel'){
     if(!t.classList.contains('armed')){ t.classList.add('armed'); t.textContent = 'تأكيد'; setTimeout(() => { if(t.isConnected){ t.classList.remove('armed'); t.textContent = 'حذف'; } }, 3500); return; }
-    state.contacts = {items: (state.contacts.items || []).filter(x => x.id !== t.dataset.id)}; lsSet('contacts', state.contacts); toast('تم الحذف'); render(); return;
+    state.contacts = Object.assign({}, state.contacts, {items: (state.contacts.items || []).filter(x => x.id !== t.dataset.id)}); lsSet('contacts', state.contacts); toast('تم الحذف'); render(); return;
   }
   if(act === 'adReload'){ sb.admin = null; render(); return; }
   if(act === 'adSub'){ const p = adFind(t.dataset.id); if(p) adSubDlg(p); return; }
@@ -4207,6 +4242,7 @@ document.addEventListener('change', async e => {
   }
   if(el.id === 'lstCls'){ state.lst.cid = el.value; state.lst.stu = ''; render(); return; }
   if(el.id === 'lstStu'){ state.lst.stu = el.value; render(); return; }
+  if(el.id === 'lstCst'){ state.lst.cst = el.value; render(); return; }
   if(el.id === 'lstAct'){ state.lst.act = el.value; render(); return; }
   if(el.id === 'regAll'){ state.regAll = el.checked; return; }
   if(el.id === 'rDate' && el.value){ state.rpt.date = el.value; render(); return; }
