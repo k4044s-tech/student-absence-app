@@ -1191,7 +1191,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v89';
+const APP_VER = 'absence-v90';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -3319,7 +3319,8 @@ function stuSheet(){
   const EX = all.reduce((a, x) => a + x.s.ex, 0), UN = all.reduce((a, x) => a + x.s.un, 0), TOT = EX + UN, TS = C.reduce((a, c) => a + c.s, 0);
   const rep3 = all.filter(x => x.t >= 3).length, onlyUn = all.filter(x => x.s.un && !x.s.ex).length;
   const kp = (v, l, cls) => `<div class="kp ${cls || ''}"><b>${v}</b><span>${l}</span></div>`;
-  const kpis = `<div class="kps">${kp(all.length, g.f ? 'طالبة غابت' : 'طالب غاب')}${kp(TOT, 'حالة غياب')}${kp(UN, 'بدون عذر', 'bad')}${kp(EX, 'بعذر', 'good')}${t === 'daily' ? kp(TS ? (Math.round(all.length / TS * 1000) / 10) + '%' : '0%', 'نسبة الغياب') : kp(rep3, '٣ أيام فأكثر', rep3 ? 'bad' : '')}</div>`;
+  const absR = TS ? Math.round((t === 'daily' ? all.length / TS : TOT / (TS * D)) * 1000) / 10 : 0;
+  const kpis = `<div class="kps" style="grid-template-columns:repeat(${t === 'daily' ? 6 : 7},1fr)">${kp(all.length, g.f ? 'طالبة غابت' : 'طالب غاب')}${kp(TOT, 'حالة غياب')}${kp(UN, 'بدون عذر', 'bad')}${kp(EX, 'بعذر', 'good')}${t === 'daily' ? '' : kp(rep3, '٣ أيام فأكثر', rep3 ? 'bad' : '')}${kp(absR + '%', 'نسبة الغياب', 'bad')}${kp(Math.round((100 - absR) * 10) / 10 + '%', 'نسبة الحضور', 'good')}</div>`;
   const segs = [{label:'بدون عذر', value:UN, color:'#EF4444'}, {label:'بعذر', value:EX, color:'#22C55E'}];
   const legend = segs.map(x => `<div class="it"><span class="dot" style="background:${x.color}"></span><span>${x.label}</span><span class="v"><b>${x.value}</b><small>${TOT ? Math.round(x.value / TOT * 100) : 0}٪</small></span></div>`).join('');
   const byCls = C.filter(c => c.a).map(c => ({label: c.short, value: c.a})).sort((a, b) => b.value - a.value).slice(0, 12);
@@ -3339,9 +3340,9 @@ function stuSheet(){
     <div class="charts"><figure><figcaption>نوع الغياب</figcaption><div class="donut">${donutSVG(segs, TOT, 'حالة غياب')}</div><div class="legend">${legend}</div></figure>${second}</div>
     <div class="ins2 one"><div class="box"><h3>أبرز النتائج</h3><ul>${ins.map(x => `<li>${x}</li>`).join('')}</ul></div></div>
     <div class="tcap">كشف ${g.absentsNom}${min > 1 ? ` (${min} أيام فأكثر)` : ''}${unOnly ? ' · بدون عذر فقط' : ''}</div>
-    <table class="rt"><thead><tr><th>م</th><th>اسم ${g.studentDef}</th><th>الفصل</th><th>بعذر<small>يوم</small></th><th>بدون عذر<small>يوم</small></th><th>الإجمالي<small>يوم</small></th>${t === 'daily' ? '' : `<th>نسبة الغياب<small>من ${D} يوم</small></th>`}<th>أيام الغياب</th></tr></thead>
-      <tbody>${rows.map((x, i) => `<tr><td class="idx">${i+1}</td><td class="name">${esc(x.s.name)}</td><td class="name">${esc(x.c.short)}</td><td class="${x.s.ex ? '' : 'zero'}">${x.s.ex}</td><td class="${x.s.un ? 'bad' : 'zero'}">${x.s.un}</td><td><b>${x.t}</b></td>${t === 'daily' ? '' : pctTd(x)}<td class="dl">${x.s.marks.map(m => m.un ? `<span class="u">${m.day}ب</span>` : m.day).join('، ')}</td></tr>`).join('') || `<tr><td colspan="8" class="zero" style="padding:18px">لا يوجد ضمن هذا الحد.</td></tr>`}</tbody></table>
-    <p class="note">${rows.length} ${g.student} · الأيام المميزة بـ«ب» غياب بدون عذر · بالأحمر: نسبة غياب ١٠٪ فأكثر.</p>
+    <table class="rt"><thead><tr><th>م</th><th>اسم ${g.studentDef}</th><th>الفصل</th><th>بعذر<small>يوم</small></th><th>بدون عذر<small>يوم</small></th><th>الإجمالي<small>يوم</small></th>${t === 'daily' ? '' : `<th>نسبة الغياب<small>من ${D} يوم</small></th>`}</tr></thead>
+      <tbody>${rows.map((x, i) => `<tr><td class="idx">${i+1}</td><td class="name">${esc(x.s.name)}</td><td class="name">${esc(x.c.short)}</td><td class="${x.s.ex ? '' : 'zero'}">${x.s.ex}</td><td class="${x.s.un ? 'bad' : 'zero'}">${x.s.un}</td><td><b>${x.t}</b></td>${t === 'daily' ? '' : pctTd(x)}</tr>`).join('') || `<tr><td colspan="8" class="zero" style="padding:18px">لا يوجد ضمن هذا الحد.</td></tr>`}</tbody></table>
+    <p class="note">${rows.length} ${g.student} · بالأحمر: نسبة غياب ١٠٪ فأكثر.</p>
     <div class="sigs">${sig(g.officer, cfg.preparer)}${sig(g.deputy, cfg.deputy)}${sig(g.principal, cfg.principal)}</div>
     <div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}</span></div>
   </article>`;
