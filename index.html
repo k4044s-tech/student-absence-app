@@ -704,12 +704,12 @@ const REPORT_CSS = `
 const REG_CSS = `
 .reg{width:794px;background:#fff;color:#1c2b36;padding:30px 30px 26px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;box-shadow:0 1px 3px rgba(15,41,58,.12),0 14px 34px rgba(15,41,58,.10);line-height:1.4}
 .reg + .reg{margin-top:26px}
-.reg-head{display:grid;grid-template-columns:1.6fr auto 1fr;align-items:center;gap:10px;margin-bottom:6px}
+.reg-head{display:grid;grid-template-columns:minmax(300px,1.7fr) auto minmax(110px,1fr);align-items:center;gap:10px;margin-bottom:6px}
 .reg-head .r{font-weight:700;font-size:12.5px;line-height:2.05}
 .reg-head .r .sch{font-size:15.5px;color:#000}
-.reg-head h1{font-size:25px;font-weight:700;margin:0;text-align:center;color:#111}
+.reg-head h1{font-size:23px;font-weight:700;margin:0;text-align:center;color:#111;white-space:nowrap}
 .reg-head .l{display:flex;justify-content:flex-end;align-items:center;min-height:70px}
-.reg-head .l img{max-height:78px;max-width:150px}
+.reg-head .l img{max-height:70px;max-width:120px}
 .reg-year{text-align:center;font-weight:700;font-size:12.5px;margin:0 0 10px}
 .reg table.rg{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px}
 .reg .rg td,.reg .rg th{border:1px solid #3b5567;height:25px;padding:0 3px;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -740,10 +740,10 @@ const ACT_CSS = `.sch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin
 .lst-wrap .actf{background:#fff;margin:0 auto;max-width:794px;box-shadow:0 1px 6px rgba(0,0,0,.08)}
 
 .actf{width:794px;background:#fff;color:#1c2b36;padding:28px 36px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;line-height:1.6}
-.actf .reg-head{display:grid;grid-template-columns:1.6fr auto 1fr;align-items:center;gap:10px}
+.actf .reg-head{display:grid;grid-template-columns:minmax(300px,1.7fr) auto minmax(110px,1fr);align-items:center;gap:10px}
 .actf .reg-head .r{font-weight:700;font-size:12px;line-height:1.9}.actf .reg-head .r .sch{font-size:14px}
 .actf .reg-head .l{display:flex;justify-content:flex-end}.actf .reg-head .l img{max-height:64px}
-.actf .ahead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding-bottom:10px;border-bottom:2px solid #1d5f8a}
+.actf .ahead{display:grid;grid-template-columns:minmax(280px,1.5fr) auto minmax(150px,1fr);align-items:center;gap:12px;padding-bottom:10px;border-bottom:2px solid #1d5f8a}
 .actf .ahead .r{font-weight:700;font-size:12px;line-height:1.9}.actf .ahead .r .sch{font-size:14px}
 .actf .ahead .c img{max-height:80px;display:block;margin:0 auto}
 .actf .ahead .d{text-align:left;font-size:12.5px;line-height:2}
@@ -786,7 +786,7 @@ const REF_CSS = `
 .warnf .wf-h:not(:first-of-type){border-top:1px solid #555;padding-top:12px}
 .wrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border)}
 .refm{width:794px;background:#fff;color:#1a1a1a;padding:26px 34px;margin:0 auto;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;direction:rtl;line-height:1.7;font-size:13px}
-.refm .ahead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding-bottom:10px;border-bottom:2px solid #1d5f8a;margin-bottom:14px}
+.refm .ahead{display:grid;grid-template-columns:minmax(280px,1.5fr) auto minmax(150px,1fr);align-items:center;gap:12px;padding-bottom:10px;border-bottom:2px solid #1d5f8a;margin-bottom:14px}
 .refm .ahead .r{font-weight:700;font-size:12px;line-height:1.9}.refm .ahead .r .sch{font-size:14px}
 .refm .ahead .c img{max-height:80px;display:block;margin:0 auto}
 .refm .ahead .d{text-align:left;font-size:12.5px;line-height:2}
@@ -829,6 +829,17 @@ document.getElementById('report-css').textContent = REPORT_CSS + REG_CSS + ACT_C
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
+/* الطباعة من الجوال: نوسّع عرض التخطيط مؤقتًا ليُطبع التقرير بعرض صفحة A4 كاملة */
+(function(){
+  const native = window.print.bind(window);
+  window.print = function(){
+    const vm = document.querySelector('meta[name=viewport]');
+    if(!vm || window.innerWidth >= 820) return native();
+    const old = vm.content; vm.content = 'width=860, initial-scale=1';
+    document.documentElement.classList.add('print-wide'); void document.body.offsetWidth;
+    setTimeout(() => { try{ native(); } finally { setTimeout(() => { vm.content = old; document.documentElement.classList.remove('print-wide'); try{ fitSheets(); }catch(e){} }, 1200); } }, 350);
+  };
+})();
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const AR = v => String(v ?? '');
 const arN = n => AR(Number(n).toLocaleString('en-US',{maximumFractionDigits:1}));
@@ -1210,7 +1221,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v96';
+const APP_VER = 'absence-v99';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -2604,7 +2615,7 @@ function flContSync(){
   if(wa) wa.style.display = 'none';
   if(mx){
     if(m === 'واتساب') mx.innerHTML = waPhone(ph) ? `<div class="fc-msg">${esc(waAbsentText(x.cid, x.name, ty, x.date) + waNote())}</div><a class="btn wa" data-cnt="1" target="_blank" rel="noopener" href="${esc(waUrl(ph, waAbsentText(x.cid, x.name, ty, x.date)))}">💬 إرسال عبر واتساب</a>` : '<div class="sub">أدخل رقم الهاتف أعلاه لإرسال رسالة واتساب.</div>';
-    else if(m === 'خطاب ولي الأمر') mx.innerHTML = `<div class="fc-let"><div class="fc-let-in">${absWarnHTML(x)}</div></div><button type="button" class="btn primary" data-act="fcLetter">${ICON.print} طباعة خطاب ولي الأمر</button>`;
+    else if(m === 'خطاب ولي الأمر') mx.innerHTML = `<div class="fc-let"><div class="fc-let-in">${absWarnHTML(x)}</div></div><div class="row-actions" style="margin-top:0"><button type="button" class="btn primary" data-act="fcLetter">${ICON.print} طباعة خطاب ولي الأمر</button><button type="button" class="btn wa" data-act="fcLetterPdf">📄 إرسال الخطاب PDF واتساب</button></div>`;
     else mx.innerHTML = ph ? `<div class="fc-call"><span>رقم ولي الأمر</span><b dir="ltr">${esc(ph)}</b><a class="btn" data-cnt="1" href="tel:${esc(ph.replace(/[^\d+]/g, ''))}">📞 اتصال الآن</a></div>` : '<div class="sub">أدخل رقم الهاتف أعلاه لعرض رقم الاتصال.</div>';
     mx.querySelectorAll('[data-cnt]').forEach(a => a.onclick = () => flCntInc(rid));
   }
@@ -2678,6 +2689,54 @@ async function flWarnPrint(rid){
   const done = () => { document.body.classList.remove('printing-reg'); $('#printArea').innerHTML = ''; window.removeEventListener('afterprint', done); render(); };
   window.addEventListener('afterprint', done);
   try{ window.print(); }catch(e){ done(); }
+}
+
+/* ---------- إرسال الخطاب PDF (مشاركة إلى واتساب) ---------- */
+let pdfLibsReady = null;
+function loadPdfLibs(){
+  if(!pdfLibsReady){ const b = 'https://cdnjs.cloudflare.com/ajax/libs/';
+    pdfLibsReady = Promise.all([loadScript(b + 'html2canvas/1.4.1/html2canvas.min.js'), loadScript(b + 'jspdf/2.5.1/jspdf.umd.min.js')]);
+    pdfLibsReady.catch(() => { pdfLibsReady = null; }); }
+  return pdfLibsReady;
+}
+async function htmlToPdfFile(html, fname){
+  await loadPdfLibs(); try{ await document.fonts.ready; }catch(e){}
+  const box = document.createElement('div');
+  box.style.cssText = 'position:fixed;left:-12000px;top:0;width:794px;background:#fff;z-index:-1';
+  box.innerHTML = html; document.body.appendChild(box);
+  box.querySelectorAll('.actf,.refm,.reg,.sheet').forEach(el => { el.style.zoom = '1'; el.style.boxShadow = 'none'; el.style.margin = '0'; });
+  await Promise.all([...box.querySelectorAll('img')].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })));
+  try{
+    const pages = [...box.children].filter(el => el.offsetHeight > 0), pdf = new window.jspdf.jsPDF({unit:'mm', format:'a4', orientation:'portrait'});
+    for(let i = 0; i < pages.length; i++){
+      const cv = await window.html2canvas(pages[i], {scale:2, backgroundColor:'#fff', useCORS:true, logging:false});
+      const W = 210, M = 8, w = W - 2 * M, h = cv.height * w / cv.width, H = 297 - 2 * M, fit = Math.min(1, H / h);
+      if(i) pdf.addPage();
+      pdf.addImage(cv.toDataURL('image/jpeg', 0.92), 'JPEG', M + (w - w * fit) / 2, M, w * fit, h * fit);
+    }
+    return new File([pdf.output('blob')], fname, {type:'application/pdf'});
+  } finally { box.remove(); }
+}
+const pdfName = (kind, name) => (kind + '-' + String(name || '').trim().replace(/\s+/g, '-').replace(/[\\/:*?"<>|]/g, '') + '.pdf');
+async function sharePdf(btn, html, fname, phone, text, onSent){
+  if(btn.dataset.ready && btn._file){ return doSharePdf(btn, btn._file, phone, text, onSent); }
+  const old = btn.innerHTML; btn.disabled = true; btn.innerHTML = '⏳ جارٍ تجهيز الملف…';
+  let file; try{ file = await htmlToPdfFile(html, fname); }catch(e){ btn.disabled = false; btn.innerHTML = old; toast('تعذّر إنشاء الملف. تحقق من الاتصال بالإنترنت.', 'err'); return; }
+  btn.disabled = false; btn.innerHTML = old; btn._file = file;
+  return doSharePdf(btn, file, phone, text, onSent);
+}
+async function doSharePdf(btn, file, phone, text, onSent){
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], text}); if(onSent) onSent(); btn.dataset.ready = ''; btn._file = null; return; }
+    catch(e){
+      if(e && e.name === 'AbortError') return;
+      btn.dataset.ready = '1'; btn.classList.add('primary'); btn.innerHTML = '📤 الملف جاهز — اضغط للمشاركة'; return;
+    }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast('حُمِّل الملف. أرفقه في محادثة واتساب التي ستُفتح الآن.');
+  if(waPhone(phone)) window.open(waUrl(phone, text), '_blank');
+  if(onSent) onSent();
 }
 /* ---------- الإنذارات الثلاثة ---------- */
 const keyOf = t => (t.closest('[data-key]') || t.closest('.modal').querySelector('[data-key]')).dataset.key;
@@ -3043,7 +3102,7 @@ function openRef(r){
         <p class="hint" id="rfCallHint" style="margin:6px 0 0" ${cl.on && !cl.done ? '' : 'hidden'}>يبقى التحويل «قيد المعالجة» حتى يحضر ولي الأمر وتُعالج المشكلة.</p>
       </div>
     </div>
-    <div class="reged-f">${isNew ? '' : `<button class="btn danger" data-act="refDel">حذف</button>`}<span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn" data-act="refCallPv" id="rfCallBtn" ${cl.on ? '' : 'hidden'}>${ICON.print} طباعة الاستدعاء</button><button class="btn wa" data-act="refCallWa" id="rfCallWa" ${cl.on ? '' : 'hidden'}>واتساب الاستدعاء</button><button class="btn" data-act="refPreview">معاينة</button><button class="btn primary" data-act="refSave">حفظ</button></div>`);
+    <div class="reged-f">${isNew ? '' : `<button class="btn danger" data-act="refDel">حذف</button>`}<span class="grow"></span><button class="btn" data-act="dlgclose">إلغاء</button><button class="btn" data-act="refCallPv" id="rfCallBtn" ${cl.on ? '' : 'hidden'}>${ICON.print} طباعة الاستدعاء</button><button class="btn wa" data-act="refCallWa" id="rfCallWa" ${cl.on ? '' : 'hidden'}>واتساب الاستدعاء</button><button class="btn wa" data-act="refCallPdf" id="rfCallPdf" ${cl.on ? '' : 'hidden'}>📄 الاستدعاء PDF</button><button class="btn" data-act="refPreview">معاينة</button><button class="btn primary" data-act="refSave">حفظ</button></div>`);
   $('#dlgBg .modal').classList.add('dlg-wide');
 }
 function readRef(){
@@ -3304,8 +3363,8 @@ function nmBars(C, RED){
     b += `<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="${Math.min(bw/2, 8)}" fill="${col}"/><text x="${x+bw/2}" y="${y-5}" font-size="10" text-anchor="middle" fill="#4b5563" ${F}>${c.d}</text><text transform="translate(${x+bw/2+4},${B+10}) rotate(-45)" font-size="${fs}" text-anchor="end" fill="#4b5563" ${F}>${esc(c.short)}</text>`; });
   return `<svg viewBox="0 0 400 300" width="100%" style="direction:ltr">${b}<line x1="${L}" x2="${L+Wd}" y1="${B}" y2="${B}" stroke="#9ca3af"/></svg>`;
 }
-function nmDaily(C){
-  const D = {}; C.forEach(c => Object.entries(c.dayCount).forEach(([d, v]) => D[d] = (D[d] || 0) + v));
+function nmDaily(C, allDays){
+  const D = {}; (allDays || []).forEach(d => D[d] = 0); C.forEach(c => Object.entries(c.dayCount).forEach(([d, v]) => D[d] = (D[d] || 0) + v));
   const k = Object.keys(D).map(Number).sort((a, b) => a - b), F = `font-family="IBM Plex Sans Arabic,Tahoma,sans-serif"`;
   if(!k.length) return `<svg viewBox="0 0 400 170" width="100%"><text x="200" y="90" text-anchor="middle" font-size="13" fill="#6b7280" ${F}>لا يوجد غياب مسجّل</text></svg>`;
   const mx = Math.max(...k.map(d => D[d])), step = mx <= 10 ? 5 : mx <= 30 ? 10 : 20, dm = Math.ceil(mx / step) * step, n = k.length;
@@ -3329,7 +3388,7 @@ function cmpReportHTML(C, M){
   const rows = C.map((c, i) => { const red = c.r >= RED, col = c.d ? (red ? '#EF4444' : '#22C55E') : '#22C55E', wd = c.d ? Math.max(Math.min(100, c.r / (RED * 1.6) * 100), 8) : 100;
     if(M.daily) return `<tr><td class="idx">${i+1}</td><td class="name">${esc(c.full)}</td><td class="days">${c.s}</td><td>${Math.max(0, c.s - c.d)}</td><td class="${red ? 'bad' : c.d ? '' : 'zero'}">${c.d}</td><td class="${c.ex ? '' : 'zero'}">${c.ex}</td><td class="${c.un ? 'bad' : 'zero'}">${c.un}</td>
       <td class="rate ${red ? 'bad' : ''}"><div class="rin"><b>${nf2(c.r)}%</b><span class="rbarx"><i style="width:${wd}%;background:${col}"></i></span></div></td><td><span class="rk ${c.rk === 1 ? 'top' : ''}">${c.rk}</span></td></tr>`;
-    return `<tr><td class="idx">${i+1}</td><td class="name">${esc(c.full)}</td><td class="days">${c.s}</td><td class="${c.a ? '' : 'zero'}">${c.a}</td><td class="${red ? 'bad' : c.d ? '' : 'zero'}">${c.d}</td><td>${(c.d / c.s).toFixed(2)}</td>
+    return `<tr><td class="idx">${i+1}</td><td class="name">${esc(c.full)}</td><td class="days">${c.s}</td><td class="${c.a ? '' : 'zero'}">${c.a}</td><td class="${c.ex ? '' : 'zero'}">${c.ex}</td><td class="${c.un ? 'bad' : 'zero'}">${c.un}</td><td class="${red ? 'bad' : c.d ? '' : 'zero'}"><b>${c.d}</b></td><td>${(c.d / c.s).toFixed(2)}</td>
       <td class="rate ${red ? 'bad' : ''}"><div class="rin"><b>${nf2(c.r)}%</b><span class="rbarx"><i style="width:${wd}%;background:${col}"></i></span></div></td><td><span class="rk ${c.rk === 1 ? 'top' : ''}">${c.rk}</span></td></tr>`; }).join('');
   const sig = (role, nm) => `<div><div class="role">${role}</div><div class="nm">${esc(nm || '')}</div><div class="ln">التوقيع: ..................</div></div>`;
   return `<article class="sheet">
@@ -3343,11 +3402,11 @@ function cmpReportHTML(C, M){
     ${M.daily ? `<table class="rt"><thead><tr><th>م</th><th>الفصل</th><th>عدد ${g.students}<small>${g.student}</small></th><th>${g.presentNom}<small>${g.student}</small></th><th>${g.absentsNom}<small>${g.student}</small></th><th>بعذر<small>${g.student}</small></th><th>بدون عذر<small>${g.student}</small></th><th>نسبة الغياب</th><th>الترتيب</th></tr></thead>
       <tbody>${rows}<tr class="total"><td></td><td class="name">الإجمالي</td><td>${T.s}</td><td>${T.s - T.d}</td><td>${T.d}</td><td>${T.ex}</td><td>${T.un}</td><td>${nf2(T.d / T.s * 100)}%</td><td></td></tr></tbody></table>
     <p class="note">بالأحمر: نسبة غياب ${RED}٪ فأكثر. نسبة الغياب = ${g.absentsNom} ÷ عدد ${g.students}. بعذر وبدون عذر من الأسماء المسجّلة. الترتيب ١ = الأقل غيابًا.</p>`
-    : `<table class="rt"><thead><tr><th>م</th><th>الفصل</th><th>عدد ${g.students}<small>${g.student}</small></th><th>${g.absentsNom}<small>${g.student}</small></th><th>أيام الغياب<small>بعذر وبدون عذر</small></th><th>متوسط الغياب<small>يوم/${g.student}</small></th><th>نسبة الغياب</th><th>الترتيب</th></tr></thead>
-      <tbody>${rows}<tr class="total"><td></td><td class="name">الإجمالي</td><td>${T.s}</td><td>${T.a}</td><td>${T.d}</td><td>${(T.d / T.s).toFixed(2)}</td><td>${nf2(T.d / (T.s * DAYS) * 100)}%</td><td></td></tr></tbody></table>
-    <p class="note">بالأحمر: نسبة غياب ${RED}٪ فأكثر. نسبة الغياب = أيام الغياب ÷ (عدد ${g.students} × ${DAYS} يومًا). الترتيب ١ = الأقل غيابًا.</p>`}
+    : `<table class="rt"><thead><tr><th>م</th><th>الفصل</th><th>عدد ${g.students}<small>${g.student}</small></th><th>${g.absentsNom}<small>عدد ${g.f ? 'الطالبات' : 'الطلاب'}</small></th><th>بعذر<small>يوم</small></th><th>بدون عذر<small>يوم</small></th><th>إجمالي أيام الغياب<small>يوم</small></th><th>متوسط الغياب<small>يوم/${g.student}</small></th><th>نسبة الغياب</th><th>الترتيب</th></tr></thead>
+      <tbody>${rows}<tr class="total"><td></td><td class="name">الإجمالي</td><td>${T.s}</td><td>${T.a}</td><td>${T.ex}</td><td>${T.un}</td><td>${T.d}</td><td>${(T.d / T.s).toFixed(2)}</td><td>${nf2(T.d / (T.s * DAYS) * 100)}%</td><td></td></tr></tbody></table>
+    <p class="note">بالأحمر: نسبة غياب ${RED}٪ فأكثر. نسبة الغياب = إجمالي أيام الغياب ÷ (عدد ${g.students} × ${DAYS} يومًا). «${g.absentsNom}» عدد ${g.f ? 'الطالبات' : 'الطلاب'} دون تكرار، وقد ${g.f ? 'تغيب الطالبة' : 'يغيب الطالب'} أكثر من يوم. الترتيب ١ = الأقل غيابًا.</p>`}
     <div class="ins2 ${days.length > 1 ? '' : 'one'}"><div class="box"><h3>أبرز النتائج</h3><ul>${nmInsights(C, T, DAYS, M.per).map(x => `<li>${x}</li>`).join('') || '<li>لا يوجد غياب مسجّل.</li>'}</ul></div>
-      ${days.length > 1 ? `<div class="box"><h3>الغياب اليومي خلال ${M.per || 'الشهر'}</h3>${nmDaily(C)}</div>` : ''}</div>
+      ${days.length > 1 ? `<div class="box"><h3>الغياب اليومي خلال ${M.per || 'الشهر'}</h3>${nmDaily(C, days)}</div>` : ''}</div>
     <div class="sigs">${sig(g.officer, cfg.preparer)}${sig(g.deputy, cfg.deputy)}${sig(g.principal, cfg.principal)}</div>
     <div class="foot"><span>أُعدّ بتاريخ ${new Date().toLocaleDateString('en-CA').replace(/-/g,'/')}${cfg.preparer ? ' — ' + esc(cfg.preparer) : ''}</span></div>
   </article>`;
@@ -3413,14 +3472,14 @@ function noorStudentsHTML(){ const C = nmClasses(); return C.length ? cmpStudent
 function appCmpData(tp){
   const r = state.rpt, cm = state.cmp, type = tp || cm.type || 'daily';
   const dates = type === 'monthly' ? rangeDates({type:'monthly', month:r.month}) : rangeDates({type, date:r.date});
-  const keys = dates.map(iso).filter(k => state.days[k]);
+  const keys = dates.map(iso).filter(k => state.days[k]), unOnlyD = !tp && !!cm.unOnly;
   const C = classes().map(c => {
     let d = 0; const dayCount = {}, st = new Map();
     keys.forEach(k => {
       const rec = state.days[k], day = +k.slice(8), v = +((rec.entries || {})[c.id]) || 0;
       const named = ((rec.students || {})[c.id] || []).filter(x => (x.name || '').trim());
-      const tot = Math.max(v, named.length); d += tot; if(tot) dayCount[day] = (dayCount[day] || 0) + tot;
-      named.forEach(x => { const nm = x.name.trim(); let o = st.get(nm); if(!o){ o = {name:nm, ex:0, un:0, marks:[]}; st.set(nm, o); }
+      const nm2 = unOnlyD ? named.filter(x => x.type !== 'بعذر') : named, tot = unOnlyD ? nm2.length : Math.max(v, named.length); d += tot; if(tot) dayCount[day] = (dayCount[day] || 0) + tot;
+      nm2.forEach(x => { const nm = x.name.trim(); let o = st.get(nm); if(!o){ o = {name:nm, ex:0, un:0, marks:[]}; st.set(nm, o); }
         const un = x.type !== 'بعذر'; if(un) o.un++; else o.ex++; o.marks.push({day, un}); });
     });
     const students = [...st.values()], ex = students.reduce((a, x) => a + x.ex, 0), un = students.reduce((a, x) => a + x.un, 0);
@@ -3433,7 +3492,7 @@ function appCmpData(tp){
   const when = type === 'daily' ? `${dayName(a)} ${dmy(a)} (${hijriFull(a)})`
     : type === 'weekly' ? `الأسبوع من ${dmy(a)} إلى ${dmy(b)} (${hijriRange(a, b)} · ${n} ${n > 2 ? 'أيام' : 'يوم'} مرصودة)`
     : `شهر ${gMonth(a)} ${a.getFullYear()} (${hijriRange(a, b)} · ${n} يومًا مرصودًا)`;
-  return {C, keys, M:{title:T, when, per: type === 'daily' ? 'اليوم' : type === 'weekly' ? 'الأسبوع' : 'الشهر', stTitle: type === 'daily' ? (g.f ? 'كشف الغائبات' : 'كشف الغائبين') : 'كشف غياب ' + g.students,
+  return {C, keys, M:{title:T + (unOnlyD ? ' (بدون عذر)' : ''), when, per: type === 'daily' ? 'اليوم' : type === 'weekly' ? 'الأسبوع' : 'الشهر', stTitle: type === 'daily' ? (g.f ? 'كشف الغائبات' : 'كشف الغائبين') : 'كشف غياب ' + g.students,
     src:'', daily: type === 'daily', days, DAYS: n || 1, red: cm.red, min: type === 'daily' ? 1 : cm.min, unOnly: cm.unOnly}};
 }
 function appCmpView(){
@@ -4044,6 +4103,7 @@ document.addEventListener('click', async e => {
   if(act === 'refOpen'){ openRef(state.refs[t.closest('.acard').dataset.rid]); return; }
   if(act === 'refView'){ const r = state.refs[t.closest('.acard').dataset.rid]; if(r) previewHTML('نموذج 31: ' + r.name, refFormHTML(r)); return; }
   if(act === 'refPrint'){ const r = state.refs[t.closest('.acard').dataset.rid]; if(r) printHTML(refFormHTML(r)); return; }
+  if(act === 'refCallPdf'){ const r = readRef(), ph = phoneFor(r.cid, r.name); await sharePdf(t, callFormHTML(r), pdfName('استدعاء', r.name), ph, `المكرّم ولي أمر ${G().studentDef} / ${r.name}\nنرفق لكم خطاب استدعاء ولي الأمر، نأمل الحضور في الموعد المحدد.\n${state.cfg.school || ''}`); return; }
   if(act === 'refCallWa'){ const r = readRef(), ph = phoneFor(r.cid, r.name); if(!waPhone(ph)){ toast('لا يوجد رقم جوال لولي الأمر — استورد كشف الطلاب من نور.', 'err'); return; } window.open(waUrl(ph, waCallText(r)), '_blank'); return; }
   if(act === 'refCallPv'){ const r = readRef(); previewHTML('استدعاء ولي أمر: ' + (r.name || ''), callFormHTML(r)); return; }
   if(act === 'refCall'){ const r = state.refs[t.closest('[data-rid]').dataset.rid]; if(r) previewHTML('استدعاء ولي أمر: ' + r.name, callFormHTML(r)); return; }
@@ -4133,6 +4193,9 @@ document.addEventListener('click', async e => {
     if(await flRowUpdate(x, {type: t.dataset.v === 'بعذر' ? 'بعذر' : 'بدون'})){ toast('تم تحديث التصنيف'); render(); } return;
   }
   if(act === 'fcMeth'){ $('#fcM').value = t.dataset.v; t.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); flContSync(); return; }
+  if(act === 'fcLetterPdf'){ const rid = t.closest('.dlg-b').dataset.rid, x = flFindRow(rid); if(!x) return; const ph = ($('#fcP') || {}).value || '';
+    await sharePdf(t, absWarnHTML(x), pdfName('خطاب', x.name), ph, `المكرّم ولي أمر ${G().studentDef} / ${x.name}\nنرفق لكم خطاب الاستفسار عن غياب ${dayName(parse(x.date))} ${hijriNum(x.date)}، نرجو الاطلاع والإفادة.\n${state.cfg.school || ''}`, async () => { state.contacts = Object.assign({}, state.contacts, {warns: Object.assign({}, state.contacts.warns || {}, {[rid]: state.contacts.warns && state.contacts.warns[rid] || today})}); await flSaveContacts(); await flCntInc(rid); render(); });
+    return; }
   if(act === 'fcLetter'){ const rid = t.closest('.dlg-b').dataset.rid; await flWarnPrint(rid); const b = $('#fcCnt'); if(b) b.textContent = AR(flCnt(rid)); return; }
   if(act === 'fileView'){ fileShow(t.dataset.rid); return; }
   if(act === 'fileClose'){ const v = $('#fileView'); if(v) v.remove(); return; }
@@ -4269,7 +4332,7 @@ document.addEventListener('change', async e => {
 });
 document.addEventListener('input', e => {
   const inp = e.target;
-  if(inp.id === 'rfCall' || inp.id === 'rfCallDone'){ const on = $('#rfCall').checked, dn = $('#rfCallDone').checked; $('#rfCallBox').hidden = !on; $('#rfCallBtn').hidden = !on; $('#rfCallWa').hidden = !on; $('#rfCallHint').hidden = !on || dn; return; }
+  if(inp.id === 'rfCall' || inp.id === 'rfCallDone'){ const on = $('#rfCall').checked, dn = $('#rfCallDone').checked; $('#rfCallBox').hidden = !on; $('#rfCallBtn').hidden = !on; $('#rfCallWa').hidden = !on; $('#rfCallPdf').hidden = !on; $('#rfCallHint').hidden = !on || dn; return; }
   if(inp.id === 'tQ'){ state.tQ = inp.value; render(); const q = $('#tQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); } return; }
   if(inp.id === 'rosQ'){ state.rosQ = inp.value; render(); const q = $('#rosQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); } return; }
   if(inp.id === 'fcR'){ delete inp.dataset.auto; return; }
