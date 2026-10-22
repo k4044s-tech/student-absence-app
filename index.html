@@ -522,6 +522,13 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 @media screen and (min-width:1600px){ .shell, .auth, #dlgBg, .toast, .updbar{ zoom:1.2; } .rail{ height:calc(100vh / 1.2); } .auth{ height:calc(100vh / 1.2); } }
 @media screen and (max-width:1099px){ body{ font-size:15px; } }
 
+/* bulk */
+.bk-sum{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:12px 0 8px;font-size:13px;color:var(--muted)}.bk-sum b{color:var(--ink)}.bk-sum .bad b{color:#dc2626}.bk-sum .ok b{color:#16a34a}
+.bk-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto}
+.bk-r{display:grid;grid-template-columns:1fr 120px auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:10px}
+.bk-r.sent{background:#f0fdf4;border-color:#bbf7d0}.bk-n{display:flex;flex-direction:column;min-width:0}.bk-n small{color:var(--muted);font-size:12px}.bk-p{font-size:13px;color:var(--muted);text-align:center}
+.bk-foot{margin-top:12px;display:flex;justify-content:center}.bk-foot .btn{min-height:44px;font-size:15px}
+@media screen and (max-width:860px){.bk-r{grid-template-columns:1fr auto}.bk-p{display:none}}
 /* teachers */
 .tch-r{display:grid;grid-template-columns:1.6fr 115px 125px 1fr 110px auto auto;gap:8px;align-items:center}.tch-r>*{min-width:0}
 .tch-add{margin-bottom:10px}.tch-h{font-size:12px;color:var(--muted);padding:0 4px}
@@ -1223,7 +1230,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v101';
+const APP_VER = 'absence-v102';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -1282,7 +1289,52 @@ function waPhone(p){
   return /^9665\d{8}$/.test(d) ? d : '';
 }
 const waNote = () => `\n\nملاحظة: سيتم إرسال ${G().f ? 'الخطاب أو العذر' : 'الخطاب أو العذر'} بشكل رسمي لكم مع ${G().studentDef}، نرجو الإفادة عليه وإعادته إلى المدرسة في أقرب وقت.`;
-const waUrl = (phone, text) => `https://wa.me/${phone ? waPhone(phone) : ''}?text=${encodeURIComponent(phone ? text + waNote() : text)}`;
+const waUrl = (phone, text, noNote) => `https://wa.me/${phone ? waPhone(phone) : ''}?text=${encodeURIComponent(phone && !noNote ? text + waNote() : text)}`;
+/* ---------- الرسائل الجماعية (واتساب، واحدة تلو الأخرى) ---------- */
+function bulkSt(){ if(!state.bulk) state.bulk = {src:'abs', date: state.entryDate || today, cid:'all', act:'all', text:'', sent:{}}; return state.bulk; }
+function bulkList(){
+  const B = bulkSt(), out = [];
+  if(B.src === 'abs'){
+    const day = state.days[B.date]; if(!day) return out;
+    classes().forEach(c => ((day.students || {})[c.id] || []).forEach(r => { const nm = (r.name || '').trim(); if(!nm) return;
+      out.push({key: B.date + '|' + c.id + '|' + nm, rid: B.date + '|' + c.id + '|' + nm, name: nm, cls: clsLabel(c), sub: r.type === 'بعذر' ? 'بعذر' : 'بدون عذر', phone: r.phone || phoneFor(c.id, nm), text: waAbsentText(c.id, nm, r.type, B.date), note: true}); }));
+  } else if(B.src === 'cls'){
+    classes().filter(c => B.cid === 'all' || c.id === B.cid).forEach(c => rosterOf(c.id).forEach(r => {
+      out.push({key: 'c|' + c.id + '|' + r.name, name: r.name, cls: clsLabel(c), sub: '', phone: r.phone || '', text: (B.text || '').replace(/\{الاسم\}/g, r.name).replace(/\{الفصل\}/g, clsLabel(c)), note: false}); }));
+  } else {
+    const A = LST_ACTS(), sel = B.act === 'all' ? A : A.filter(a => a.id === B.act);
+    studentStats().forEach(s => { const a = sel.filter(x => x.hit(s)).pop(); if(!a) return;
+      out.push({key: 'a|' + s.key + '|' + B.act, name: s.name, cls: s.cls ? clsLabel(s.cls) : '', sub: a.t, phone: s.phone || phoneFor(s.cid, s.name), text: waActText(s), note: false}); });
+  }
+  return out;
+}
+function bulkBody(){
+  const B = bulkSt(), L = bulkList(), ok = L.filter(o => waPhone(o.phone)), sent = ok.filter(o => B.sent[o.key]).length, g = G();
+  const next = ok.find(o => !B.sent[o.key]);
+  const ctl = B.src === 'abs' ? `<label class="f">يوم الغياب<input class="input" type="date" id="bkDate" value="${esc(B.date)}"></label>`
+    : B.src === 'cls' ? `<label class="f">الفصل<select class="input" id="bkCls"><option value="all">${stgLabel() ? 'كل فصول ' + stgLabel() : 'كل الفصول'}</option>${classes().map(c => `<option value="${c.id}" ${B.cid === c.id ? 'selected' : ''}>${esc(clsLabel(c))}</option>`).join('')}</select></label>
+      <label class="f" style="grid-column:1/-1">نص الرسالة <small style="color:var(--muted)">— يمكنك كتابة {الاسم} و{الفصل} ليُستبدلا تلقائيًا</small><textarea class="input" id="bkText" rows="4" placeholder="المكرّم ولي أمر ${g.studentDef} / {الاسم}&#10;السلام عليكم ورحمة الله وبركاته…">${esc(B.text || '')}</textarea></label>`
+    : `<label class="f">الإجراء<select class="input" id="bkAct"><option value="all">كل من بلغ إجراءً</option>${LST_ACTS().map(a => `<option value="${a.id}" ${B.act === a.id ? 'selected' : ''}>${esc(a.t)}</option>`).join('')}</select></label><div class="sub" style="align-self:end">الفترة المحددة أعلى الصفحة تُطبَّق هنا.</div>`;
+  return `<div class="seg fc-seg" id="bkSrc" style="margin-bottom:12px">${[['abs','💬 غائبو يوم'],['cls','🏫 فصل / مرحلة'],['act','⚖️ من بلغوا إجراء']].map(([k, t]) => `<button type="button" data-act="bkSrc" data-v="${k}" class="${B.src === k ? 'on' : ''}">${t}</button>`).join('')}</div>
+    <div class="fields">${ctl}</div>
+    <div class="bk-sum"><span><b>${AR(L.length)}</b> مستلم</span><span><b>${AR(ok.length)}</b> لديهم جوال</span>${L.length - ok.length ? `<span class="bad"><b>${AR(L.length - ok.length)}</b> بلا رقم</span>` : ''}<span class="ok"><b>${AR(sent)}</b> أُرسل</span>${sent ? `<button class="btn sm" data-act="bkReset">تصفير</button>` : ''}</div>
+    ${B.src === 'cls' && !(B.text || '').trim() ? '<p class="hint">اكتب نص الرسالة أولًا.</p>' : ''}
+    <div class="bk-list">${L.map(o => { const has = waPhone(o.phone), s = B.sent[o.key];
+      return `<div class="bk-r ${s ? 'sent' : ''}" data-k="${esc(o.key)}"><span class="bk-n"><b>${esc(o.name)}</b><small>${esc(o.cls)}${o.sub ? ' · ' + esc(o.sub) : ''}</small></span><span class="bk-p" dir="ltr">${esc(o.phone || '—')}</span>${has ? `<button class="btn sm ${s ? '' : 'wa'}" data-act="bkOne">${s ? '✓ أُرسل' : 'إرسال'}</button>` : '<span class="tag mute">بلا رقم</span>'}</div>`; }).join('') || `<p class="hint">لا يوجد مستلمون${B.src === 'abs' ? ' في هذا اليوم' : ''}.</p>`}</div>
+    <div class="bk-foot">${next && !(B.src === 'cls' && !(B.text || '').trim()) ? `<button class="btn primary" data-act="bkNext">▶ إرسال التالي: ${esc(next.name)} (${AR(sent + 1)} من ${AR(ok.length)})</button>` : ok.length ? '<span class="tag ok">✓ اكتمل الإرسال</span>' : ''}</div>`;
+}
+function bulkOpen(){
+  openDlg(`<div class="reged-h"><b>📨 رسائل واتساب جماعية</b><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b" id="bkBody">${bulkBody()}</div>
+    <div class="reged-f"><span class="sub">تُفتح المحادثة في واتساب واضغط «إرسال» هناك، ثم ارجع واضغط «التالي».</span><span class="grow"></span><button class="btn" data-act="dlgclose">إغلاق</button></div>`);
+  const m = $('#dlgBg .modal'); if(m) m.classList.add('dlg-wide');
+}
+const bulkRefresh = () => { const b = $('#bkBody'); if(b){ const y = (b.querySelector('.bk-list') || {}).scrollTop || 0; b.innerHTML = bulkBody(); const l = b.querySelector('.bk-list'); if(l) l.scrollTop = y; } };
+async function bulkSend(o){
+  const B = bulkSt(); window.open(waUrl(o.phone, o.text, !o.note), '_blank');
+  B.sent[o.key] = 1; if(o.rid) await flCntInc(o.rid); bulkRefresh();
+}
+
 function waCallText(r){
   const g = G(), f = g.f, cl = (r.coun && r.coun.call) || {}, st = f ? 'الطالبة' : 'الطالب', son = f ? 'ابنتكم' : 'ابنكم';
   const tm = (cl.time || '09:00').split(':'), hh = +tm[0], t12 = `${String(hh % 12 || 12).padStart(2, '0')}:${tm[1] || '00'}`, ap = hh < 12 ? 'صباحًا' : 'مساءً';
@@ -2098,7 +2150,7 @@ function actionsView(){
   return `${periodBar()}<div class="bar">
       <label class="f" style="flex-direction:row;align-items:center;gap:8px">أيام الدراسة الفعلية<input class="input" id="actDays" type="number" min="1" inputmode="numeric" value="${actDays()}" style="width:90px"></label>
       <span class="grow"></span>
-      ${dueN ? `<button class="btn" data-act="actViewDue">معاينة النماذج المستحقة</button><button class="btn primary" data-act="actPrintDue">${ICON.print} طباعة النماذج المستحقة (${dueN})</button>` : ''}
+      <button class="btn wa" data-act="bkOpenAct">📨 رسائل جماعية</button>${dueN ? `<button class="btn" data-act="actViewDue">معاينة النماذج المستحقة</button><button class="btn primary" data-act="actPrintDue">${ICON.print} طباعة النماذج المستحقة (${dueN})</button>` : ''}
     </div>
     <div class="panel" style="padding:12px 16px"><div style="font-size:13px;color:var(--muted);margin-bottom:8px">عدد أيام الغياب = نسبة الغياب × الأيام الفعلية للدراسة ÷ 100 · يُحتسب الغياب <b style="color:var(--ink)">بدون عذر</b> فقط من أسماء الغائبين المسجّلة</div><div class="chips">${[10,15,20,25].map(x => `<span class="tag mute">نسبة ${x}٪ ← ${pctDays(x)} يومًا</span>`).join('')}<span class="tag mute">تحويل للمرشد ← 3 أيام متصلة أو 5 منفصلة</span></div></div>
     <div class="kpis">
@@ -3008,7 +3060,7 @@ async function caseSave(){
 function followView(){
   state.fl.tab = 'daily';
   return `${periodBar(`<input class="input" id="flQ" type="search" placeholder="ابحث بالاسم…" value="${esc(state.fl.q || '')}" style="min-width:170px">
-      <button class="btn primary" data-act="flPrint" data-all="0">${ICON.print} طباعة السجل</button>`)}
+      <button class="btn wa" data-act="bkOpen">📨 رسائل جماعية</button><button class="btn primary" data-act="flPrint" data-all="0">${ICON.print} طباعة السجل</button>`)}
     ${flDailyView()}`;
 }
 function flDlg(item){
@@ -4049,6 +4101,10 @@ document.addEventListener('click', async e => {
   if(t.dataset.fltab){ state.fl.tab = t.dataset.fltab; render(); return; }
   if(t.dataset.cmptype){ state.cmp.type = t.dataset.cmptype; render(); return; }
   if(t.dataset.rgo){ state.rpt.tab = t.dataset.rgo; if(t.dataset.rkind) state.lst.kind = t.dataset.rkind; if(t.dataset.rgo === 'register') state.rpt.type = 'daily'; window.scrollTo(0, 0); render(); return; }
+  if(t.dataset.act === 'bkOpen' || t.dataset.act === 'bkOpenAct'){ const B = bulkSt(); if(t.dataset.act === 'bkOpenAct') B.src = 'act'; bulkOpen(); return; }
+  if(t.dataset.act === 'bkSrc'){ bulkSt().src = t.dataset.v; bulkRefresh(); return; }
+  if(t.dataset.act === 'bkReset'){ bulkSt().sent = {}; bulkRefresh(); return; }
+  if(t.dataset.act === 'bkOne' || t.dataset.act === 'bkNext'){ const L = bulkList(), B = bulkSt(); const o = t.dataset.act === 'bkNext' ? L.find(x => waPhone(x.phone) && !B.sent[x.key]) : L.find(x => x.key === t.closest('.bk-r').dataset.k); if(o) await bulkSend(o); return; }
   if(t.dataset.act === 'tStg'){ state.tStage = t.dataset.v; render(); return; }
   if(t.dataset.tsf){ state.tSf = t.dataset.tsf; render(); return; }
   if(t.dataset.act === 'tPick'){ $('#tFile').click(); return; }
@@ -4344,6 +4400,7 @@ document.addEventListener('change', async e => {
 document.addEventListener('input', e => {
   const inp = e.target;
   if(inp.id === 'rfCall' || inp.id === 'rfCallDone'){ const on = $('#rfCall').checked, dn = $('#rfCallDone').checked; $('#rfCallBox').hidden = !on; $('#rfCallBtn').hidden = !on; $('#rfCallWa').hidden = !on; $('#rfCallPdf').hidden = !on; $('#rfCallHint').hidden = !on || dn; return; }
+  if(inp.id === 'bkText'){ bulkSt().text = inp.value; const f = $('#bkBody .bk-foot'); clearTimeout(window._bkT); window._bkT = setTimeout(() => { const ta = $('#bkText'), p = ta && ta.selectionStart; bulkRefresh(); const t2 = $('#bkText'); if(t2){ t2.focus(); t2.setSelectionRange(p, p); } }, 500); return; }
   if(inp.id === 'tQ'){ state.tQ = inp.value; render(); const q = $('#tQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); } return; }
   if(inp.id === 'rosQ'){ state.rosQ = inp.value; render(); const q = $('#rosQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); } return; }
   if(inp.id === 'fcR'){ delete inp.dataset.auto; return; }
@@ -4400,6 +4457,7 @@ document.addEventListener('change', async e => {
     if(el.id === 'actDays') state.cfg.schoolDays = Math.max(1, +el.value || 180); else state.cfg.actFrom = el.value;
     if(await saveCfg()) toast('تم الحفظ'); render(); return;
   }
+  if(el.id === 'bkDate' || el.id === 'bkCls' || el.id === 'bkAct'){ const B = bulkSt(); if(el.id === 'bkDate') B.date = el.value; if(el.id === 'bkCls') B.cid = el.value; if(el.id === 'bkAct') B.act = el.value; bulkRefresh(); return; }
   if(el.id === 'tFile'){ const f = el.files && el.files[0]; el.value = ''; if(f) importTeachersPdf(f); return; }
   if(el.id === 'noorFile'){ const f = el.files && el.files[0]; el.value = ''; if(f) noorImport(f); return; }
   if(el.id === 'pCls'){ openPaste(el.value); return; }
