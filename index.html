@@ -1230,7 +1230,7 @@ function installHTML(compact){
   if(isIOS()) return compact ? `<div>للتثبيت على الآيفون: زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div>` : `<span class="hint" style="margin:0">في Safari اضغط زر المشاركة <b>⎋</b> ثم «إضافة إلى الشاشة الرئيسية».</span>`;
   return compact ? '' : `<span class="hint" style="margin:0">افتح التطبيق في Chrome أو Edge، ثم اختر «تثبيت» من شريط العنوان أو من القائمة ⋮.</span>`;
 }
-const APP_VER = 'absence-v102';
+const APP_VER = 'absence-v103';
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', () => {
     const had = !!navigator.serviceWorker.controller;
@@ -1690,10 +1690,23 @@ function noorInfoParse(pages){
     if(!ser.length) return;
     const gaps = ser.slice(1).map((n, k) => ser[k].y - n.y).filter(g => g > 2).sort((a, b) => a - b);
     const h = gaps.length ? gaps[Math.floor(gaps.length / 2)] : 24;
+    /* أسطر عمود الاسم: الاسم الطويل يلتف على أكثر من سطر، فنوزّع الأسطر على الأرقام بحيث يتوسّط كل اسم صفَّه */
+    const serX = Math.min(...ser.map(n => n.x)), nmLines = [];
+    body.filter(f => f.x >= nameLeft && f.x < serX - 2 && /[؀-ۿ]/.test(f.t)).forEach(f => { let L = nmLines.find(l => Math.abs(l.y - f.y) < 3); if(!L){ L = {y:f.y, items:[]}; nmLines.push(L); } L.items.push(f); });
+    nmLines.sort((a, b) => b.y - a.y).forEach(L => L.items.sort((a, b) => b.x - a.x));
+    const NL = nmLines.filter(L => L.y <= ser[0].y + h && L.y >= ser[ser.length - 1].y - h), m = ser.length, nL = NL.length, groups = [];
+    const lgs = NL.slice(1).map((L, q) => NL[q].y - L.y).filter(d => d > 6 && d < 16).sort((a, b) => a - b), lineH = lgs.length ? lgs[Math.floor(lgs.length / 2)] : 11;
+    if(nL >= m){
+      const INF = 1e9, dp = Array.from({length: m + 1}, () => new Array(nL + 1).fill(INF)), bk = Array.from({length: m + 1}, () => new Array(nL + 1).fill(-1)); dp[0][0] = 0;
+      for(let k = 1; k <= m; k++) for(let j = k; j <= nL; j++) for(let i = k - 1; i < j; i++){ if(dp[k - 1][i] >= INF) continue;
+        let gp = 0; for(let q = i + 1; q < j; q++){ const d = NL[q - 1].y - NL[q].y; if(Math.abs(d - lineH) > 2.5) gp += 20; }
+        const c = dp[k - 1][i] + Math.max(0, Math.abs((NL[i].y + NL[j - 1].y) / 2 - ser[k - 1].y) - 1) + gp + (j - i > 4 ? 50 : 0); if(c < dp[k][j]){ dp[k][j] = c; bk[k][j] = i; } }
+      let j = nL; for(let k = m; k >= 1; k--){ const i = bk[k][j]; groups[k - 1] = NL.slice(i, j); j = i; }
+    }
     ser.forEach((sn, k) => {
       const top = k === 0 ? sn.y + h / 2 : (ser[k - 1].y + sn.y) / 2, bot = k === ser.length - 1 ? sn.y - h / 2 : (sn.y + ser[k + 1].y) / 2;
       const band = body.filter(f => f.y <= top && f.y > bot).sort((a, b) => (b.y - a.y) > 2 ? 1 : (a.y - b.y) > 2 ? -1 : b.x - a.x);
-      const name = band.filter(f => f.x >= nameLeft && f.x < sn.x - 2 && /[؀-ۿ]/.test(f.t)).map(f => f.t).join(' ').replace(/\s+/g, ' ').trim();
+      const name = (groups[k] ? groups[k].flatMap(L => L.items) : band.filter(f => f.x >= nameLeft && f.x < sn.x - 2 && /[؀-ۿ]/.test(f.t))).map(f => f.t).join(' ').replace(/\s+/g, ' ').trim();
       const phone = noorPhone(band.filter(f => f.x + f.w <= phRight + 2 && /^\d+$/.test(f.t)).map(f => f.t).join(''));
       const n = +sn.t;
       if(name.split(' ').length >= 2 && !C.rows.some(r => r.n === n)) C.rows.push({n, name, phone});
