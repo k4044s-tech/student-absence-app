@@ -522,6 +522,20 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
 @media screen and (min-width:1600px){ .shell, .auth, #dlgBg, .toast, .updbar{ zoom:1.2; } .rail{ height:calc(100vh / 1.2); } .auth{ height:calc(100vh / 1.2); } }
 @media screen and (max-width:1099px){ body{ font-size:15px; } }
 
+
+/* today */
+.td-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.td-s{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--card)}
+.td-s.todo{border-inline-start:4px solid #f59e0b}.td-s.ok{border-inline-start:4px solid #22c55e}
+.td-n{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:#fef3c7;color:#92400e}.td-s.ok .td-n{background:#dcfce7;color:#166534}
+.td-b{display:flex;flex-direction:column;gap:3px;min-width:0}.td-b b{font-size:15.5px}.td-b small{color:var(--muted);font-size:13px}
+.td-a{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media screen and (max-width:860px){.td-s{grid-template-columns:36px 1fr;padding:12px}.td-a{grid-column:1/-1;justify-content:flex-start}}
+/* roster check */
+.rc-s{border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:8px}.rc-s summary{cursor:pointer;display:flex;gap:8px;align-items:center}
+.rc-i{display:grid;grid-template-columns:1fr 120px auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--border)}.rc-i span:first-child{display:flex;flex-direction:column}.rc-i small{color:var(--muted);font-size:12px}
+.rc-g{border:1px dashed var(--border);border-radius:8px;padding:0 8px;margin:6px 0}
+@media print{html.bw .sheet,html.bw .reg,html.bw .actf,html.bw .refm,html.bw #printArea{filter:grayscale(1)}}
 /* bulk */
 .bk-sum{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:12px 0 8px;font-size:13px;color:var(--muted)}.bk-sum b{color:var(--ink)}.bk-sum .bad b{color:#dc2626}.bk-sum .ok b{color:#16a34a}
 .bk-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto}
@@ -622,6 +636,7 @@ label.chk input{ width:18px; height:18px; accent-color:var(--accent); margin:0; 
       <div style="min-width:0"><h4 id="appName">متابعة غياب الطلاب</h4><div class="sync" id="sync">جارٍ الاتصال</div></div>
     </div>
     <nav class="nav">
+      <button type="button" data-view="today"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>اليوم</span></button>
       <button type="button" data-view="entry" class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>رصد الغياب</span></button>
       <button type="button" data-view="follow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg><span>سجل المتابعة</span></button>
       <button type="button" data-view="actions"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>إجراءات الغياب</span></button>
@@ -1384,6 +1399,70 @@ ${state.cfg.school || ''}`;
 function waBtn(cid, name, phone){
   return waPhone(phone) ? `<a class="btn sm wa" data-wa="${esc(cid)}" data-wname="${esc(name)}" href="#" target="_blank" rel="noopener">واتساب</a>` : `<span class="tag mute" title="أضف رقم الجوال من «تفاصيل»">بلا جوال</span>`;
 }
+
+/* ---------- لوحة اليوم ---------- */
+function todayView(){
+  const g = G(), k = today, d = parse(k), rec = state.days[k], list = classes();
+  const absN = rec ? list.reduce((a, c) => a + (+((rec.entries || {})[c.id]) || 0), 0) : 0;
+  const rows = flDailyAll().filter(x => x.date === k), noC = rows.filter(x => !flContactOf(flRid(x)) && !flCnt(flRid(x)));
+  const lateT = (typeof dsAll === 'function') ? dsAll('late').filter(r => r.date === k).length : 0;
+  const S = studentStats(), dueA = S.filter(s => s.due.length).length, dueW = S.filter(s => warnDue(s).length).length;
+  const dueL = (typeof lateStats === 'function') ? lateStats().filter(o => o.due.length).length : 0;
+  const coun = refsPendingCoun().length, dep = refsNewForDep().length;
+  const step = (i, ok, title, desc, btn) => `<div class="td-s ${ok ? 'ok' : 'todo'}"><span class="td-n">${ok ? '✓' : AR(i)}</span><div class="td-b"><b>${title}</b><small>${desc}</small></div><div class="td-a">${btn || ''}</div></div>`;
+  const go = (v, t, extra) => `<button class="btn sm ${extra || ''}" data-act="tdGo" data-v="${v}">${t}</button>`;
+  return `<div class="rhero"><div class="rhero-i">☀️</div><div class="rhero-t"><h2>يوم ${dayName(d)} ${AR(dmy(d))}</h2><p>${hijriNum(k)}${stgLabel() ? ' · ' + stgLabel() : ''} — مهام اليوم بالترتيب، وكل مهمة تنقلك لمكانها.</p></div></div>
+  <div class="td-list">
+    ${step(1, !!rec, 'رصد الغياب', rec ? `تم الرصد · ${AR(absN)} ${absN > 2 && absN < 11 ? g.students : g.student} غائب${g.f ? 'ة' : ''} من ${AR(totalStudents())}` : 'لم يُرصد غياب اليوم بعد', go('entry', rec ? 'تعديل الرصد' : 'ابدأ الرصد', rec ? '' : 'primary'))}
+    ${step(2, true, 'التأخر الصباحي', lateT ? `${AR(lateT)} حالة تأخر مسجلة اليوم` : 'لا توجد حالات تأخر مسجلة اليوم', go('late', 'تسجيل تأخر'))}
+    ${step(3, rec && !noC.length, 'التواصل مع أولياء الأمور', !rows.length ? 'لا توجد أسماء غائبين اليوم' : noC.length ? `${AR(noC.length)} من ${AR(rows.length)} لم يُتواصل مع أولياء أمورهم` : `تم التواصل مع الجميع (${AR(rows.length)})`, rows.length ? go('follow', noC.length ? 'تواصل الآن' : 'سجل المتابعة', noC.length ? 'primary' : '') + (noC.length > 1 ? `<button class="btn sm wa" data-act="tdBulk">📨 جماعي</button>` : '') : '')}
+    ${step(4, !dueA && !dueW && !dueL, 'الإجراءات المستحقة', [dueA ? `${AR(dueA)} إجراء غياب` : '', dueW ? `${AR(dueW)} إنذار غياب` : '', dueL ? `${AR(dueL)} إجراء تأخر` : ''].filter(Boolean).join(' · ') || 'لا توجد إجراءات مستحقة', (dueA || dueW ? go('actions', 'إجراءات الغياب', 'primary') : '') + (dueL ? go('late', 'إجراءات التأخر') : ''))}
+    ${step(5, !coun && !dep, 'الإرشاد الطلابي', [coun ? `${AR(coun)} تحويل بانتظار ${g.counselor}` : '', dep ? `${AR(dep)} إفادة جديدة للوكيل` : ''].filter(Boolean).join(' · ') || 'لا توجد تحويلات معلّقة', (coun || dep) ? go('counsel', 'فتح الإرشاد') : '')}
+    ${step(6, false, 'نهاية اليوم', 'أرسل ملخص اليوم للقائد واطبع التقرير اليومي', `${rec ? `<a class="btn sm wa" href="${esc(waUrl('', daySummaryText()))}" target="_blank" rel="noopener">ملخص للقائد</a>` : ''}${go('report', ICON.print + ' التقرير اليومي')}`)}
+  </div>`;
+}
+/* ---------- فحص قوائم الطلاب ---------- */
+function rosterIssues(){
+  const out = {noPh:[], badPh:[], dupPh:[], dupNm:[], short:[]}, phones = new Map(), names = new Map();
+  classes(true).forEach(c => rosterOf(c.id).forEach(r => {
+    const nm = (r.name || '').trim(), ph = (r.phone || '').replace(/\D/g, ''), it = {cid: c.id, cls: clsLabel(c), name: nm, phone: r.phone || ''};
+    if(!ph) out.noPh.push(it); else if(!/^(05\d{8}|9665\d{8}|5\d{8})$/.test(ph)) out.badPh.push(it);
+    else { const p = ph.slice(-9); if(!phones.has(p)) phones.set(p, []); phones.get(p).push(it); }
+    const w = nm.split(/\s+/); if(w.length < 3 || w[w.length - 1].length < 2) out.short.push(it);
+    const nk = normAr(nm); if(!names.has(nk)) names.set(nk, []); names.get(nk).push(it);
+  }));
+  phones.forEach(L => { if(L.length < 2) return; const fam = new Set(L.map(x => x.name.split(/\s+/).pop())); if(fam.size > 1) out.dupPh.push(L); });
+  names.forEach(L => { if(L.length > 1) out.dupNm.push(L); });
+  return out;
+}
+function rosterCheckDlg(){
+  const I = rosterIssues(), g = G();
+  const one = it => `<div class="rc-i"><span><b>${esc(it.name)}</b><small>${esc(it.cls)}</small></span><span dir="ltr">${esc(it.phone || '—')}</span><button class="btn sm" data-act="rcGo" data-cid="${esc(it.cid)}">تعديل</button></div>`;
+  const sec = (t, hint, arr, grp) => `<details class="rc-s" ${arr.length ? 'open' : ''}><summary><b>${t}</b> <span class="tag ${arr.length ? 'warn' : 'ok'}">${arr.length ? AR(arr.length) : '✓ لا يوجد'}</span></summary>${arr.length ? `<p class="hint">${hint}</p>` + (grp ? arr.map(L => `<div class="rc-g">${L.map(one).join('')}</div>`).join('') : arr.map(one).join('')) : ''}</details>`;
+  const n = I.noPh.length + I.badPh.length + I.dupPh.length + I.dupNm.length + I.short.length;
+  openDlg(`<div class="reged-h"><b>🔍 فحص قوائم ${g.students}</b><span class="tag ${n ? 'warn' : 'ok'}">${n ? AR(n) + ' ملاحظة' : 'القوائم سليمة'}</span><button class="modal-x" data-act="dlgclose" aria-label="إغلاق">×</button></div>
+    <div class="dlg-b">
+      ${sec('بلا رقم جوال', 'لا يمكن التواصل مع أولياء أمورهم عبر واتساب.', I.noPh)}
+      ${sec('رقم جوال غير صحيح', 'الرقم الصحيح 10 خانات يبدأ بـ 05.', I.badPh)}
+      ${sec('رقم واحد لعائلات مختلفة', 'نفس الجوال مسجّل لأسماء بعوائل مختلفة، وقد يكون خطأ في الإدخال (الإخوة لنفس العائلة لا يظهرون هنا).', I.dupPh, true)}
+      ${sec('أسماء مكررة', 'نفس الاسم في أكثر من مكان؛ قد يكون تكرارًا في الاستيراد.', I.dupNm, true)}
+      ${sec('أسماء ناقصة أو مقطوعة', 'أقل من ثلاثة أجزاء أو آخره حرف واحد (قد يكون مقطوعًا من نور).', I.short)}
+    </div>
+    <div class="reged-f"><span class="grow"></span><button class="btn" data-act="dlgclose">إغلاق</button></div>`);
+  const m = $('#dlgBg .modal'); if(m) m.classList.add('dlg-wide');
+}
+/* ---------- طباعة أبيض وأسود + تصدير Excel للكشوف ---------- */
+const bwOn = () => lsGet('bw', false) === true;
+function bwApply(){ document.documentElement.classList.toggle('bw', bwOn()); }
+async function exportTablesXlsx(root, name){
+  const X = await loadXlsx().catch(() => null); if(!X){ toast('تعذّر تحميل مكتبة Excel. تأكد من الاتصال.','err'); return; }
+  const tbs = [...(root || document).querySelectorAll('table')].filter(t => t.rows.length > 1 && t.offsetParent !== null);
+  if(!tbs.length){ toast('لا توجد جداول للتصدير','err'); return; }
+  const wb = X.utils.book_new(); wb.Workbook = {Views:[{RTL:true}]};
+  tbs.forEach((t, i) => { const ws = X.utils.table_to_sheet(t, {raw:true}); ws['!cols'] = [...(t.rows[0] ? t.rows[0].cells : [])].map(c => ({wch: Math.max(8, Math.min(40, (c.textContent || '').length + 6))})); X.utils.book_append_sheet(wb, ws, (i + 1) + '-' + (name || 'تقرير').slice(0, 25)); });
+  const out = X.write(wb, {type:'array', bookType:'xlsx'});
+  try{ await state.downloads.save({filename: (name || 'report') + '.xlsx', data: new Blob([out], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}); toast('تم تصدير ملف Excel'); }catch(e){ toast('تعذّر التصدير.','err'); }
+}
 /* ---------- ملخص اليوم للقائد ---------- */
 function daySummaryText(){
   const g = G(), d = parse(state.entryDate), list = classes(); let abs = 0;
@@ -1484,9 +1563,9 @@ function bannerHTML(){
 /* ---------- الواجهة حسب الدور (لكل جهاز) ---------- */
 function ROLES(){ const g = G(); return {
   all:{t:'كل الصلاحيات', v:null, ib:null},
-  dep:{t:g.deputy, v:['entry','follow','actions','counsel','disc','reports','settings'], ib:['dep','act','noc']},
+  dep:{t:g.deputy, v:['today','entry','follow','actions','counsel','disc','reports','settings'], ib:['dep','act','noc']},
   coun:{t:g.f ? 'الموجهة' : 'الموجه', v:['counsel','disc','follow'], ib:['coun']},
-  rec:{t:g.officer, v:['entry','disc','reports'], ib:['noc']}
+  rec:{t:g.officer, v:['today','entry','disc','reports'], ib:['noc']}
 }; }
 const roleGet = () => { const r = lsGet('role'); return ROLES()[r] ? r : 'all'; };
 const roleOK = v => { const R = ROLES()[roleGet()]; return !R.v || R.v.includes(v); };
@@ -1512,9 +1591,10 @@ function render(){
   const sy = $('#sync'); sy.textContent = sb.user ? sbSyncLabel() : (isStandalone() ? 'تطبيق مثبّت · حفظ على الجهاز' : 'حفظ على الجهاز'); sy.className = 'sync' + (state.mode === 'db' ? '' : ' local');
   $('#railNote').innerHTML = adm ? `مسجّل باسم <b dir="ltr">${esc(uName(sb.profile) || sb.user.email || '')}</b><button class="btn" style="margin-top:8px;width:100%" data-act="sbOut">تسجيل الخروج</button>` : railNote();
   $('#banner').innerHTML = adm ? '' : (bannerHTML());
-  roleApply(); navBadges(); inboxRender();
+  roleApply(); navBadges(); inboxRender(); bwApply();
   const d = parse(state.entryDate);
   const head = {
+    today: ['لوحة اليوم', 'مهام اليوم خطوة بخطوة من الرصد حتى التقرير'],
     entry: ['رصد الغياب اليومي', `${dayName(d)} ${AR(dmy(d))} · ${AR(classes().length)} فصلًا · ${arN(totalStudents())} ${G().nStudents}`],
     reports: ['التقارير', 'الإحصائية وسجل الغياب اليومي، جاهزة للطباعة'],
     counsel: ['الإرشاد الطلابي', 'تحويل ' + G().students + ' لوكيل شؤون ' + G().students + ' والموجه الطلابي (نموذج 31)'],
@@ -1527,7 +1607,7 @@ function render(){
   $('#pTitle').textContent = head[0]; $('#pSub').textContent = head[1]; $('#tbTitle').textContent = head[0];
   $('#shell').classList.remove('open');
   const m = $('#main');
-  m.innerHTML = `<div class="view">${({entry:entryView, reports:reportsView, actions:actionsView, counsel:counselView, settings:settingsView, admin:adminView, follow:followView, disc:discView})[state.view]()}</div>`;
+  m.innerHTML = `<div class="view">${({entry:entryView, reports:reportsView, actions:actionsView, counsel:counselView, settings:settingsView, admin:adminView, follow:followView, disc:discView, today:todayView})[state.view]()}</div>`;
   if(state.view === 'entry') updateTally();
 }
 
@@ -3727,7 +3807,7 @@ function reportsView(){
   const r = state.rpt, tab = r.tab || 'home';
   if(tab === 'home') return reportsHome();
   const cur = RCARDS().flatMap(x => x[2]).find(c => c[0] === tab && (tab !== 'lists' || c[1] === state.lst.kind));
-  const tabs = `<div class="rback"><button class="btn" data-rgo="home">→ كل التقارير</button><b>${cur ? cur[2] + ' ' + cur[4] : ''}</b></div>`;
+  const tabs = `<div class="rback"><button class="btn" data-rgo="home">→ كل التقارير</button><b>${cur ? cur[2] + ' ' + cur[4] : ''}</b><span class="grow"></span><label class="chk"><input type="checkbox" id="bwT" ${bwOn() ? 'checked' : ''}> طباعة أبيض وأسود</label>${state.downloads ? `<button class="btn" data-act="xlsT">⬇ Excel</button>` : ''}</div>`;
   if(tab === 'lists') return `<div class="no-print">${tabs}</div>` + listsView();
   if(tab === 'noor') return `<div class="no-print">${tabs}</div>` + noorView();
   if(tab === 'cmp') return `<div class="no-print">${tabs}</div>` + appCmpView();
@@ -4099,6 +4179,7 @@ function rosterPanel(){
     <div class="row-actions" style="margin-top:0">
       <button class="btn primary" data-act="noorPick">${ICON.up} استيراد من نور (PDF)</button>
       <button class="btn" data-act="pasteOpen">لصق أسماء فصل</button>
+      <button class="btn" data-act="rcOpen">🔍 فحص القوائم</button>
       <input type="file" id="noorFile" accept="application/pdf,.pdf" hidden>
     </div>
     ${list.length ? `<div class="chips" style="margin-top:14px">${list.map(c => `<button class="chip ${state.rosCls === c.id ? 'on' : ''}" data-rcls="${esc(c.id)}">${esc(clsLabel(c))} <b style="margin-inline-start:6px">${rosterOf(c.id).length}</b></button>`).join('')}</div>` : ''}
@@ -4567,6 +4648,11 @@ document.addEventListener('click', async e => {
   }
   if(t.dataset.stu){ stuDlg(t.dataset.stu); return; }
   if(t.dataset.go){ state.view = t.dataset.go; render(); return; }
+  if(t.dataset.act === 'tdGo'){ const v = t.dataset.v; if(v === 'late'){ state.view = 'disc'; state.dc.tab = 'late'; } else if(v === 'report'){ state.view = 'reports'; state.rpt.tab = 'stats'; state.rpt.type = 'daily'; state.rpt.date = today; } else if(v === 'follow'){ state.view = 'follow'; state.fl.from = today; state.fl.to = today; } else { if(v === 'entry' && state.entryDate !== today){ state.entryDate = today; loadDraft(); } state.view = v; } render(); window.scrollTo(0, 0); return; }
+  if(t.dataset.act === 'tdBulk'){ const B = bulkSt(); B.src = 'abs'; B.date = today; bulkOpen(); return; }
+  if(t.dataset.act === 'rcOpen'){ rosterCheckDlg(); return; }
+  if(t.dataset.act === 'rcGo'){ state.rosCls = t.dataset.cid; state.rosQ = ''; closeDlg(); state.view = 'settings'; render(); const ed = $('.ros-ed'); if(ed) ed.scrollIntoView({block:'start'}); return; }
+  if(t.dataset.act === 'xlsT'){ const root = $('.main .sheet-wrap') || $('.main .lst-wrap') || $('.main'); const cur = ($('.rback b') || {}).textContent || 'تقرير'; await exportTablesXlsx(root, cur.replace(/[^\u0600-\u06FF\w\s-]/g, '').trim().replace(/\s+/g, '-')); return; }
   if(t.dataset.open){ if(isDirty()){ toast('احفظ غياب اليوم الحالي أولًا أو اضغط «تراجع».','err'); return; } state.entryDate = t.dataset.open; loadDraft(); render(); window.scrollTo(0,0); return; }
   if(t.dataset.rtype){ state.rpt.type = t.dataset.rtype; render(); return; }
   if(t.dataset.fcty){ t.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); flContSync(); return; }
@@ -4933,6 +5019,7 @@ document.addEventListener('change', async e => {
     if(el.id === 'actDays') state.cfg.schoolDays = Math.max(1, +el.value || 180); else state.cfg.actFrom = el.value;
     if(await saveCfg()) toast('تم الحفظ'); render(); return;
   }
+  if(el.id === 'bwT'){ lsSet('bw', el.checked); bwApply(); toast(el.checked ? 'ستُطبع التقارير بالأبيض والأسود' : 'ستُطبع التقارير بالألوان'); return; }
   if(el.id === 'bkDate' || el.id === 'bkCls' || el.id === 'bkAct'){ const B = bulkSt(); if(el.id === 'bkDate') B.date = el.value; if(el.id === 'bkCls') B.cid = el.value; if(el.id === 'bkAct') B.act = el.value; bulkRefresh(); return; }
   if(el.id === 'tFile'){ const f = el.files && el.files[0]; el.value = ''; if(f) importTeachersPdf(f); return; }
   if(el.id === 'noorFile'){ const f = el.files && el.files[0]; el.value = ''; if(f) noorImport(f); return; }
